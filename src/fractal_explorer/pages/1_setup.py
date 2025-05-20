@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import streamlit as st
 
 from fractal_explorer.setup_utils import plate_mode_setup
-from fractal_explorer.utils import Scope
+from fractal_explorer.utils import Scope, invalidate_session_state
 
 
 def init_global_state():
@@ -72,13 +72,6 @@ def setup_global_state():
     return dashboard_mode
 
 
-def invalidate_filters():
-    for key in st.session_state.keys():
-        _key = str(key)
-        if _key.startswith(Scope.FILTERS.value):
-            del st.session_state[key]
-
-
 def main():
     st.set_page_config(
         layout="wide",
@@ -124,15 +117,17 @@ def main():
         old_schema = st.session_state[f"{Scope.GLOBAL}:feature_table_schema"]
         if old_table_name != table_name:
             # invalidate the old table
-            print(
-                f"Invalidating because table name changed from {old_table_name} to {table_name}"
+            st.info(
+                "The feature table name has changed. Please reapply the filters."
             )
-            invalidate_filters()
+            invalidate_session_state(f"{Scope.FILTERS}")
 
         if old_schema != schema:
             # invalidate the old table
-            print(f"Invalidating because schema changed from {old_schema} to {schema}")
-            invalidate_filters()
+            st.info(
+                "The schema of the feature table has changed. Please reapply the filters."
+            )
+            invalidate_session_state(f"{Scope.FILTERS}")
 
     st.session_state[f"{Scope.GLOBAL}:feature_table"] = features_table
     st.session_state[f"{Scope.GLOBAL}:feature_table_name"] = table_name

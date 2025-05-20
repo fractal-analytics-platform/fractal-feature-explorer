@@ -119,7 +119,7 @@ def feature_explore_setup(feature_table: pl.LazyFrame, table_name: str) -> Featu
     )
     feature_frame = build_feature_frame(feature_table)
     feature_frame = apply_filters(feature_frame)
-
+    
     col1, col2 = st.columns(2)
     with col1:
         add_plot()

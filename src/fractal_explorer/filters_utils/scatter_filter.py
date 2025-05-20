@@ -154,7 +154,6 @@ def scatter_filter_component(
     Create a scatter filter for the feature frame
     And return the filtered feature frame
     """
-
     col1, col2 = st.columns(2)
     features_columns = feature_frame.features
     with col1:
@@ -265,6 +264,7 @@ def scatter_filter_component(
                     sel_y=selection.get("lasso", [])[0].get("y", []),
                 )
                 st.session_state[f"{key}:state"] = scatter_state.model_dump_json()
+                st.rerun()
             else:
                 if f"{key}:state" in st.session_state:
                     del st.session_state[f"{key}:state"]

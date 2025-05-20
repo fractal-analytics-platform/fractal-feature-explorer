@@ -1,4 +1,4 @@
-from fractal_explorer.utils.common import GlobalConfigs, Scope
+from fractal_explorer.utils.common import GlobalConfigs, Scope, invalidate_session_state
 from fractal_explorer.utils.st_components import (
     double_slider_component,
     multiselect_component,
@@ -17,4 +17,5 @@ __all__ = [
     "number_input_component",
     "Scope",
     "GlobalConfigs",
+    "invalidate_session_state",
 ]

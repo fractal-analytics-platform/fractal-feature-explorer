@@ -20,8 +20,14 @@ class ColumnsFilter(BaseModel):
         """
         Filter the feature frame using the columns filter
         """
+        all_columns = set(
+            self.features
+            + self.cathegorical
+            + self.others
+            + feature_frame.protected
+        )
         filtered_table = feature_frame.table.select(
-            self.features + self.cathegorical + self.others
+            all_columns,
         )
         return FeatureFrame(
             table=filtered_table,

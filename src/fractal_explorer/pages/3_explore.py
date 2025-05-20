@@ -32,7 +32,6 @@ def main():
         ### Feature Table: {feature_table_name}
         """
     )
-
     feature_explore_setup(feature_table=feature_table, table_name=feature_table_name)
 
 

@@ -14,7 +14,7 @@ from fractal_explorer.filters_utils.scatter_filter import (
     ScatterFilter,
     scatter_filter_component,
 )
-from fractal_explorer.utils import Scope
+from fractal_explorer.utils import Scope, invalidate_session_state
 from fractal_explorer.utils.st_components import (
     selectbox_component,
 )
@@ -122,7 +122,11 @@ def display_filters(feature_frame: FeatureFrame) -> FeatureFrame:
     filter_list = st.session_state[f"{Scope.FILTERS}:filters_dict"]
 
     for name, (filter_key, filter_component) in filter_list.items():
-        with st.expander(f"{name}", expanded=False):
+        if "Columns Filter" in name:
+            expanded = False
+        else:
+            expanded = True
+        with st.expander(f"{name}", expanded=expanded):
             st.markdown(
                 f"""
                 ### {name}
@@ -132,6 +136,19 @@ def display_filters(feature_frame: FeatureFrame) -> FeatureFrame:
                 key=filter_key,
                 feature_frame=feature_frame,
             )
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Reset Filter", key=f"{filter_key}:reset_filter_button", icon="🔄"):
+                    invalidate_session_state(filter_key)
+                    st.rerun()
+            with col2:
+                if "Columns Filter" in name:
+                    continue
+                if st.button("Delete Filter", key=f"{filter_key}:delete_filter_button", icon="🚮"):
+                    invalidate_session_state(filter_key)
+                    del filter_list[name]
+                    st.session_state[f"{Scope.FILTERS}:filters_dict"] = filter_list
+                    st.rerun()
 
     return feature_frame
 
@@ -143,9 +160,7 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
     if f"{Scope.FILTERS}:filters_dict" not in st.session_state:
         return feature_frame
     filters_dict = st.session_state[f"{Scope.FILTERS}:filters_dict"]
-    for key in st.session_state.keys():
-        _key = str(key)
-
+    
     for name, (filter_key, filter_component) in filters_dict.items():
         status_key = f"{filter_key}:state"
         type_key = f"{filter_key}:type"
@@ -179,26 +194,6 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
     return feature_frame
 
 
-def delete_filters() -> None:
-    """
-    Delete the filters in the feature table
-    """
-    filter_list = st.session_state[f"{Scope.FILTERS}:filters_dict"]
-    if len(filter_list) == 0:
-        return None
-    filter_to_delete = selectbox_component(
-        key=f"{Scope.FILTERS}:delete_filter",
-        label="Select filter to delete",
-        options=filter_list.keys(),
-        help="Select the filter to delete.",
-    )
-    if st.button("Delete Filter", key=f"{Scope.FILTERS}:delete_filter_button"):
-        del filter_list[filter_to_delete]
-        st.session_state[f"{Scope.FILTERS}:filters_dict"] = filter_list
-        st.rerun()
-    return None
-
-
 def feature_filters_setup(feature_table: pl.LazyFrame, table_name: str) -> FeatureFrame:
     """
     Setup the feature table for the dashboard.
@@ -213,11 +208,9 @@ def feature_filters_setup(feature_table: pl.LazyFrame, table_name: str) -> Featu
     )
     feature_frame = build_feature_frame(feature_table)
 
-    col1, col2 = st.columns(2)
+    col1, _ = st.columns(2)
     with col1:
         add_filters()
-    with col2:
-        delete_filters()
 
     feature_frame = display_filters(feature_frame)
     return feature_frame
