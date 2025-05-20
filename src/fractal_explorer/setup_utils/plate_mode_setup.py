@@ -833,11 +833,7 @@ def plate_mode_setup():
     """Setup the plate mode for the dashboard."""
 
     urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
-
-    if st.toggle("Authorization Token", value=False):
-        token = st.text_input("Token", type="password")
-    else:
-        token = None
+    token = st.session_state.get(f"{Scope.GLOBAL}:token", None)
 
     if f"{Scope.SETUP}:plate_setup:urls" not in st.session_state:
         st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = set()
