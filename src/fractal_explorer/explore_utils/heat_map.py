@@ -2,16 +2,14 @@ import copy
 
 import numpy as np
 import plotly.express as px
+import polars as pl
 import streamlit as st
 
 from fractal_explorer.filters_utils.common import FeatureFrame
-
+from fractal_explorer.filters_utils.scatter_filter import view_point
 from fractal_explorer.utils.st_components import (
     selectbox_component,
 )
-from fractal_explorer.filters_utils.scatter_filter import view_point
-import polars as pl
-import copy
 
 
 def heat_map_component(

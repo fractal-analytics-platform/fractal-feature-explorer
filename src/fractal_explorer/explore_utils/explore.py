@@ -1,14 +1,11 @@
 import polars as pl
 import streamlit as st
 
-from fractal_explorer.filters_utils.common import FeatureFrame
-from fractal_explorer.utils import Scope
-from fractal_explorer.utils.st_components import (
-    selectbox_component,
-)
-from fractal_explorer.filters_utils import apply_filters, build_feature_frame
-from fractal_explorer.explore_utils.scatter_plot import scatter_plot_component
 from fractal_explorer.explore_utils.heat_map import heat_map_component
+from fractal_explorer.explore_utils.scatter_plot import scatter_plot_component
+from fractal_explorer.filters_utils import apply_filters, build_feature_frame
+from fractal_explorer.filters_utils.common import FeatureFrame
+from fractal_explorer.utils import Scope, invalidate_session_state
 
 
 def _find_unique_name(keys: list[str], prefix: str) -> str:
@@ -82,28 +79,21 @@ def display_plots(feature_frame: FeatureFrame) -> FeatureFrame:
             key=plot_key,
             feature_frame=feature_frame,
         )
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Reset Plot", key=f"{plot_key}:reset_plot_button", icon="🔄"):
+                invalidate_session_state(plot_key)
+                st.rerun()
+        with col2:
+            if st.button(
+                "Delete Plot", key=f"{plot_key}:delete_plot_button", icon="🚮"
+            ):
+                invalidate_session_state(plot_key)
+                del plot_list[name]
+                st.session_state[f"{Scope.EXPLORE}:plots_dict"] = plot_list
+                st.rerun()
 
     return feature_frame
-
-
-def delete_plot() -> None:
-    """
-    Delete the filters in the feature table
-    """
-    plot_list = st.session_state[f"{Scope.EXPLORE}:plots_dict"]
-    if len(plot_list) == 0:
-        return None
-    plot_to_delete = selectbox_component(
-        key=f"{Scope.EXPLORE}:delete_plot",
-        label="Select plot to delete",
-        options=plot_list.keys(),
-        help="Select the plot to delete.",
-    )
-    if st.button("Delete Plot", key=f"{Scope.EXPLORE}:delete_plot_button"):
-        del plot_list[plot_to_delete]
-        st.session_state[f"{Scope.EXPLORE}:plots_dict"] = plot_list
-        st.rerun()
-    return None
 
 
 def feature_explore_setup(feature_table: pl.LazyFrame, table_name: str) -> FeatureFrame:
@@ -119,12 +109,10 @@ def feature_explore_setup(feature_table: pl.LazyFrame, table_name: str) -> Featu
     )
     feature_frame = build_feature_frame(feature_table)
     feature_frame = apply_filters(feature_frame)
-    
-    col1, col2 = st.columns(2)
+
+    col1, _ = st.columns(2)
     with col1:
         add_plot()
-    with col2:
-        delete_plot()
 
     feature_frame = display_plots(feature_frame)
     return feature_frame

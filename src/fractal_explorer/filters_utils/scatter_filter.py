@@ -2,6 +2,7 @@ import copy
 
 import numpy as np
 import plotly.graph_objects as go
+import polars as pl
 import streamlit as st
 from matplotlib.path import Path
 from pydantic import BaseModel, Field
@@ -15,8 +16,6 @@ from fractal_explorer.utils.st_components import (
     selectbox_component,
     single_slider_component,
 )
-
-import polars as pl
 
 
 @st.dialog("Cell Preview")

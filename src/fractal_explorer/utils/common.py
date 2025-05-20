@@ -37,8 +37,7 @@ class GlobalConfigs(BaseModel):
             ),
             zarr_urls=st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", []),
         )
-        
-        
+
 
 def invalidate_session_state(key_prefix: str) -> None:
     """

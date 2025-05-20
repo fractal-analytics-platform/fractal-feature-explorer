@@ -15,9 +15,6 @@ from fractal_explorer.filters_utils.scatter_filter import (
     scatter_filter_component,
 )
 from fractal_explorer.utils import Scope, invalidate_session_state
-from fractal_explorer.utils.st_components import (
-    selectbox_component,
-)
 
 
 def build_feature_frame(feature_table: pl.LazyFrame) -> FeatureFrame:
@@ -138,13 +135,17 @@ def display_filters(feature_frame: FeatureFrame) -> FeatureFrame:
             )
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("Reset Filter", key=f"{filter_key}:reset_filter_button", icon="🔄"):
+                if st.button(
+                    "Reset Filter", key=f"{filter_key}:reset_filter_button", icon="🔄"
+                ):
                     invalidate_session_state(filter_key)
                     st.rerun()
             with col2:
                 if "Columns Filter" in name:
                     continue
-                if st.button("Delete Filter", key=f"{filter_key}:delete_filter_button", icon="🚮"):
+                if st.button(
+                    "Delete Filter", key=f"{filter_key}:delete_filter_button", icon="🚮"
+                ):
                     invalidate_session_state(filter_key)
                     del filter_list[name]
                     st.session_state[f"{Scope.FILTERS}:filters_dict"] = filter_list
@@ -160,7 +161,7 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
     if f"{Scope.FILTERS}:filters_dict" not in st.session_state:
         return feature_frame
     filters_dict = st.session_state[f"{Scope.FILTERS}:filters_dict"]
-    
+
     for name, (filter_key, filter_component) in filters_dict.items():
         status_key = f"{filter_key}:state"
         type_key = f"{filter_key}:type"

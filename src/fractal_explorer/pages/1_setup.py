@@ -117,9 +117,7 @@ def main():
         old_schema = st.session_state[f"{Scope.GLOBAL}:feature_table_schema"]
         if old_table_name != table_name:
             # invalidate the old table
-            st.info(
-                "The feature table name has changed. Please reapply the filters."
-            )
+            st.info("The feature table name has changed. Please reapply the filters.")
             invalidate_session_state(f"{Scope.FILTERS}")
 
         if old_schema != schema:

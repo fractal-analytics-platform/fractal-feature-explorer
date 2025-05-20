@@ -1,7 +1,7 @@
 import streamlit as st
 
-from fractal_explorer.utils import Scope
 from fractal_explorer.explore_utils import feature_explore_setup
+from fractal_explorer.utils import Scope
 
 
 def main():
