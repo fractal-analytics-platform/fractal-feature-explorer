@@ -16,17 +16,17 @@ from fractal_explorer.utils.st_components import (
     single_slider_component,
 )
 
+import polars as pl
+
 
 @st.dialog("Cell Preview")
-def view_point(point: int, feature_frame: FeatureFrame) -> None:
+def view_point(point: int, feature_df: pl.DataFrame) -> None:
     """
     View the point in the data frame
     """
-    point_dict = (
-        feature_frame.table.select("image_url", "label", "reference_label")
-        .collect()
-        .to_dicts()[point]
-    )
+    point_dict = feature_df.select("image_url", "label", "reference_label").to_dicts()[
+        point
+    ]
     container = get_ome_zarr_container(
         point_dict["image_url"],
         token=st.session_state.get("token"),
@@ -171,31 +171,43 @@ def scatter_filter_component(
             label="Select **Y-axis**",
             options=_features_columns,
         )
+
     with col2:
         feature_lf = feature_frame.table
-        x_series = feature_lf.select(x_column).collect()[x_column].to_numpy()
-        y_series = feature_lf.select(y_column).collect()[y_column].to_numpy()
+        feature_df = feature_lf.select(
+            x_column, y_column, "image_url", "label", "reference_label"
+        ).collect()
 
-        if x_series.shape[0] > 50000:
-            default = 50000 / x_series.shape[0]
-        else:
-            default = 1.0
-        perc_samples = single_slider_component(
-            key=f"{key}:scatter_filter_num_samples",
-            label="Percentage of samples to display",
-            min_value=0,
-            max_value=1,
-            default=default,
-            help="Number of samples to display in the scatter plot.",
+        do_sampling = st.toggle(
+            key=f"{key}:scatter_filter_sampling",
+            label="Do sampling",
+            value=True,
+            help="If the number of points is too high, we will sample the points to display",
         )
-        st.write("Number of points to display: ", int(perc_samples * x_series.shape[0]))
+        if do_sampling:
+            if feature_df.height > 50000:
+                default = 50000 / feature_df.height
+            else:
+                default = 1.0
+            perc_samples = single_slider_component(
+                key=f"{key}:scatter_filter_num_samples",
+                label="Percentage of samples to display",
+                min_value=0,
+                max_value=1,
+                default=default,
+                help="Number of samples to display in the scatter plot.",
+            )
+            st.write(
+                "Number of points to display: ", int(perc_samples * feature_df.height)
+            )
+        else:
+            perc_samples = 1.0
+            st.write("Number of points to display: ", feature_df.height)
 
-    np.random.seed(0)
-    samples = np.random.randint(
-        0, x_series.shape[0], size=int(perc_samples * x_series.shape[0])
-    )
-    x_series = x_series[samples]
-    y_series = y_series[samples]
+    if do_sampling:
+        feature_df = feature_df.sample(n=int(feature_df.height * perc_samples), seed=0)
+    x_series = feature_df[x_column]
+    y_series = feature_df[y_column]
 
     if st.session_state.get(f"{key}:scatter_selected_points", None) is not None:
         selected_points = st.session_state[f"{key}:scatter_selected_points"]
@@ -261,7 +273,7 @@ def scatter_filter_component(
         elif is_click_selection:
             view_point(
                 point=selection.get("point_indices", [])[0],
-                feature_frame=feature_frame,
+                feature_df=feature_df,
             )
 
     st.session_state[f"{key}:type"] = "scatter"

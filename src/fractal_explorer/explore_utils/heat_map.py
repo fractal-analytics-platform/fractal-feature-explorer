@@ -13,6 +13,7 @@ from fractal_explorer.filters_utils.scatter_filter import view_point
 import polars as pl
 import copy
 
+
 def heat_map_component(
     key: str,
     feature_frame: FeatureFrame,
@@ -23,32 +24,32 @@ def heat_map_component(
         label="Select **X-axis**",
         options=features_columns,
     )
-    
+
     cathegorical_columns = copy.deepcopy(feature_frame.cathegorical)
-    
+
     if "row" in cathegorical_columns:
         cathegorical_columns.remove("row")
         cathegorical_columns = ["row"] + cathegorical_columns
-        
+
     x_axis = selectbox_component(
         key=f"{key}:scatter_plot_x_axis",
         label="Select **X-axis**",
         options=cathegorical_columns,
     )
-    
+
     x_axis_index = feature_frame.cathegorical.index(x_axis)
     cathegorical_columns.pop(x_axis_index)
-    
+
     if "column" in cathegorical_columns:
         cathegorical_columns.remove("column")
         cathegorical_columns = ["column"] + cathegorical_columns
-    
+
     y_axis = selectbox_component(
         key=f"{key}:scatter_plot_y_axis",
         label="Select **Y-axis**",
         options=cathegorical_columns,
     )
-    
+
     aggregation = st.pills(
         label="Aggregation",
         options=["Mean", "Sum", "Median", "Counts"],

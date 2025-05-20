@@ -1,6 +1,5 @@
 import copy
 
-import numpy as np
 import plotly.express as px
 import streamlit as st
 
@@ -22,7 +21,6 @@ def scatter_plot_component(
     And return the filtered feature frame
     """
 
-    
     features_columns = feature_frame.features
     x_column = selectbox_component(
         key=f"{key}:scatter_plot_x_column",
@@ -37,15 +35,15 @@ def scatter_plot_component(
         label="Select **Y-axis**",
         options=_features_columns,
     )
-    columns_neeed = [x_column, y_column]
-    
+    columns_needed = [x_column, y_column, "image_url", "label", "reference_label"]
+
     with st.expander("Advanced Options", expanded=False):
-        
         do_sampling = st.toggle(
             key=f"{key}:scatter_plot_advanced_options",
             label="Randomly sample points",
-            value=True)
-        
+            value=True,
+        )
+
         if do_sampling:
             perc_samples = single_slider_component(
                 key=f"{key}:scatter_plot_num_samples",
@@ -57,19 +55,21 @@ def scatter_plot_component(
             )
         else:
             perc_samples = 1.0
-            
-    
+
         # color
         color_column = selectbox_component(
             key=f"{key}:scatter_plot_color_column",
             label="Select **Color**",
-            options=["--No Color--"] + feature_frame.cathegorical + feature_frame.protected + feature_frame.features,
+            options=["--No Color--"]
+            + feature_frame.cathegorical
+            + feature_frame.protected
+            + feature_frame.features,
         )
         if color_column != "--No Color--":
-            columns_neeed.append(color_column)
+            columns_needed.append(color_column)
         else:
             color_column = None
-            
+
         # size
         size_column = selectbox_component(
             key=f"{key}:scatter_plot_size_column",
@@ -77,10 +77,10 @@ def scatter_plot_component(
             options=["--No Size--"] + feature_frame.features,
         )
         if size_column != "--No Size--":
-            columns_neeed.append(size_column)
+            columns_needed.append(size_column)
         else:
             size_column = None
-            
+
         # marginal x
         marginal_x = selectbox_component(
             key=f"{key}:scatter_plot_marginal_x",
@@ -89,7 +89,7 @@ def scatter_plot_component(
         )
         if marginal_x == "--No Marginal--":
             marginal_x = None
-        
+
         # marginal y
         marginal_y = selectbox_component(
             key=f"{key}:scatter_plot_marginal_y",
@@ -100,9 +100,11 @@ def scatter_plot_component(
             marginal_y = None
 
     feature_lf = feature_frame.table
-    feature_df = feature_lf.select(columns_neeed).collect()
+    feature_df = feature_lf.select(columns_needed).collect()
     if do_sampling:
-        feature_df = feature_df.sample(n=int(perc_samples * feature_df.shape[0]), seed=0)
+        feature_df = feature_df.sample(
+            n=int(perc_samples * feature_df.shape[0]), seed=0
+        )
 
     fig = px.scatter(
         data_frame=feature_df,
@@ -120,9 +122,11 @@ def scatter_plot_component(
         is_event_selection = (
             len(selection.get("box", [])) > 0 or len(selection.get("lasso", [])) > 0
         )
-        is_click_selection = not is_event_selection and len(selection.get("point_indices", [])) > 0
+        is_click_selection = (
+            not is_event_selection and len(selection.get("point_indices", [])) > 0
+        )
         if is_click_selection:
             view_point(
                 point=selection.get("point_indices", [])[0],
-                feature_frame=feature_frame,
+                feature_df=feature_df,
             )

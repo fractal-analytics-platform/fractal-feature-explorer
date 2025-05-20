@@ -1,5 +1,4 @@
 import io
-from functools import partial
 
 import polars as pl
 import streamlit as st
