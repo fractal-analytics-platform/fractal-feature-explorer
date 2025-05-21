@@ -777,14 +777,15 @@ def load_feature_table(
     if selected_table is None:
         st.stop()
 
-    if mode == "image":
-        return load_images_feature_table(
+    with st.spinner("Loading feature table...", show_time=True):
+        if mode == "image":
+            return load_images_feature_table(
+                plate_setup_df, selected_table, token=token
+            ), selected_table
+
+        return load_plate_feature_table(
             plate_setup_df, selected_table, token=token
         ), selected_table
-
-    return load_plate_feature_table(
-        plate_setup_df, selected_table, token=token
-    ), selected_table
 
 
 def feature_table_setup(
@@ -860,10 +861,11 @@ def plate_mode_setup():
         if plate_setup_df.is_empty():
             st.warning("No images selected.")
             st.stop()
-
+        
         st.markdown("## Condition Tables")
-        plate_setup_df = join_condition_tables(plate_setup_df, token=token)
-        plate_setup_df = filter_based_on_condition(plate_setup_df)
+        with st.spinner("Loading condition tables...", show_time=True):
+            plate_setup_df = join_condition_tables(plate_setup_df, token=token)
+            plate_setup_df = filter_based_on_condition(plate_setup_df)
 
         if plate_setup_df.is_empty():
             st.warning("No images selected.")
@@ -873,7 +875,8 @@ def plate_mode_setup():
         images_setup = into_images_df(plate_setup_df)
         show_selected_images_widget(images_setup)
 
-    st.markdown("## Feature Table Selection")
+
     feature_table, table_name = feature_table_setup(images_setup, token=token)
+    st.markdown("## Feature Table Selection")
     features_infos(feature_table, table_name)
     return feature_table.lazy(), table_name
