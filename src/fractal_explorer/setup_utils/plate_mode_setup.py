@@ -433,7 +433,7 @@ def _join_plate_condition_table(
     token=None,
 ) -> pl.DataFrame:
     """Load the condition table from the plate URLs."""
-    plate_urls = plate_setup_df["plate_url"].unique().to_list()
+    plate_urls = plate_setup_df["plate_url"].unique().sort().to_list()
     condition_df = _load_plates_condition_table(plate_urls, table_name, token=token)
     if condition_df is None:
         return plate_setup_df
@@ -447,7 +447,7 @@ def _join_image_condition_table(
     token=None,
 ) -> pl.DataFrame:
     """Load the condition table from the image URLs."""
-    images_urls = plate_setup_df["image_url"].unique().to_list()
+    images_urls = plate_setup_df["image_url"].unique().sort().to_list()
     condition_df = _load_images_condition_table(images_urls, table_name, token=token)
     return _join_setup_condition_table(plate_setup_df, condition_df)
 
@@ -689,6 +689,7 @@ def _load_images_feature_table(
     token=None,
 ) -> pl.DataFrame:
     """Load the feature table from the image URLs."""
+    print("Loading images feature table")
     images = [
         get_ome_zarr_container(url, token=token, mode="plate") for url in list_urls
     ]
@@ -720,7 +721,7 @@ def load_images_feature_table(
     token=None,
 ) -> pl.DataFrame:
     """Load the feature table from the image URLs."""
-    images_urls = plate_setup_df["image_url"].unique().to_list()
+    images_urls = plate_setup_df["image_url"].unique().sort().to_list()
     feature_table = _load_images_feature_table(images_urls, table_name, token=token)
     return feature_table
 
@@ -731,7 +732,7 @@ def load_plate_feature_table(
     token=None,
 ) -> pl.DataFrame:
     """Load the feature table from the plate URLs."""
-    plate_urls = plate_setup_df["plate_url"].unique().to_list()
+    plate_urls = plate_setup_df["plate_url"].unique().sort().to_list()
     feature_table = _load_plates_feature_table(plate_urls, table_name, token=token)
     return feature_table
 
