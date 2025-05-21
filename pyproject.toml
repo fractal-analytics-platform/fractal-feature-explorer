@@ -1,6 +1,6 @@
 [project]
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
-dependencies = ["streamlit", "plotly", "numpy", "matplotlib"]
+dependencies = ["streamlit", "plotly", "numpy", "matplotlib", "orjson"]
 name = "fractal-explorer"
 requires-python = ">= 3.11"
 version = "0.1.0"
@@ -29,4 +29,4 @@ dev = { features = ["dev"], solve-group = "dev" }
 explorer = { cmd = "streamlit run src/fractal_explorer/main.py" }
 explorer_local = { cmd = "streamlit run src/fractal_explorer/main.py -- --zarr-urls /Users/locerr/data/20200812-CardiomyocyteDifferentiation14-Cycle1_mip_parquet.zarr" }
 explorer_synt = { cmd = "streamlit run src/fractal_explorer/main.py -- --zarr-urls ./data/plate_0.zarr ./data/plate_2.zarr ./data/plate_1.zarr " }
-explorer_http = { cmd = "streamlit run src/fractal_explorer/main.py -- --zarr-urls http://localhost:8000/" }
+explorer_http = { cmd = "streamlit run src/fractal_explorer/main.py -- --zarr-urls http://localhost:8001/" }

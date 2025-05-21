@@ -34,7 +34,7 @@ def scatter_plot_component(
         label="Select **Y-axis**",
         options=_features_columns,
     )
-    columns_needed = [x_column, y_column, "image_url", "label", "reference_label"]
+    columns_needed = {x_column, y_column, "image_url", "label", "reference_label"}
 
     with st.expander("Advanced Options", expanded=False):
         do_sampling = st.toggle(
@@ -56,27 +56,40 @@ def scatter_plot_component(
             perc_samples = 1.0
 
         # color
+        possible_color_columns = (
+            ["--No Color--"]
+            + feature_frame.cathegorical
+            + feature_frame.protected
+            + feature_frame.features
+        )
+        possible_color_columns = copy.deepcopy(possible_color_columns)
+        for col in columns_needed:
+            if col in possible_color_columns:
+                possible_color_columns.remove(col)
         color_column = selectbox_component(
             key=f"{key}:scatter_plot_color_column",
             label="Select **Color**",
-            options=["--No Color--"]
-            + feature_frame.cathegorical
-            + feature_frame.protected
-            + feature_frame.features,
+            options=possible_color_columns,
+            help="Select the column to color the points by.",
         )
         if color_column != "--No Color--":
-            columns_needed.append(color_column)
+            columns_needed.add(color_column)
         else:
             color_column = None
 
         # size
+        possible_size_columns = ["--No Size--"] + feature_frame.features
+        possible_size_columns = copy.deepcopy(possible_size_columns)
+        for col in columns_needed:
+            if col in possible_size_columns:
+                possible_size_columns.remove(col)
         size_column = selectbox_component(
             key=f"{key}:scatter_plot_size_column",
             label="Select **Size**",
-            options=["--No Size--"] + feature_frame.features,
+            options=possible_size_columns,
         )
         if size_column != "--No Size--":
-            columns_needed.append(size_column)
+            columns_needed.add(size_column)
         else:
             size_column = None
 
@@ -114,6 +127,8 @@ def scatter_plot_component(
         marginal_x=marginal_x,
         marginal_y=marginal_y,
     )
+    fig.update_xaxes(showgrid=True) # type: ignore
+    fig.update_yaxes(showgrid=True) # type: ignore
 
     event = st.plotly_chart(fig, key=f"{key}:scatter_plot", on_select="rerun")
     selection = event.get("selection")

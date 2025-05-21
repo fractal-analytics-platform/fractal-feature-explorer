@@ -7,3 +7,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# notebooks
+.ipynb_checkpoints
+*.ipynb

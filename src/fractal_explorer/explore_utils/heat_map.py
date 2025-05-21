@@ -1,12 +1,9 @@
 import copy
 
-import numpy as np
 import plotly.express as px
-import polars as pl
 import streamlit as st
 
 from fractal_explorer.filters_utils.common import FeatureFrame
-from fractal_explorer.filters_utils.scatter_filter import view_point
 from fractal_explorer.utils.st_components import (
     selectbox_component,
 )
@@ -17,7 +14,7 @@ def heat_map_component(
     feature_frame: FeatureFrame,
 ) -> None:
     features_columns = feature_frame.features
-    column = selectbox_component(
+    selected_feature = selectbox_component(
         key=f"{key}:scatter_plot_x_column",
         label="Select **X-axis**",
         options=features_columns,
@@ -56,9 +53,10 @@ def heat_map_component(
         selection_mode="single",
         help="Select the type of aggregation to apply.",
     )
-    columns_neeed = [column, x_axis, y_axis]
-    feature_df = feature_frame.table.select(columns_neeed).collect()
+    columns_needed = {selected_feature, x_axis, y_axis}
+    feature_df = feature_frame.table.select(columns_needed).collect()
     feature_df = feature_df.to_pandas()
+
     df_piv = feature_df.groupby([x_axis, y_axis], as_index=False)
     if aggregation == "Mean":
         df_piv = df_piv.mean(numeric_only=True)
@@ -71,6 +69,20 @@ def heat_map_component(
     else:
         st.stop()
 
-    df_piv = df_piv.pivot(index=x_axis, columns=y_axis, values=column)
-    fig = px.imshow(df_piv)
+    new_feature_name = f"{selected_feature} {aggregation}"
+    df_piv = df_piv.rename(columns={selected_feature: new_feature_name})
+    df_piv = df_piv.pivot(index=x_axis, columns=y_axis, values=new_feature_name)
+    img = df_piv.to_numpy()
+    fig = px.imshow(
+        img,
+        x=df_piv.columns.to_list(),
+        y=df_piv.index.to_list(),
+        labels={"x": x_axis, "y": y_axis, "color": new_feature_name},
+    )
+    fig.update_xaxes( # type: ignore
+        type="category", showgrid=True, title=x_axis, tickson="boundaries", ticklen=0
+    )
+    fig.update_yaxes( # type: ignore
+        type="category", showgrid=True, title=y_axis, tickson="boundaries", ticklen=0
+    )
     st.plotly_chart(fig)
