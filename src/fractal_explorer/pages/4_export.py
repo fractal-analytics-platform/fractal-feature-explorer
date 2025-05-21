@@ -17,6 +17,7 @@ def table_to_csv_buffer(table: pl.LazyFrame) -> io.BytesIO:
     buffer.seek(0)
     return buffer
 
+
 def table_to_parquet_buffer(table: pl.LazyFrame) -> io.BytesIO:
     """
     Convert a Polars DataFrame to a Parquet buffer.
@@ -26,6 +27,7 @@ def table_to_parquet_buffer(table: pl.LazyFrame) -> io.BytesIO:
     _table.write_parquet(buffer)
     buffer.seek(0)
     return buffer
+
 
 def main():
     st.set_page_config(
@@ -49,8 +51,6 @@ def main():
             "No feature table found in session state. Please make sure to run the setup page first."
         )
         st.stop()
-        
-        
 
     export_format = st.pills(
         label="Select Export Format",
@@ -58,11 +58,9 @@ def main():
         default=None,
         help="Select the format to export the Table.",
     )
-    
+
     if export_format is None:
-        st.warning(
-            "Please select an export format to download the filtered data."
-        )
+        st.warning("Please select an export format to download the filtered data.")
         st.stop()
 
     if st.toggle(
@@ -75,7 +73,6 @@ def main():
         )
         feature_table = apply_filters(feature_frame=feature_frame).table
 
-    
     if export_format == "CSV":
         file = table_to_csv_buffer(feature_table)
         st.download_button(
@@ -84,7 +81,7 @@ def main():
             file_name=f"{feature_table_name}_filtered.csv",
             mime="text/csv",
             on_click="ignore",
-            icon="📥"
+            icon="📥",
         )
     elif export_format == "Parquet":
         file = table_to_parquet_buffer(feature_table)
@@ -94,7 +91,7 @@ def main():
             file_name=f"{feature_table_name}_filtered.parquet",
             mime="application/octet-stream",
             on_click="ignore",
-            icon="📥"
+            icon="📥",
         )
 
 

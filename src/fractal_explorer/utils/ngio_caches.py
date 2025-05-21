@@ -18,7 +18,8 @@ from ngio.utils import fractal_fsspec_store
 
 @st.cache_resource
 def get_ome_zarr_plate(url: str, token: str | None = None) -> OmeZarrPlate:
-    if token:
+    is_http = url.startswith("http://") or url.startswith("https://")
+    if token is not None and is_http:
         store = fractal_fsspec_store(url, fractal_token=token)
     else:
         store = url
@@ -27,7 +28,8 @@ def get_ome_zarr_plate(url: str, token: str | None = None) -> OmeZarrPlate:
 
 
 def _get_ome_zarr_container(url: str, token: str | None = None) -> OmeZarrContainer:
-    if token:
+    is_http = url.startswith("http://") or url.startswith("https://")
+    if token is not None and is_http:
         store = fractal_fsspec_store(url, fractal_token=token)
     else:
         store = url

@@ -109,7 +109,7 @@ def plate_name_selection(
             plates[plate_url] = plate_name
     else:
         st.warning(
-            "The plate URLs are not unique. The url is used to identify the plate."
+            "The plate names are not unique. The url is used to identify the plate."
         )
         for plate_url in plate_urls:
             plates[plate_url] = plate_url
@@ -861,7 +861,7 @@ def plate_mode_setup():
         if plate_setup_df.is_empty():
             st.warning("No images selected.")
             st.stop()
-        
+
         st.markdown("## Condition Tables")
         with st.spinner("Loading condition tables...", show_time=True):
             plate_setup_df = join_condition_tables(plate_setup_df, token=token)
@@ -874,7 +874,6 @@ def plate_mode_setup():
         st.markdown("## Final Images Selection")
         images_setup = into_images_df(plate_setup_df)
         show_selected_images_widget(images_setup)
-
 
     feature_table, table_name = feature_table_setup(images_setup, token=token)
     st.markdown("## Feature Table Selection")

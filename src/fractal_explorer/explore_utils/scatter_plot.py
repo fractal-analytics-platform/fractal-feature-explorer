@@ -127,8 +127,8 @@ def scatter_plot_component(
         marginal_x=marginal_x,
         marginal_y=marginal_y,
     )
-    fig.update_xaxes(showgrid=True) # type: ignore
-    fig.update_yaxes(showgrid=True) # type: ignore
+    fig.update_xaxes(showgrid=True)  # type: ignore
+    fig.update_yaxes(showgrid=True)  # type: ignore
 
     event = st.plotly_chart(fig, key=f"{key}:scatter_plot", on_select="rerun")
     selection = event.get("selection")

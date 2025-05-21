@@ -79,10 +79,10 @@ def heat_map_component(
         y=df_piv.index.to_list(),
         labels={"x": x_axis, "y": y_axis, "color": new_feature_name},
     )
-    fig.update_xaxes( # type: ignore
+    fig.update_xaxes(  # type: ignore
         type="category", showgrid=True, title=x_axis, tickson="boundaries", ticklen=0
     )
-    fig.update_yaxes( # type: ignore
+    fig.update_yaxes(  # type: ignore
         type="category", showgrid=True, title=y_axis, tickson="boundaries", ticklen=0
     )
     st.plotly_chart(fig)

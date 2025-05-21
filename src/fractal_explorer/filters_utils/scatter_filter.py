@@ -310,8 +310,8 @@ def scatter_filter_component(
                 name="Current Selection",
             )
         )
-    fig.update_xaxes(showgrid=True) # type: ignore
-    fig.update_yaxes(showgrid=True) # type: ignore
+    fig.update_xaxes(showgrid=True)  # type: ignore
+    fig.update_yaxes(showgrid=True)  # type: ignore
 
     event = st.plotly_chart(
         fig,
