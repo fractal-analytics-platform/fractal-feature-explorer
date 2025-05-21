@@ -9,8 +9,8 @@ from fractal_explorer.utils import Scope, invalidate_session_state
 def init_global_state():
     if f"{Scope.GLOBAL}:token" not in st.session_state:
         st.session_state[f"{Scope.GLOBAL}:token"] = None
-    if f"{Scope.GLOBAL}:dashboard_mode" not in st.session_state:
-        st.session_state[f"{Scope.GLOBAL}:dashboard_mode"] = "Plates"
+    if f"{Scope.GLOBAL}:setup_mode" not in st.session_state:
+        st.session_state[f"{Scope.GLOBAL}:setup_mode"] = "Plates"
     if f"{Scope.GLOBAL}:zarr_urls" not in st.session_state:
         st.session_state[f"{Scope.GLOBAL}:zarr_urls"] = []
 
@@ -18,11 +18,11 @@ def init_global_state():
 def parse_cli_args():
     parser = ArgumentParser(description="Fractal Plate Explorer")
     parser.add_argument(
-        "--dashboard-mode",
+        "--setup-mode",
         type=str,
         default=None,
         choices=["Plates", "Images"],
-        help="Select the mode of the dashboard.",
+        help="Select the mode of the setup.",
     )
     parser.add_argument(
         "--zarr-urls",
@@ -31,21 +31,35 @@ def parse_cli_args():
         default=None,
         help="List of Zarr URLs to add to the DataFrame",
     )
+    parser.add_argument(
+        "--token",
+        type=str,
+        default=None,
+        help="Fractal token to use for authentication.",
+    )
+    
     args = parser.parse_args()
-    if args.dashboard_mode is not None:
-        st.session_state[f"{Scope.GLOBAL}:dashboard_mode"] = args.dashboard_mode
+    if args.setup_mode is not None:
+        st.session_state[f"{Scope.GLOBAL}:setup_mode"] = args.setup_mode
 
+    if args.token is not None:
+        st.session_state[f"{Scope.GLOBAL}:token"] = args.token
+        
     if args.zarr_urls is not None:
         zarr_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
         st.session_state[f"{Scope.GLOBAL}:zarr_urls"] = zarr_urls + args.zarr_urls
 
 
 def parse_query_params():
-    dashboard_mode = st.query_params.get("dashboard_mode", None)
-    if dashboard_mode is not None:
-        st.session_state[f"{Scope.GLOBAL}:dashboard_mode"] = dashboard_mode
+    setup_mode = st.query_params.get("setup_mode", None)
+    if setup_mode is not None:
+        st.session_state[f"{Scope.GLOBAL}:setup_mode"] = setup_mode
+        
+    token = st.query_params.get("token", None)
+    if token is not None:
+        st.session_state[f"{Scope.GLOBAL}:token"] = token
 
-    zarr_urls = st.query_params.get_all("zarr_urls")
+    zarr_urls = st.query_params.get_all("zarr_url")
     _zarr_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
     st.session_state[f"{Scope.GLOBAL}:zarr_urls"] = _zarr_urls + zarr_urls
 
@@ -58,18 +72,18 @@ def setup_global_state():
     parse_cli_args()
     parse_query_params()
 
-    default_dashboard_mode = st.session_state.get(
-        f"{Scope.GLOBAL}:dashboard_mode", "Plates"
+    default_setup_mode = st.session_state.get(
+        f"{Scope.GLOBAL}:setup_mode", "Plates"
     )
-    dashboard_mode = st.pills(
-        "Dashboard Mode",
+    setup_mode = st.pills(
+        "Setup Mode",
         options=["Plates", "Images"],
-        default=default_dashboard_mode,
-        key="_dashboard_mode",
-        help="Select the mode of the dashboard.",
+        default=default_setup_mode,
+        key="_setup_mode",
+        help="Select the mode of the setup.",
     )
-    st.session_state[f"{Scope.GLOBAL}:dashboard_mode"] = dashboard_mode
-    return dashboard_mode
+    st.session_state[f"{Scope.GLOBAL}:setup_mode"] = setup_mode
+    return setup_mode
 
 
 def main():
@@ -89,7 +103,7 @@ def main():
 
     st.divider()
 
-    dashboard_mode = setup_global_state()
+    setup_mode = setup_global_state()
     with st.sidebar:
         token = st.text_input(
             label="Fractal Token",
@@ -99,7 +113,7 @@ def main():
         )
         st.session_state[f"{Scope.GLOBAL}:token"] = token
 
-    match dashboard_mode:
+    match setup_mode:
         case "Plates":
             features_table, table_name = plate_mode_setup()
         case "Images":
@@ -107,7 +121,7 @@ def main():
             st.stop()
         case _:
             st.error(
-                f"Invalid dashboard mode selected. Should be 'Plates' or 'Images' but got {dashboard_mode}."
+                f"Invalid setup mode selected. Should be 'Plates' or 'Images' but got {setup_mode}."
             )
             st.stop()
 
