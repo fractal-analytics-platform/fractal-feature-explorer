@@ -44,9 +44,11 @@ def pills_component(
             st.session_state[f"{key}_state_model"]
         )
         pills_model.options = options
+        if len(pills_model.default) == 0 and len(options) > 0:
+            pills_model.default = [options[0]]
 
     def _update_session_state():
-        pills_model.default = st.session_state[key]
+        pills_model.default = st.session_state[key]        
         st.session_state[f"{key}_state_model"] = pills_model.model_dump_json()
 
     selected_options = st.pills(
@@ -58,6 +60,7 @@ def pills_component(
         key=key,
         on_change=_update_session_state,
     )
+        
     if selected_options is None:
         selected_options = []
     if not isinstance(selected_options, list):
@@ -158,6 +161,8 @@ def multiselect_component(
             st.session_state[f"{key}_state_model"]
         )
         multiselect_model.options = options
+        if len(multiselect_model.default) == 0 and len(options) > 0:
+            multiselect_model.default = [options[0]]
 
     def _update_session_state():
         multiselect_model.default = st.session_state[key]
