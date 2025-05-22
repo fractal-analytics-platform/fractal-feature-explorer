@@ -3,7 +3,7 @@ import streamlit as st
 
 def main():
     setup_page = st.Page(
-        "pages/1_setup.py", title="OME-Zarr Setup", icon=":material/settings:"
+        "setup_page/page.py", title="OME-Zarr Setup", icon=":material/settings:"
     )
     filter_page = st.Page(
         "pages/2_filters.py", title="Features Filters", icon=":material/filter:"

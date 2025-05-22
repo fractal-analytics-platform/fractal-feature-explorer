@@ -1,9 +1,12 @@
 from argparse import ArgumentParser
 
 import streamlit as st
+from streamlit.logger import get_logger
 
-from fractal_explorer.setup_utils import plate_mode_setup
+from fractal_explorer.setup_page._plate_mode_setup import plate_mode_setup_component
 from fractal_explorer.utils import Scope, invalidate_session_state
+
+logger = get_logger(__name__)
 
 
 def init_global_state():
@@ -41,28 +44,37 @@ def parse_cli_args():
     args = parser.parse_args()
     if args.setup_mode is not None:
         st.session_state[f"{Scope.GLOBAL}:setup_mode"] = args.setup_mode
+        logger.debug(
+            f"setup_mode: {args.setup_mode} (set from CLI args)"
+        )
 
     if args.token is not None:
         st.session_state[f"{Scope.GLOBAL}:token"] = args.token
+        logger.debug("token: *** (set from CLI args)")
 
     if args.zarr_urls is not None:
         zarr_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
         st.session_state[f"{Scope.GLOBAL}:zarr_urls"] = zarr_urls + args.zarr_urls
+        logger.debug(
+            f"zarr_urls: {args.zarr_urls} (set from CLI args)"
+        )
 
 
 def parse_query_params():
     setup_mode = st.query_params.get("setup_mode", None)
     if setup_mode is not None:
         st.session_state[f"{Scope.GLOBAL}:setup_mode"] = setup_mode
-
-    token = st.query_params.get("token", None)
-    if token is not None:
-        st.session_state[f"{Scope.GLOBAL}:token"] = token
+        logger.debug(
+            f"setup_mode: {setup_mode} (set url from query params)"
+        )
 
     zarr_urls = st.query_params.get_all("zarr_url")
-    _zarr_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
-    st.session_state[f"{Scope.GLOBAL}:zarr_urls"] = _zarr_urls + zarr_urls
-
+    if len(zarr_urls) > 0:
+        _zarr_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
+        st.session_state[f"{Scope.GLOBAL}:zarr_urls"] = _zarr_urls + zarr_urls
+        logger.debug(
+            f"zarr_urls: {zarr_urls} (set url from query params)"
+        )
 
 def setup_global_state():
     """
@@ -113,14 +125,17 @@ def main():
 
     match setup_mode:
         case "Plates":
-            features_table, table_name = plate_mode_setup()
+            features_table, table_name = plate_mode_setup_component()
         case "Images":
             st.error("Image mode is not yet implemented. Please select 'Plates' mode.")
+            logger.error("Image mode is not yet implemented.")
             st.stop()
         case _:
-            st.error(
+            error_msg = (
                 f"Invalid setup mode selected. Should be 'Plates' or 'Images' but got {setup_mode}."
             )
+            st.error(error_msg)
+            logger.error(error_msg)
             st.stop()
 
     schema = features_table.collect_schema()
@@ -129,14 +144,20 @@ def main():
         old_schema = st.session_state[f"{Scope.GLOBAL}:feature_table_schema"]
         if old_table_name != table_name:
             # invalidate the old table
-            st.info("The feature table name has changed. Please reapply the filters.")
-            invalidate_session_state(f"{Scope.FILTERS}")
-
-        if old_schema != schema:
-            # invalidate the old table
-            st.info(
-                "The schema of the feature table has changed. Please reapply the filters."
+            warn_msg = (
+                f"The feature table name has changed. {old_table_name} -> {table_name}. \n"
+                "All filters have been reset."
             )
+            logger.warning(warn_msg)
+            st.warning(warn_msg)
+
+        elif old_schema != schema:
+            # invalidate the old table
+            warn_msg = (
+                "The feature table schema has changed. The filters have been reset."
+            )
+            logger.warning(warn_msg)
+            st.warning(warn_msg)
             invalidate_session_state(f"{Scope.FILTERS}")
 
     st.session_state[f"{Scope.GLOBAL}:feature_table"] = features_table
