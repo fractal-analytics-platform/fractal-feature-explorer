@@ -43,8 +43,9 @@ example URL: `http://localhost:8501/?zarr_url=/Users/locerr/data/20200812-23well
 
 ## Test data
 
-- [Small ~100Mb](https://zenodo.org/records/13305316)
-- [Large ~30Gb](https://zenodo.org/records/14826000)
+- [Small 2D (~100Mb)](https://zenodo.org/records/13305316/files/20200812-CardiomyocyteDifferentiation14-Cycle1_mip.zarr.zip?download=1)
+- [Small 2D (~100Mb) and 3D (~750Mb)](https://zenodo.org/records/13305316)
+- [Large 2D (~30Gb)](https://zenodo.org/records/14826000)
 
 ## Main limitations
 
