@@ -20,14 +20,35 @@ from fractal_explorer.utils.st_components import (
     pills_component,
     selectbox_component,
 )
+from pathlib import Path
 
 
-def sanifiy_url(url: str) -> str:
+
+def sanifiy_http_url(url: str, token: str | None) -> str | None:
     """Sanitize the URL by removing the trailing slash."""
     url = url.replace(" ", "%20")
 
     if url.endswith("/"):
         url = url[:-1]
+    return url
+
+
+def sanify_path_url(url: str) -> str | None:
+    """Sanitize a local path URL."""
+    path = Path(url).absolute()
+    if not path.exists():
+        st.error(f"Path {path} does not exist.")
+        return None
+        
+    return str(path)
+
+
+def sanifiy_url(url: str, token: str | None) -> str | None:
+    """Sanitize the URL by removing the trailing slash."""
+    if url.startswith("http://") or url.startswith("https://"):
+        return sanifiy_http_url(url, token=token)
+    else:
+        return sanify_path_url(url)
     return url
 
 
@@ -50,12 +71,18 @@ def extras_from_url(image_url: str) -> dict[str, str]:
 def build_plate_setup_df(plate_urls: list[str], token=None) -> pl.DataFrame:
     plates = []
     for plate_url in plate_urls:
-        plate_url = sanifiy_url(plate_url)
+        plate_url = sanifiy_url(plate_url, token=token)
+        if plate_url is None:
+            st.error(f"Invalid Plate URL: {plate_url}")
+            continue
         plate = get_ome_zarr_plate(plate_url, token=token)
         images_paths = asyncio.run(plate.images_paths_async())
         for path_in_plate in images_paths:
             image_url = f"{plate_url}/{path_in_plate}"
-            image_url = sanifiy_url(image_url)
+            image_url = sanifiy_url(image_url, token=token)
+            if image_url is None:
+                st.error(f"Invalid Image URL: {image_url}")
+                continue
             extras = extras_from_url(image_url)
             plates.append(
                 {
@@ -167,8 +194,16 @@ def rows_selection_widget(
     plate_setup_df: pl.DataFrame,
 ) -> pl.DataFrame:
     """Create a widget for selecting rows."""
-    rows_names = _row_selection_widget(plate_setup_df)
-    plate_setup_df = _row_selection_filter(plate_setup_df, rows_names)
+    rows = plate_setup_df["row"].unique().sort().to_list()
+    rows_names = pills_component(
+        key=f"{Scope.SETUP}:plate_setup:row_selection",
+        label="Rows",
+        options=rows,
+        selection_mode="multi",
+        help="Select rows to include in the analysis.",
+    )
+    
+    plate_setup_df = plate_setup_df.filter(pl.col("row").is_in(rows_names))
     return plate_setup_df
 
 
@@ -824,13 +859,17 @@ def plate_mode_setup():
     new_url = st.text_input("Plate URL")
     if st.button("Add Plate URL"):
         # Validate the URL
-        try:
-            _ = get_ome_zarr_plate(new_url, token=token)
-            current_urls = st.session_state[f"{Scope.SETUP}:plate_setup:urls"]
-            current_urls.add(new_url)
-            st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = current_urls
-        except Exception as e:
-            st.error(f"Invalid URL: {e}")
+        new_url = sanifiy_url(new_url, token=token)
+        if new_url is None:
+            st.error("Invalid Plate URL.")
+        else:
+            try:
+                _ = get_ome_zarr_plate(new_url, token=token)
+                current_urls = st.session_state[f"{Scope.SETUP}:plate_setup:urls"]
+                current_urls.add(new_url)
+                st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = current_urls
+            except Exception as e:
+                st.error(f"Invalid Plate URL: {e}")
 
     local_urls = st.session_state[f"{Scope.SETUP}:plate_setup:urls"]
     urls = global_urls + list(local_urls)
@@ -848,6 +887,10 @@ def plate_mode_setup():
         col1, col2 = st.columns(2)
         with col1:
             plate_setup_df = rows_selection_widget(plate_setup_df)
+            
+            if plate_setup_df.is_empty():
+                st.warning("No images selected.")
+                st.stop()
         with col2:
             plate_setup_df = columns_selection_widget(plate_setup_df)
         plate_setup_df = acquisition_selection_widget(plate_setup_df)
