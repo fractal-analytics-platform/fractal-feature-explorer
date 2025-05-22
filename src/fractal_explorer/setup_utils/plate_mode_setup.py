@@ -22,6 +22,25 @@ from fractal_explorer.utils.st_components import (
 )
 from pathlib import Path
 
+from ngio.utils import fractal_fsspec_store
+from ngio.utils import NgioValueError
+
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+@st.cache_data
+def validate_http_url(url: str, token: str | None) -> bool:
+    """Validate the URL by checking if it is a valid HTTP URL."""
+    try:
+        logger.debug(f"Attempting to open URL: {url}")
+        fractal_fsspec_store(url, fractal_token=token)
+    except NgioValueError as e:
+        st.error(e)
+        logger.error(e)
+        return False
+    return True
 
 
 def sanifiy_http_url(url: str, token: str | None) -> str | None:
@@ -30,6 +49,10 @@ def sanifiy_http_url(url: str, token: str | None) -> str | None:
 
     if url.endswith("/"):
         url = url[:-1]
+
+    if not validate_http_url(url, token=token):
+        return None
+
     return url
 
 
@@ -38,8 +61,9 @@ def sanify_path_url(url: str) -> str | None:
     path = Path(url).absolute()
     if not path.exists():
         st.error(f"Path {path} does not exist.")
+        logger.error(f"Path {path} does not exist.")
         return None
-        
+
     return str(path)
 
 
@@ -49,7 +73,6 @@ def sanifiy_url(url: str, token: str | None) -> str | None:
         return sanifiy_http_url(url, token=token)
     else:
         return sanify_path_url(url)
-    return url
 
 
 def plate_name_from_url(plate_url: str) -> str:
@@ -73,7 +96,6 @@ def build_plate_setup_df(plate_urls: list[str], token=None) -> pl.DataFrame:
     for plate_url in plate_urls:
         plate_url = sanifiy_url(plate_url, token=token)
         if plate_url is None:
-            st.error(f"Invalid Plate URL: {plate_url}")
             continue
         plate = get_ome_zarr_plate(plate_url, token=token)
         images_paths = asyncio.run(plate.images_paths_async())
@@ -81,7 +103,6 @@ def build_plate_setup_df(plate_urls: list[str], token=None) -> pl.DataFrame:
             image_url = f"{plate_url}/{path_in_plate}"
             image_url = sanifiy_url(image_url, token=token)
             if image_url is None:
-                st.error(f"Invalid Image URL: {image_url}")
                 continue
             extras = extras_from_url(image_url)
             plates.append(
@@ -113,15 +134,6 @@ def build_plate_setup_df(plate_urls: list[str], token=None) -> pl.DataFrame:
 #
 # ====================================================================
 
-
-def _plate_selection_filter(
-    plate_setup_df: pl.DataFrame, plates_names: list[str]
-) -> pl.DataFrame:
-    """Filter the plate setup DataFrame based on the selected plates."""
-    plate_setup_df = plate_setup_df.filter(pl.col("plate_name").is_in(plates_names))
-    return plate_setup_df
-
-
 def plate_name_selection(
     plate_setup_df: pl.DataFrame,
 ) -> pl.DataFrame:
@@ -136,6 +148,9 @@ def plate_name_selection(
             plates[plate_url] = plate_name
     else:
         st.warning(
+            "The plate names are not unique. The url is used to identify the plate."
+        )
+        logger.warning(
             "The plate names are not unique. The url is used to identify the plate."
         )
         for plate_url in plate_urls:
@@ -202,7 +217,7 @@ def rows_selection_widget(
         selection_mode="multi",
         help="Select rows to include in the analysis.",
     )
-    
+
     plate_setup_df = plate_setup_df.filter(pl.col("row").is_in(rows_names))
     return plate_setup_df
 
@@ -860,16 +875,14 @@ def plate_mode_setup():
     if st.button("Add Plate URL"):
         # Validate the URL
         new_url = sanifiy_url(new_url, token=token)
-        if new_url is None:
-            st.error("Invalid Plate URL.")
-        else:
+        if new_url is not None:
             try:
                 _ = get_ome_zarr_plate(new_url, token=token)
                 current_urls = st.session_state[f"{Scope.SETUP}:plate_setup:urls"]
                 current_urls.add(new_url)
                 st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = current_urls
             except Exception as e:
-                st.error(f"Invalid Plate URL: {e}")
+                st.error(f"Error loading plate at {new_url} \n{e}")
 
     local_urls = st.session_state[f"{Scope.SETUP}:plate_setup:urls"]
     urls = global_urls + list(local_urls)
@@ -887,7 +900,7 @@ def plate_mode_setup():
         col1, col2 = st.columns(2)
         with col1:
             plate_setup_df = rows_selection_widget(plate_setup_df)
-            
+
             if plate_setup_df.is_empty():
                 st.warning("No images selected.")
                 st.stop()

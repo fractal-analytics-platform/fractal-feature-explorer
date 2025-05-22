@@ -37,14 +37,14 @@ def parse_cli_args():
         default=None,
         help="Fractal token to use for authentication.",
     )
-    
+
     args = parser.parse_args()
     if args.setup_mode is not None:
         st.session_state[f"{Scope.GLOBAL}:setup_mode"] = args.setup_mode
 
     if args.token is not None:
         st.session_state[f"{Scope.GLOBAL}:token"] = args.token
-        
+
     if args.zarr_urls is not None:
         zarr_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
         st.session_state[f"{Scope.GLOBAL}:zarr_urls"] = zarr_urls + args.zarr_urls
@@ -54,7 +54,7 @@ def parse_query_params():
     setup_mode = st.query_params.get("setup_mode", None)
     if setup_mode is not None:
         st.session_state[f"{Scope.GLOBAL}:setup_mode"] = setup_mode
-        
+
     token = st.query_params.get("token", None)
     if token is not None:
         st.session_state[f"{Scope.GLOBAL}:token"] = token
@@ -72,9 +72,7 @@ def setup_global_state():
     parse_cli_args()
     parse_query_params()
 
-    default_setup_mode = st.session_state.get(
-        f"{Scope.GLOBAL}:setup_mode", "Plates"
-    )
+    default_setup_mode = st.session_state.get(f"{Scope.GLOBAL}:setup_mode", "Plates")
     setup_mode = st.pills(
         "Setup Mode",
         options=["Plates", "Images"],
