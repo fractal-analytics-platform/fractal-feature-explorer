@@ -14,16 +14,16 @@ from fractal_explorer.utils.st_components import (
 
 
 from streamlit.logger import get_logger
-from fractal_explorer.setup_page._plate_advanced_selection import (
+from fractal_explorer.pages.setup_page._plate_advanced_selection import (
     advanced_plate_selection_component,
 )
-from fractal_explorer.setup_page._tables import (
+from fractal_explorer.pages.setup_page._tables import (
     list_images_tables,
     list_plate_tables,
     collect_feature_table_from_images,
     collect_feature_table_from_plates,
 )
-from fractal_explorer.setup_page._utils import (
+from fractal_explorer.pages.setup_page._utils import (
     sanifiy_url,
     extras_from_url,
 )

@@ -2,10 +2,10 @@ import polars as pl
 import streamlit as st
 from streamlit.logger import get_logger
 
-from fractal_explorer.explore_page._heat_map_plot import heat_map_component
-from fractal_explorer.explore_page._scatter_plot import scatter_plot_component
-from fractal_explorer.filters_page import apply_filters, build_feature_frame
-from fractal_explorer.filters_page._common import FeatureFrame
+from fractal_explorer.pages.explore_page._heat_map_plot import heat_map_component
+from fractal_explorer.pages.explore_page._scatter_plot import scatter_plot_component
+from fractal_explorer.pages.filters_page import apply_filters, build_feature_frame
+from fractal_explorer.pages.filters_page._common import FeatureFrame
 from fractal_explorer.utils import Scope, invalidate_session_state
 
 logger = get_logger(__name__)

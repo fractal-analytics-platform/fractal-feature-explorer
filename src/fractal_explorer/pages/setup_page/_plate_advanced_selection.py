@@ -9,7 +9,7 @@ from fractal_explorer.utils.st_components import (
     selectbox_component,
 )
 
-from fractal_explorer.setup_page._tables import (
+from fractal_explorer.pages.setup_page._tables import (
     list_images_tables,
     list_plate_tables,
     collect_condition_table_from_images,

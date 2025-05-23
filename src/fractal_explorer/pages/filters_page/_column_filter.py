@@ -1,7 +1,7 @@
 import streamlit as st
 from pydantic import BaseModel, ConfigDict
 
-from fractal_explorer.filters_page._common import FeatureFrame
+from fractal_explorer.pages.filters_page._common import FeatureFrame
 from fractal_explorer.utils.st_components import (
     multiselect_component,
 )

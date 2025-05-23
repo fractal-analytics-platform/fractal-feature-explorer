@@ -13,7 +13,7 @@ from fractal_explorer.utils.ngio_caches import (
     get_ome_zarr_plate,
     list_image_tables_async,
 )
-from fractal_explorer.setup_page._utils import (
+from fractal_explorer.pages.setup_page._utils import (
     plate_name_from_url,
     extras_from_url,
 )

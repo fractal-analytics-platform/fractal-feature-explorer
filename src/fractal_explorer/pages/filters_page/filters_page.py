@@ -1,16 +1,16 @@
 import polars as pl
 import streamlit as st
 
-from fractal_explorer.filters_page._column_filter import (
+from fractal_explorer.pages.filters_page._column_filter import (
     ColumnsFilter,
     columns_filter_component,
 )
-from fractal_explorer.filters_page._common import FeatureFrame
-from fractal_explorer.filters_page._histogram_filter import (
+from fractal_explorer.pages.filters_page._common import FeatureFrame
+from fractal_explorer.pages.filters_page._histogram_filter import (
     HistogramFilter,
     histogram_filter_component,
 )
-from fractal_explorer.filters_page._scatter_filter import (
+from fractal_explorer.pages.filters_page._scatter_filter import (
     ScatterFilter,
     scatter_filter_component,
 )

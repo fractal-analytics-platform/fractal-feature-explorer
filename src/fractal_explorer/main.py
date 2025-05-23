@@ -43,18 +43,20 @@ def main():
     st.markdown(f"{footer_style}{footer_content}", unsafe_allow_html=True)
 
     setup_page = st.Page(
-        "setup_page/setup_page.py", title="OME-Zarr Setup", icon=":material/settings:"
+        "pages/setup_page/setup_page.py",
+        title="OME-Zarr Setup", icon=":material/settings:"
     )
     filter_page = st.Page(
-        "filters_page/filters_page.py",
+        "pages/filters_page/filters_page.py",
         title="Features Filters",
         icon=":material/filter:",
     )
     explore_page = st.Page(
-        "explore_page/explore_page.py", title="Explore", icon=":material/search:"
+        "pages/explore_page/explore_page.py",
+        title="Explore", icon=":material/search:"
     )
     export_page = st.Page(
-        "pages/4_export.py", title="Export", icon=":material/download:"
+        "pages/export_page.py", title="Export", icon=":material/download:"
     )
     pg = st.navigation([setup_page, filter_page, explore_page, export_page])
     pg.run()
