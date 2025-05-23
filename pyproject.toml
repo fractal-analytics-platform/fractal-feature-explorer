@@ -1,6 +1,14 @@
 [project]
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
-dependencies = ["streamlit", "plotly", "numpy", "matplotlib", "orjson", "rich"]
+dependencies = [
+    "streamlit",
+    "ngio>=0.3.0a0, <0.4.0",
+    "plotly",
+    "numpy",
+    "matplotlib",
+    "orjson",
+    "rich",
+]
 name = "fractal-explorer"
 requires-python = "==3.12"
 dynamic = ["version"]
@@ -29,7 +37,7 @@ platforms = ["osx-arm64", "linux-64"]
 
 [tool.pixi.pypi-dependencies]
 fractal_explorer = { path = ".", editable = true }
-ngio = { path = "../ngio", editable = true }
+# ngio = { path = "../ngio", editable = true }
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
