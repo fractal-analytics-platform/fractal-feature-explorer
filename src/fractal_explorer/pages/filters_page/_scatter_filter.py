@@ -22,6 +22,17 @@ from streamlit.logger import get_logger
 logger = get_logger(__name__)
 
 
+def _show_point_info(
+    point_dict: dict,
+):
+    st.write("Image URL: ", point_dict["image_url"])
+    st.write("Label: ", point_dict["label"])
+    st.write("Reference Label: ", point_dict["reference_label"])
+    for key, value in point_dict.items():
+        if key not in ["image_url", "label", "reference_label"]:
+            st.write(f"{key}: ", value)
+
+
 @st.dialog("Cell Preview")
 def view_point(point: int, feature_df: pl.DataFrame) -> None:
     """
@@ -30,13 +41,22 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
     point_dict = feature_df.select("image_url", "label", "reference_label").to_dicts()[
         point
     ]
+    logger.info(f"Opening point: {point_dict} in dialog")
     token = st.session_state.get(f"{Scope.PRIVATE}:token")
-    container = get_ome_zarr_container(
-        point_dict["image_url"],
-        token=token,
-        mode="image",
-    )
-    image = container.get_image()
+    
+    try:
+        container = get_ome_zarr_container(
+            point_dict["image_url"],
+            token=token,
+            mode="image",
+        )
+        image = container.get_image()
+    except Exception as e:
+        logger.error(f"Error opening image: {e}")
+        st.error("Error opening image")
+        _show_point_info(point_dict)
+        return
+        
 
     channels = container.image_meta.channel_labels
     if len(channels) > 1:
@@ -93,24 +113,28 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             help="Select the level to display",
         )
 
-    image = get_single_label_image(
-        image_url=point_dict["image_url"],
-        ref_label=point_dict["reference_label"],
-        label=int(point_dict["label"]),
-        level_path=level_path,
-        channel=channel,
-        z_slice=z_slice,
-        t_slice=t_slice,
-        show_label=show_label,
-        zoom_factor=zoom_factor,
-        token=token,
-    )
-    st.image(image, use_container_width=True)
+    try:
+        image = get_single_label_image(
+            image_url=point_dict["image_url"],
+            ref_label=point_dict["reference_label"],
+            label=int(point_dict["label"]),
+            level_path=level_path,
+            channel=channel,
+            z_slice=z_slice,
+            t_slice=t_slice,
+            show_label=show_label,
+            zoom_factor=zoom_factor,
+            token=token,
+        )
+        st.image(image, use_container_width=True)
+    except Exception as e:
+        logger.error(f"Error opening image: {e}")
+        st.error("Error opening image")
+        _show_point_info(point_dict)
+        return
 
     with st.expander("Infos", expanded=False):
-        st.write("Image URL: ", point_dict["image_url"])
-        st.write("Label: ", point_dict["label"])
-        st.write("Reference Label: ", point_dict["reference_label"])
+        _show_point_info(point_dict)
 
 
 class ScatterFilter(BaseModel):
