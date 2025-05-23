@@ -5,6 +5,7 @@ from streamlit.logger import get_logger
 
 from fractal_explorer.setup_page._plate_mode_setup import plate_mode_setup_component
 from fractal_explorer.utils import Scope, invalidate_session_state
+import polars as pl
 
 logger = get_logger(__name__)
 
@@ -89,30 +90,8 @@ def setup_global_state():
     return setup_mode
 
 
-def main():
-    setup_mode = setup_global_state()
-    with st.sidebar:
-        token = st.text_input(
-            label="Fractal Token",
-            value=st.session_state.get(f"{Scope.PRIVATE}:token", ""),
-            key="_fractal_token",
-            type="password",
-        )
-        st.session_state[f"{Scope.PRIVATE}:token"] = token
 
-    match setup_mode:
-        case "Plates":
-            features_table, table_name = plate_mode_setup_component()
-        case "Images":
-            st.error("Image mode is not yet implemented. Please select 'Plates' mode.")
-            logger.error("Image mode is not yet implemented.")
-            st.stop()
-        case _:
-            error_msg = f"Invalid setup mode selected. Should be 'Plates' or 'Images' but got {setup_mode}."
-            st.error(error_msg)
-            logger.error(error_msg)
-            st.stop()
-
+def filter_cache_invalidations(features_table: pl.LazyFrame, table_name: str) -> pl.Schema:
     schema = features_table.collect_schema()
     if f"{Scope.DATA}:feature_table" in st.session_state:
         old_table_name = st.session_state[f"{Scope.DATA}:feature_table_name"]
@@ -135,6 +114,44 @@ def main():
             logger.warning(warn_msg)
             st.warning(warn_msg)
             invalidate_session_state(f"{Scope.FILTERS}")
+    return schema
+
+
+def main():
+    setup_mode = setup_global_state()
+    with st.sidebar:
+        with st.expander("Advanced Options", expanded=False):
+            token = st.text_input(
+                label="Fractal Authentication Token",
+                value=st.session_state.get(f"{Scope.PRIVATE}:token", ""),
+                key="_fractal_token",
+                type="password",
+            )
+            st.session_state[f"{Scope.PRIVATE}:token"] = token
+            
+            st.divider()
+            if st.button("Reset Setup", 
+                        key=f"{Scope.SETUP}:reset_setup", 
+                        icon="🔄",
+                        help="Reset the setup state. This will clear all filters and the feature table."):
+                invalidate_session_state(f"{Scope.SETUP}")
+                st.rerun()
+
+    match setup_mode:
+        case "Plates":
+            features_table, table_name = plate_mode_setup_component()
+        case "Images":
+            st.error("Image mode is not yet implemented. Please select 'Plates' mode.")
+            logger.error("Image mode is not yet implemented.")
+            st.stop()
+        case _:
+            error_msg = f"Invalid setup mode selected. Should be 'Plates' or 'Images' but got {setup_mode}."
+            st.error(error_msg)
+            logger.error(error_msg)
+            st.stop()
+
+    schema = filter_cache_invalidations(features_table, table_name)
+    
     st.session_state[f"{Scope.DATA}:feature_table"] = features_table
     st.session_state[f"{Scope.DATA}:feature_table_name"] = table_name
     st.session_state[f"{Scope.DATA}:feature_table_schema"] = schema

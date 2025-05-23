@@ -55,7 +55,6 @@ def main():
         "pages/4_export.py", title="Export", icon=":material/download:"
     )
     pg = st.navigation([setup_page, filter_page, explore_page, export_page])
-
     pg.run()
 
 
