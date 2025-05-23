@@ -3,7 +3,7 @@ import io
 import polars as pl
 import streamlit as st
 
-from fractal_explorer.filters_utils import apply_filters, build_feature_frame
+from fractal_explorer.filters_page import apply_filters, build_feature_frame
 from fractal_explorer.utils import Scope
 
 

@@ -7,7 +7,7 @@ import streamlit as st
 from matplotlib.path import Path
 from pydantic import BaseModel, Field
 
-from fractal_explorer.filters_utils.common import FeatureFrame
+from fractal_explorer.filters_page._common import FeatureFrame
 from fractal_explorer.utils import Scope
 from fractal_explorer.utils.ngio_caches import (
     get_ome_zarr_container,

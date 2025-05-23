@@ -3,8 +3,8 @@ import copy
 import plotly.express as px
 import streamlit as st
 from streamlit.logger import get_logger
-from fractal_explorer.filters_utils.common import FeatureFrame
-from fractal_explorer.filters_utils.scatter_filter import view_point
+from fractal_explorer.filters_page._common import FeatureFrame
+from fractal_explorer.filters_page._scatter_filter import view_point
 from fractal_explorer.utils.st_components import (
     selectbox_component,
     single_slider_component,

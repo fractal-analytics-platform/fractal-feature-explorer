@@ -3,8 +3,8 @@ import streamlit as st
 
 from fractal_explorer.explore_utils.heat_map import heat_map_component
 from fractal_explorer.explore_utils.scatter_plot import scatter_plot_component
-from fractal_explorer.filters_utils import apply_filters, build_feature_frame
-from fractal_explorer.filters_utils.common import FeatureFrame
+from fractal_explorer.filters_page import apply_filters, build_feature_frame
+from fractal_explorer.filters_page._common import FeatureFrame
 from fractal_explorer.utils import Scope, invalidate_session_state
 
 
