@@ -1,20 +1,23 @@
 import polars as pl
 import streamlit as st
 
-from fractal_explorer.filters_utils.column_filter import (
+from fractal_explorer.pages.filters_page._column_filter import (
     ColumnsFilter,
     columns_filter_component,
 )
-from fractal_explorer.filters_utils.common import FeatureFrame
-from fractal_explorer.filters_utils.histogram_filter import (
+from fractal_explorer.pages.filters_page._common import FeatureFrame
+from fractal_explorer.pages.filters_page._histogram_filter import (
     HistogramFilter,
     histogram_filter_component,
 )
-from fractal_explorer.filters_utils.scatter_filter import (
+from fractal_explorer.pages.filters_page._scatter_filter import (
     ScatterFilter,
     scatter_filter_component,
 )
 from fractal_explorer.utils import Scope, invalidate_session_state
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def build_feature_frame(feature_table: pl.LazyFrame) -> FeatureFrame:
@@ -96,6 +99,7 @@ def add_filters() -> None:
                 key,
                 histogram_filter_component,
             )
+            logger.info(f"New Histogram Filter added: {name}")
             st.rerun()
         elif filter_type == "Scatter Filter":
             name = _find_unique_name(
@@ -107,6 +111,7 @@ def add_filters() -> None:
                 key,
                 scatter_filter_component,
             )
+            logger.info(f"New Scatter Filter added: {name}")
             st.rerun()
 
     return None
@@ -129,10 +134,19 @@ def display_filters(feature_frame: FeatureFrame) -> FeatureFrame:
                 ### {name}
                 """
             )
-            feature_frame = filter_component(
-                key=filter_key,
-                feature_frame=feature_frame,
-            )
+            try:
+                feature_frame = filter_component(
+                    key=filter_key,
+                    feature_frame=feature_frame,
+                )
+            except Exception as e:
+                error_msg = (
+                    f"Error applying filter {name}: {e}. "
+                    "Please check the filter parameters and try again."
+                )
+                st.error(error_msg)
+                logger.error(error_msg)
+
             col1, col2 = st.columns(2)
             with col1:
                 if st.button(
@@ -168,17 +182,25 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
 
         status_json = st.session_state.get(status_key, None)
         if status_json is None:
-            st.warning(
-                f"Filter {name} is not yet applied. Please apply the filter first."
+            warn_msg = (
+                f"Filter {name} has not been applied yet. "
+                "Please apply the filter from the filter page first."
             )
+            logger.warning(warn_msg)
+            st.warning(warn_msg)
             continue
 
         filter_type = st.session_state.get(type_key, None)
         if filter_type is None:
-            st.warning(
-                f"Filter {name} is not yet applied. Please apply the filter first."
+            warn_msg = (
+                f"Filter {name} has not been applied yet. "
+                "Please apply the filter from the filter page first."
             )
+            logger.warning(warn_msg)
+            st.warning(warn_msg)
             continue
+
+        logger.info(f"Applying filter {name} of type {filter_type}")
         if filter_type == "columns":
             filter_component = ColumnsFilter.model_validate_json(status_json)
             feature_frame = filter_component.apply(feature_frame)
@@ -192,10 +214,13 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
             st.warning(f"Filter {name} is not found. Please apply the filter first.")
             continue
 
+    logger.info("Filters applied to feature table")
     return feature_frame
 
 
-def feature_filters_setup(feature_table: pl.LazyFrame, table_name: str) -> FeatureFrame:
+def feature_filters_manger(
+    feature_table: pl.LazyFrame, table_name: str
+) -> FeatureFrame:
     """
     Setup the feature table for the dashboard.
     """
@@ -215,3 +240,31 @@ def feature_filters_setup(feature_table: pl.LazyFrame, table_name: str) -> Featu
 
     feature_frame = display_filters(feature_frame)
     return feature_frame
+
+
+def main():
+    with st.sidebar:
+        with st.expander("Advanced Options", expanded=False):
+            if st.button(
+                "Reset Filters",
+                key=f"{Scope.FILTERS}:reset_filters",
+                icon="🔄",
+                help="Reset the filters state. This will clear all filters.",
+            ):
+                invalidate_session_state(f"{Scope.FILTERS}")
+                st.rerun()
+
+    feature_table = st.session_state.get(f"{Scope.DATA}:feature_table", None)
+    feature_table_name = st.session_state.get(f"{Scope.DATA}:feature_table_name", "")
+    if feature_table is None:
+        st.warning(
+            "No feature table found in session state. Please make sure to run the setup page first."
+        )
+        st.stop()
+
+    feature_filters_manger(feature_table=feature_table, table_name=feature_table_name)
+    logger.info("Filters page loading complete")
+
+
+if __name__ == "__main__":
+    main()

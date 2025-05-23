@@ -3,7 +3,7 @@ import copy
 import plotly.express as px
 import streamlit as st
 
-from fractal_explorer.filters_utils.common import FeatureFrame
+from fractal_explorer.pages.filters_page._common import FeatureFrame
 from fractal_explorer.utils.st_components import (
     selectbox_component,
 )
@@ -67,7 +67,7 @@ def heat_map_component(
     elif aggregation == "Counts":
         df_piv = df_piv.count()
     else:
-        st.stop()
+        raise ValueError(f"Unknown aggregation: {aggregation}")
 
     new_feature_name = f"{selected_feature} {aggregation}"
     df_piv = df_piv.rename(columns={selected_feature: new_feature_name})

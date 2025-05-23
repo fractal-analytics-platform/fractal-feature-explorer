@@ -7,7 +7,7 @@ import streamlit as st
 from matplotlib.path import Path
 from pydantic import BaseModel, Field
 
-from fractal_explorer.filters_utils.common import FeatureFrame
+from fractal_explorer.pages.filters_page._common import FeatureFrame
 from fractal_explorer.utils import Scope
 from fractal_explorer.utils.ngio_caches import (
     get_ome_zarr_container,
@@ -17,6 +17,20 @@ from fractal_explorer.utils.st_components import (
     selectbox_component,
     single_slider_component,
 )
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+def _show_point_info(
+    point_dict: dict,
+):
+    st.write("Image URL: ", point_dict["image_url"])
+    st.write("Label: ", point_dict["label"])
+    st.write("Reference Label: ", point_dict["reference_label"])
+    for key, value in point_dict.items():
+        if key not in ["image_url", "label", "reference_label"]:
+            st.write(f"{key}: ", value)
 
 
 @st.dialog("Cell Preview")
@@ -27,13 +41,22 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
     point_dict = feature_df.select("image_url", "label", "reference_label").to_dicts()[
         point
     ]
-    token = st.session_state.get(f"{Scope.GLOBAL}:token")
-    container = get_ome_zarr_container(
-        point_dict["image_url"],
-        token=token,
-        mode="image",
-    )
-    image = container.get_image()
+    logger.info(f"Opening point: {point_dict} in dialog")
+    token = st.session_state.get(f"{Scope.PRIVATE}:token")
+    
+    try:
+        container = get_ome_zarr_container(
+            point_dict["image_url"],
+            token=token,
+            mode="image",
+        )
+        image = container.get_image()
+    except Exception as e:
+        logger.error(f"Error opening image: {e}")
+        st.error("Error opening image")
+        _show_point_info(point_dict)
+        return
+        
 
     channels = container.image_meta.channel_labels
     if len(channels) > 1:
@@ -90,24 +113,28 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             help="Select the level to display",
         )
 
-    image = get_single_label_image(
-        image_url=point_dict["image_url"],
-        ref_label=point_dict["reference_label"],
-        label=int(point_dict["label"]),
-        level_path=level_path,
-        channel=channel,
-        z_slice=z_slice,
-        t_slice=t_slice,
-        show_label=show_label,
-        zoom_factor=zoom_factor,
-        token=token,
-    )
-    st.image(image, use_container_width=True)
+    try:
+        image = get_single_label_image(
+            image_url=point_dict["image_url"],
+            ref_label=point_dict["reference_label"],
+            label=int(point_dict["label"]),
+            level_path=level_path,
+            channel=channel,
+            z_slice=z_slice,
+            t_slice=t_slice,
+            show_label=show_label,
+            zoom_factor=zoom_factor,
+            token=token,
+        )
+        st.image(image, use_container_width=True)
+    except Exception as e:
+        logger.error(f"Error opening image: {e}")
+        st.error("Error opening image")
+        _show_point_info(point_dict)
+        return
 
     with st.expander("Infos", expanded=False):
-        st.write("Image URL: ", point_dict["image_url"])
-        st.write("Label: ", point_dict["label"])
-        st.write("Reference Label: ", point_dict["reference_label"])
+        _show_point_info(point_dict)
 
 
 class ScatterFilter(BaseModel):
@@ -170,6 +197,14 @@ def scatter_filter_component(
     Create a scatter filter for the feature frame
     And return the filtered feature frame
     """
+    if len(feature_frame.features) < 2:
+        error_msg = (
+            "Not enough features found in the feature table. "
+            "At least 2 features are required for the scatter filter."
+        )
+        logger.error(error_msg)
+        raise ValueError(error_msg)
+
     col1, col2 = st.columns(2)
     features_columns = feature_frame.features
     with col1:
@@ -283,6 +318,7 @@ def scatter_filter_component(
     )
 
     if len(state.sel_x) > 0:
+        logger.info("Adding filtered points to the scatter plot")
         filtered_df = state.apply_to_df(feature_df)
         fig.add_trace(
             go.Scattergl(
@@ -319,6 +355,7 @@ def scatter_filter_component(
         on_select="rerun",
         selection_mode=["points", "lasso"],
     )
+    logger.info("Scatter plot created")
     selection = event.get("selection")
     if selection is not None:
         is_event_selection = (
@@ -327,20 +364,26 @@ def scatter_filter_component(
         is_click_selection = len(selection.get("point_indices", [])) > 0
         if is_event_selection:
             if len(selection.get("lasso", [])) > 0:
-                scatter_state = ScatterFilter(
-                    column_x=x_column,
-                    column_y=y_column,
-                    sel_x=selection.get("lasso", [])[0].get("x", []),
-                    sel_y=selection.get("lasso", [])[0].get("y", []),
-                )
-                st.session_state[f"{key}:state"] = scatter_state.model_dump_json()
-                st.rerun()
+                if st.button(
+                    "Confirm selection", key=f"{key}:confirm_selection", icon="✅"
+                ):
+                    scatter_state = ScatterFilter(
+                        column_x=x_column,
+                        column_y=y_column,
+                        sel_x=selection.get("lasso", [])[0].get("x", []),
+                        sel_y=selection.get("lasso", [])[0].get("y", []),
+                    )
+                    st.session_state[f"{key}:state"] = scatter_state.model_dump_json()
+                    logger.info(f"Adding scatter filter state: {scatter_state}")
+                    st.rerun()
             else:
                 if f"{key}:state" in st.session_state:
+                    logger.info("Removing scatter filter state")
                     del st.session_state[f"{key}:state"]
                     st.rerun()
 
         elif is_click_selection:
+            logger.info("Click selection on the scatter plot")
             view_point(
                 point=selection.get("point_indices", [])[0],
                 feature_df=feature_df,
@@ -351,7 +394,11 @@ def scatter_filter_component(
         scatter_state = ScatterFilter.model_validate_json(
             st.session_state[f"{key}:state"]
         )
-        return scatter_state.apply(feature_frame=feature_frame)
+        feature_frame = scatter_state.apply(feature_frame=feature_frame)
+        logger.info(
+            f"Scatter filter applied: {scatter_state.column_x} [{scatter_state.sel_x}, {scatter_state.sel_y}]"
+        )
+        return feature_frame
     scatter_state = ScatterFilter(
         column_x=x_column,
         column_y=y_column,

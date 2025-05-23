@@ -2,6 +2,9 @@ from typing import Literal
 
 import streamlit as st
 from pydantic import BaseModel, ConfigDict, model_validator
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class PillsState(BaseModel):
@@ -44,6 +47,8 @@ def pills_component(
             st.session_state[f"{key}_state_model"]
         )
         pills_model.options = options
+        if len(pills_model.default) == 0 and len(options) > 0:
+            pills_model.default = [options[0]]
 
     def _update_session_state():
         pills_model.default = st.session_state[key]
@@ -58,6 +63,7 @@ def pills_component(
         key=key,
         on_change=_update_session_state,
     )
+
     if selected_options is None:
         selected_options = []
     if not isinstance(selected_options, list):
@@ -77,6 +83,9 @@ class SelectBoxState(BaseModel):
     @model_validator(mode="after")
     def check_model(self):
         # index should be less than the length of options
+        if len(self.options) == 0:
+            return self
+
         if self.index >= len(self.options):
             self.index = 0
         return self
@@ -85,13 +94,19 @@ class SelectBoxState(BaseModel):
 def selectbox_component(
     key: str,
     label: str,
-    options: list,
+    options: list[str],
     help: str | None = None,
-):
+) -> str:
     """Wrapper for the streamlit.selectbox component.
     This function handles the session state for the selectbox component.
     A unique key is required for each selectbox component.
     """
+
+    if len(options) == 0:
+        raise ValueError(
+            "Selectbox options are empty. Selectbox cannot be created with an empty list."
+        )
+
     if f"{key}_state_model" not in st.session_state:
         selectbox_model = SelectBoxState(
             options=options,
@@ -158,6 +173,8 @@ def multiselect_component(
             st.session_state[f"{key}_state_model"]
         )
         multiselect_model.options = options
+        if len(multiselect_model.default) == 0 and len(options) > 0:
+            multiselect_model.default = [options[0]]
 
     def _update_session_state():
         multiselect_model.default = st.session_state[key]

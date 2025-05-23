@@ -1,11 +1,14 @@
 import polars as pl
 import streamlit as st
+from streamlit.logger import get_logger
 
-from fractal_explorer.explore_utils.heat_map import heat_map_component
-from fractal_explorer.explore_utils.scatter_plot import scatter_plot_component
-from fractal_explorer.filters_utils import apply_filters, build_feature_frame
-from fractal_explorer.filters_utils.common import FeatureFrame
+from fractal_explorer.pages.explore_page._heat_map_plot import heat_map_component
+from fractal_explorer.pages.explore_page._scatter_plot import scatter_plot_component
+from fractal_explorer.pages.filters_page import apply_filters, build_feature_frame
+from fractal_explorer.pages.filters_page._common import FeatureFrame
 from fractal_explorer.utils import Scope, invalidate_session_state
+
+logger = get_logger(__name__)
 
 
 def _find_unique_name(keys: list[str], prefix: str) -> str:
@@ -47,6 +50,7 @@ def add_plot() -> None:
                 key,
                 scatter_plot_component,
             )
+            logger.info(f"New Scatter Plot added: {name}")
             st.rerun()
         elif plot_type == "Heat Map":
             name = _find_unique_name(
@@ -58,6 +62,7 @@ def add_plot() -> None:
                 key,
                 heat_map_component,
             )
+            logger.info(f"New Heat Map added: {name}")
             st.rerun()
 
     return None
@@ -75,10 +80,16 @@ def display_plots(feature_frame: FeatureFrame) -> FeatureFrame:
             ### {name}
             """
         )
-        plot_component(
-            key=plot_key,
-            feature_frame=feature_frame,
-        )
+        try:
+            plot_component(
+                key=plot_key,
+                feature_frame=feature_frame,
+            )
+        except Exception as e:
+            error_msg = f"Error displaying plot {name}: {e}"
+            logger.error(error_msg)
+            st.error(error_msg)
+
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Reset Plot", key=f"{plot_key}:reset_plot_button", icon="🔄"):
@@ -96,7 +107,9 @@ def display_plots(feature_frame: FeatureFrame) -> FeatureFrame:
     return feature_frame
 
 
-def feature_explore_setup(feature_table: pl.LazyFrame, table_name: str) -> FeatureFrame:
+def feature_explore_manager(
+    feature_table: pl.LazyFrame, table_name: str, skip_filters: bool = True
+) -> FeatureFrame:
     """
     Setup the feature table for the dashboard.
     """
@@ -108,7 +121,8 @@ def feature_explore_setup(feature_table: pl.LazyFrame, table_name: str) -> Featu
         """
     )
     feature_frame = build_feature_frame(feature_table)
-    feature_frame = apply_filters(feature_frame)
+    if not skip_filters:
+        feature_frame = apply_filters(feature_frame)
 
     col1, _ = st.columns(2)
     with col1:
@@ -116,3 +130,42 @@ def feature_explore_setup(feature_table: pl.LazyFrame, table_name: str) -> Featu
 
     feature_frame = display_plots(feature_frame)
     return feature_frame
+
+
+def main():
+    with st.sidebar:
+        with st.expander("Advanced Options", expanded=False):
+            skip_filters = st.toggle(
+                label="Skip Filters",
+                key=f"{Scope.EXPLORE}:apply_filters",
+                value=False,
+            )
+
+            if st.button(
+                "Reset Explore Page",
+                key=f"{Scope.EXPLORE}:reset_explore_page",
+                icon="🔄",
+                help="Reset the explore page state. This will clear all plots.",
+            ):
+                invalidate_session_state(f"{Scope.EXPLORE}")
+                st.rerun()
+
+    feature_table = st.session_state.get(f"{Scope.DATA}:feature_table", None)
+    feature_table_name = st.session_state.get(f"{Scope.DATA}:feature_table_name", "")
+
+    if feature_table is None:
+        st.warning(
+            "No feature table found in session state. Please make sure to run the setup page first."
+        )
+        st.stop()
+
+    feature_explore_manager(
+        feature_table=feature_table,
+        table_name=feature_table_name,
+        skip_filters=skip_filters,
+    )
+    logger.info("Explore page loading complete")
+
+
+if __name__ == "__main__":
+    main()
