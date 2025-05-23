@@ -6,7 +6,14 @@ requires-python = "==3.12"
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["devtools", "notebook", "pre-commit", "ruff", "watchdog"]
+dev = [
+    "devtools",
+    "notebook",
+    "pre-commit",
+    "ruff",
+    "watchdog",
+    "psrecord[plot]",
+]
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
