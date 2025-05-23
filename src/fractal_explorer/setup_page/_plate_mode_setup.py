@@ -49,7 +49,7 @@ def user_plate_url_input_component(token=None):
         st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = set()
 
     new_url = st.text_input("Plate URL")
-    if st.button("Add Plate URL"):
+    if st.button("Add Plate URL", icon="➕"):
         # Validate the URL
         new_url = sanifiy_url(new_url, token=token)
         if new_url is not None:

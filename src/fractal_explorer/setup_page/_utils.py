@@ -61,6 +61,11 @@ def sanify_path_url(url: str) -> str | None:
 
 def sanifiy_url(url: str, token: str | None) -> str | None:
     """Sanitize the URL by removing the trailing slash."""
+    if len(url) == 0:
+        st.error("URL is empty.")
+        logger.error("URL is empty.")
+        return None
+    
     if url.startswith("http://") or url.startswith("https://"):
         return sanifiy_http_url(url, token=token)
     else:

@@ -140,9 +140,13 @@ def display_filters(feature_frame: FeatureFrame) -> FeatureFrame:
                     feature_frame=feature_frame,
                 )
             except Exception as e:
-                st.error(f"Error applying filter {name}: {e}")
-                logger.error(f"Error applying filter {name}: {e}")
-            
+                error_msg = (
+                    f"Error applying filter {name}: {e}. "
+                    "Please check the filter parameters and try again."
+                )
+                st.error(error_msg)
+                logger.error(error_msg)
+
             col1, col2 = st.columns(2)
             with col1:
                 if st.button(
@@ -195,7 +199,7 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
             logger.warning(warn_msg)
             st.warning(warn_msg)
             continue
-        
+
         logger.info(f"Applying filter {name} of type {filter_type}")
         if filter_type == "columns":
             filter_component = ColumnsFilter.model_validate_json(status_json)
@@ -209,12 +213,14 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
         else:
             st.warning(f"Filter {name} is not found. Please apply the filter first.")
             continue
-    
+
     logger.info("Filters applied to feature table")
     return feature_frame
 
 
-def feature_filters_manger(feature_table: pl.LazyFrame, table_name: str) -> FeatureFrame:
+def feature_filters_manger(
+    feature_table: pl.LazyFrame, table_name: str
+) -> FeatureFrame:
     """
     Setup the feature table for the dashboard.
     """
@@ -239,14 +245,15 @@ def feature_filters_manger(feature_table: pl.LazyFrame, table_name: str) -> Feat
 def main():
     with st.sidebar:
         with st.expander("Advanced Options", expanded=False):
-            if st.button("Reset Filters",
-                        key=f"{Scope.FILTERS}:reset_filters",
-                        icon="🔄",
-                        help="Reset the filters state. This will clear all filters."):
+            if st.button(
+                "Reset Filters",
+                key=f"{Scope.FILTERS}:reset_filters",
+                icon="🔄",
+                help="Reset the filters state. This will clear all filters.",
+            ):
                 invalidate_session_state(f"{Scope.FILTERS}")
                 st.rerun()
 
-    
     feature_table = st.session_state.get(f"{Scope.DATA}:feature_table", None)
     feature_table_name = st.session_state.get(f"{Scope.DATA}:feature_table_name", "")
     if feature_table is None:
@@ -256,6 +263,7 @@ def main():
         st.stop()
 
     feature_filters_manger(feature_table=feature_table, table_name=feature_table_name)
+    logger.info("Filters page loading complete")
 
 
 if __name__ == "__main__":

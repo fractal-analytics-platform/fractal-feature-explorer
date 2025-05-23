@@ -175,12 +175,11 @@ def scatter_filter_component(
     """
     if len(feature_frame.features) < 2:
         error_msg = (
-            "Not enough features found in the feature table. ",
-            "At least 2 features are required for the scatter filter.",
+            "Not enough features found in the feature table. "
+            "At least 2 features are required for the scatter filter."
         )
-        st.error(error_msg)
         logger.error(error_msg)
-        st.stop()
+        raise ValueError(error_msg)
 
     col1, col2 = st.columns(2)
     features_columns = feature_frame.features
@@ -341,7 +340,9 @@ def scatter_filter_component(
         is_click_selection = len(selection.get("point_indices", [])) > 0
         if is_event_selection:
             if len(selection.get("lasso", [])) > 0:
-                if st.button("Confirm selection", key=f"{key}:confirm_selection", icon="✅"):
+                if st.button(
+                    "Confirm selection", key=f"{key}:confirm_selection", icon="✅"
+                ):
                     scatter_state = ScatterFilter(
                         column_x=x_column,
                         column_y=y_column,

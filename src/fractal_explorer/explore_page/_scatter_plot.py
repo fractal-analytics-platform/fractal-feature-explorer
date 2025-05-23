@@ -23,12 +23,11 @@ def scatter_plot_component(
     """
     if len(feature_frame.features) < 2:
         error_msg = (
-            "Not enough features found in the feature table. ",
-            "At least 2 features are required for the scatter filter.",
+            "Not enough features found in the feature table. "
+            "At least 2 features are required for the scatter filter."
         )
-        st.error(error_msg)
         logger.error(error_msg)
-        st.stop()
+        raise ValueError(error_msg)
 
     features_columns = feature_frame.features
     x_column = selectbox_component(

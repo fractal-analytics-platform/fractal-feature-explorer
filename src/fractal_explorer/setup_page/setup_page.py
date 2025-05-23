@@ -90,8 +90,9 @@ def setup_global_state():
     return setup_mode
 
 
-
-def filter_cache_invalidations(features_table: pl.LazyFrame, table_name: str) -> pl.Schema:
+def filter_cache_invalidations(
+    features_table: pl.LazyFrame, table_name: str
+) -> pl.Schema:
     schema = features_table.collect_schema()
     if f"{Scope.DATA}:feature_table" in st.session_state:
         old_table_name = st.session_state[f"{Scope.DATA}:feature_table_name"]
@@ -128,12 +129,14 @@ def main():
                 type="password",
             )
             st.session_state[f"{Scope.PRIVATE}:token"] = token
-            
+
             st.divider()
-            if st.button("Reset Setup", 
-                        key=f"{Scope.SETUP}:reset_setup", 
-                        icon="🔄",
-                        help="Reset the setup state. This will clear all filters and the feature table."):
+            if st.button(
+                "Reset Setup",
+                key=f"{Scope.SETUP}:reset_setup",
+                icon="🔄",
+                help="Reset the setup state. This will clear all filters and the feature table.",
+            ):
                 invalidate_session_state(f"{Scope.SETUP}")
                 st.rerun()
 
@@ -151,10 +154,14 @@ def main():
             st.stop()
 
     schema = filter_cache_invalidations(features_table, table_name)
-    
+
     st.session_state[f"{Scope.DATA}:feature_table"] = features_table
     st.session_state[f"{Scope.DATA}:feature_table_name"] = table_name
     st.session_state[f"{Scope.DATA}:feature_table_schema"] = schema
+    logger.info(
+        f"Feature table {table_name} with schema {schema} has been set in session state."
+    )
+    logger.info("Setup page loading complete.")
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ def list_plate_tables(
 
     for url in plate_urls:
         logger.warning(f"Loading plate {url}...")
-        
+
         plate = get_ome_zarr_plate(url, token=token)
         if plate._tables_container is None:
             logger.warning(

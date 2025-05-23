@@ -50,9 +50,8 @@ def histogram_filter_component(
     """
     if len(feature_frame.features) == 0:
         error_msg = "No features found in the feature table."
-        st.error(error_msg)
         logger.error(error_msg)
-        st.stop()
+        raise ValueError(error_msg)
 
     col1, col2 = st.columns(2)
     with col1:
