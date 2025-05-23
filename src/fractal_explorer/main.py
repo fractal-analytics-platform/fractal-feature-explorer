@@ -1,5 +1,6 @@
 import streamlit as st
-from fractal_explorer import __version__
+import fractal_explorer
+import ngio
 
 
 def main():
@@ -34,7 +35,8 @@ def main():
     """
     footer_content = f"""
     <div class='footer'>
-        fractal-explorer v{__version__} |
+        Fractal Explorer Version: {fractal_explorer.__version__} |
+        ngio Version: {ngio.__version__} |
         © Copyright 2025 University of Zurich (see LICENSE file for details)
     </div>
     """
