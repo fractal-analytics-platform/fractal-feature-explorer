@@ -14,9 +14,14 @@ from fractal_explorer.utils.st_components import (
 
 
 from streamlit.logger import get_logger
-from fractal_explorer.setup_page._plate_advanced_selection import advanced_plate_selection_component
+from fractal_explorer.setup_page._plate_advanced_selection import (
+    advanced_plate_selection_component,
+)
 from fractal_explorer.setup_page._tables import (
-    list_images_tables, list_plate_tables, collect_feature_table_from_images, collect_feature_table_from_plates
+    list_images_tables,
+    list_plate_tables,
+    collect_feature_table_from_images,
+    collect_feature_table_from_plates,
 )
 from fractal_explorer.setup_page._utils import (
     sanifiy_url,
@@ -32,12 +37,13 @@ logger = get_logger(__name__)
 #
 # ====================================================================
 
+
 def user_plate_url_input_component(token=None):
     """Create a widget for inputting plate URLs."""
     st.markdown("## Input Plate URLs")
-    global_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
+    global_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
     logger.debug(f"Global URLs: {global_urls}")
-    token = st.session_state.get(f"{Scope.GLOBAL}:token", None)
+    token = st.session_state.get(f"{Scope.SETUP}:token", None)
 
     if f"{Scope.SETUP}:plate_setup:urls" not in st.session_state:
         st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = set()
@@ -56,10 +62,10 @@ def user_plate_url_input_component(token=None):
                 error_msg = f"Error loading plate at {new_url} \n{e}"
                 st.error(error_msg)
                 logger.error(error_msg)
-    
+
     local_urls = st.session_state[f"{Scope.SETUP}:plate_setup:urls"]
     return local_urls
-    
+
 
 def build_plate_setup_df(plate_urls: list[str], token=None) -> pl.DataFrame:
     plates = []
@@ -95,6 +101,7 @@ def build_plate_setup_df(plate_urls: list[str], token=None) -> pl.DataFrame:
         },
     )
     return plate_setup_df
+
 
 # ====================================================================
 #
@@ -150,6 +157,7 @@ def plate_name_selection(
 #
 # ====================================================================
 
+
 def _feature_table_selection_widget(
     plate_feature_tables: list[str], image_feature_tables: list[str]
 ) -> tuple[str | None, str | None]:
@@ -202,9 +210,7 @@ def load_feature_table(
             plate_setup_df, selected_table, token=token
         )
         if feature_table is None:
-            st.error(
-                f"Feature table `{selected_table}` not found in the plate URLs."
-            )
+            st.error(f"Feature table `{selected_table}` not found in the plate URLs.")
             logger.error(
                 f"Feature table `{selected_table}` not found in the plate URLs."
             )
@@ -220,6 +226,7 @@ def features_infos(feature_table: pl.DataFrame, name: str = "Feature Table"):
         f"`{len(feature_table.columns)}` features."
     )
 
+
 # ====================================================================
 #
 # Plate Mode Setup:
@@ -227,11 +234,12 @@ def features_infos(feature_table: pl.DataFrame, name: str = "Feature Table"):
 #
 # ====================================================================
 
+
 def plate_mode_setup_component():
     """Setup the plate mode for the dashboard."""
-    token = st.session_state.get(f"{Scope.GLOBAL}:token", None)
-    global_urls = st.session_state.get(f"{Scope.GLOBAL}:zarr_urls", [])
-    
+    token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
+    global_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
+
     local_urls = user_plate_url_input_component(token=token)
     logger.debug(f"Local URLs: {local_urls}")
     urls = global_urls + list(local_urls)
@@ -254,9 +262,7 @@ def plate_mode_setup_component():
         st.stop()
 
     with st.expander("Advanced Selection", expanded=False):
-        images_setup = advanced_plate_selection_component(
-            plate_setup_df, token=token
-        )
+        images_setup = advanced_plate_selection_component(plate_setup_df, token=token)
 
     feature_table, table_name = load_feature_table(images_setup, token=token)
     st.markdown("## Feature Table Selection")

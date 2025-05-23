@@ -8,10 +8,11 @@ class Scope(StrEnum):
     Enum for the different phases of the fractal explorer.
     """
 
-    GLOBAL = "global"
-    SETUP = "setup"
-    FILTERS = "filters"
-    EXPLORE = "explore"
+    PRIVATE = "private"  # User private data (like auth token)
+    SETUP = "setup"  # Setup page keys
+    FILTERS = "filters"  # Filters page keys
+    EXPLORE = "explore"  # Explore page keys
+    DATA = "data"  # Non-serializable data (like polars DataFrames)
 
 
 def invalidate_session_state(key_prefix: str) -> None:

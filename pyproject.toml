@@ -1,16 +1,20 @@
 [project]
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
-dependencies = ["streamlit", "plotly", "numpy", "matplotlib", "orjson"]
+dependencies = ["streamlit", "plotly", "numpy", "matplotlib", "orjson", "rich"]
 name = "fractal-explorer"
-requires-python = ">= 3.11"
-version = "0.1.0"
+requires-python = "==3.12"
+dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["devtools", "notebook", "pre-commit", "rich", "ruff", "watchdog"]
+dev = ["devtools", "notebook", "pre-commit", "ruff", "watchdog"]
 
 [build-system]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
-requires = ["hatchling"]
+
+# https://hatch.pypa.io/latest/config/metadata/
+[tool.hatch.version]
+source = "vcs"
 
 [tool.pixi.project]
 channels = ["conda-forge"]

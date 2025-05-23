@@ -1,5 +1,3 @@
-import asyncio
-
 import polars as pl
 import streamlit as st
 
@@ -11,7 +9,12 @@ from fractal_explorer.utils.st_components import (
     selectbox_component,
 )
 
-from fractal_explorer.setup_page._tables import list_images_tables, list_plate_tables, collect_condition_table_from_images, collect_condition_table_from_plates
+from fractal_explorer.setup_page._tables import (
+    list_images_tables,
+    list_plate_tables,
+    collect_condition_table_from_images,
+    collect_condition_table_from_plates,
+)
 
 from streamlit.logger import get_logger
 
@@ -33,12 +36,14 @@ def extras_from_url(image_url: str) -> dict[str, str]:
         "path_in_well": path_in_well,
     }
 
+
 # ====================================================================
 #
 # Row Selection Widget:
 # allow the used to select which rows to include in the analysis
 #
 # ====================================================================
+
 
 def rows_selection_widget(
     plate_setup_df: pl.DataFrame,
@@ -189,6 +194,7 @@ def wells_selection_widget(
 #
 # ====================================================================
 
+
 def _join_condition_table_widget(
     table_condition_tables: list[str], image_condition_tables: list[str]
 ) -> tuple[str | None, str | None]:
@@ -240,9 +246,7 @@ def join_condition_tables(
             token=token,
         )
         if new_plate_setup_df is None:
-            st.warning(
-                f"Condition table {selected_table} not found in the plates."
-            )
+            st.warning(f"Condition table {selected_table} not found in the plates.")
             return plate_setup_df
         return new_plate_setup_df
 

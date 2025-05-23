@@ -4,7 +4,7 @@ import polars as pl
 import streamlit as st
 from ngio.common import (
     concatenate_image_tables_async,
-    concatenate_image_tables_as_async
+    concatenate_image_tables_as_async,
 )
 from ngio.tables import FeatureTable
 from typing import Literal
@@ -21,6 +21,7 @@ from fractal_explorer.setup_page._utils import (
 from streamlit.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 def list_plate_tables(
     plate_setup_df: pl.DataFrame, token=None, filter_types: str = "condition_table"
@@ -54,11 +55,13 @@ def list_images_tables(
     )
     return images_condition_tables
 
+
 # ====================================================================
 #
 # Condition tables utils
 #
 # ====================================================================
+
 
 @st.cache_data
 def _load_single_plate_condition_table(
@@ -116,9 +119,7 @@ def _collect_condition_table_from_images_cached(
     mode: Literal["plate", "image"] = "plate",
 ) -> pl.DataFrame:
     """Load the condition table from the image URLs."""
-    images = [
-        get_ome_zarr_container(url, token=token, mode=mode) for url in list_urls
-    ]
+    images = [get_ome_zarr_container(url, token=token, mode=mode) for url in list_urls]
 
     extras = [extras_from_url(url) for url in list_urls]
     # For more efficient loading, we should reimplement this
@@ -140,8 +141,9 @@ def _collect_condition_table_from_images_cached(
 
 
 def _join_setup_to_condition_table(
-    plate_setup_df: pl.DataFrame, condition_df: pl.DataFrame, 
-    on=("plate_name", "row", "column", "path_in_well")
+    plate_setup_df: pl.DataFrame,
+    condition_df: pl.DataFrame,
+    on=("plate_name", "row", "column", "path_in_well"),
 ) -> pl.DataFrame:
     """Join the condition table with the plate setup DataFrame."""
     plate_setup_df = plate_setup_df.join(
@@ -151,6 +153,7 @@ def _join_setup_to_condition_table(
     )
     return plate_setup_df
 
+
 def collect_condition_table_from_plates(
     plate_setup_df: pl.DataFrame,
     table_name: str,
@@ -158,10 +161,13 @@ def collect_condition_table_from_plates(
 ) -> pl.DataFrame | None:
     """Load the condition table from the plate URLs."""
     plate_urls = plate_setup_df["plate_url"].unique().sort().to_list()
-    condition_df = _collect_condition_table_from_plates_cached(plate_urls, table_name, token=token)
+    condition_df = _collect_condition_table_from_plates_cached(
+        plate_urls, table_name, token=token
+    )
     if condition_df is None:
         return None
     return _join_setup_to_condition_table(plate_setup_df, condition_df)
+
 
 def collect_condition_table_from_images(
     plate_setup_df: pl.DataFrame,
@@ -172,7 +178,9 @@ def collect_condition_table_from_images(
 ) -> pl.DataFrame:
     """Load the condition table from the image URLs."""
     images_urls = plate_setup_df["image_url"].unique().sort().to_list()
-    condition_df = _collect_condition_table_from_images_cached(images_urls, table_name, token=token, mode=mode)
+    condition_df = _collect_condition_table_from_images_cached(
+        images_urls, table_name, token=token, mode=mode
+    )
     return _join_setup_to_condition_table(plate_setup_df, condition_df, on=on)
 
 
@@ -181,6 +189,7 @@ def collect_condition_table_from_images(
 # Feature tables utils
 #
 # ====================================================================
+
 
 @st.cache_data
 def _load_plate_feature_table(
@@ -271,10 +280,12 @@ def _collect_feature_table_from_images_cached(
         )
     return feature_df
 
+
 def _join_feature_table_to_setup(
-    plate_setup_df: pl.DataFrame, feature_df: pl.DataFrame, 
+    plate_setup_df: pl.DataFrame,
+    feature_df: pl.DataFrame,
     on=("plate_name", "row", "column", "path_in_well"),
-    drop=("plate_url", )
+    drop=("plate_url",),
 ) -> pl.DataFrame:
     """Join the feature table with the plate setup DataFrame."""
     feature_df = feature_df.join(
@@ -285,6 +296,7 @@ def _join_feature_table_to_setup(
     feature_df = feature_df.drop(drop)
     return feature_df
 
+
 def collect_feature_table_from_plates(
     plate_setup_df: pl.DataFrame,
     table_name: str,
@@ -292,11 +304,14 @@ def collect_feature_table_from_plates(
 ) -> pl.DataFrame | None:
     """Load the feature table from the plate URLs."""
     plate_urls = plate_setup_df["plate_url"].unique().sort().to_list()
-    feature_table = _collect_feature_table_from_plates_cached(plate_urls, table_name, token=token)
+    feature_table = _collect_feature_table_from_plates_cached(
+        plate_urls, table_name, token=token
+    )
     if feature_table is None:
         return None
     feature_table = _join_feature_table_to_setup(plate_setup_df, feature_table)
     return feature_table
+
 
 def collect_feature_table_from_images(
     plate_setup_df: pl.DataFrame,
@@ -305,7 +320,8 @@ def collect_feature_table_from_images(
 ) -> pl.DataFrame:
     """Load the feature table from the image URLs."""
     images_urls = plate_setup_df["image_url"].unique().sort().to_list()
-    feature_table = _collect_feature_table_from_images_cached(images_urls, table_name, token=token)
+    feature_table = _collect_feature_table_from_images_cached(
+        images_urls, table_name, token=token
+    )
     feature_table = _join_feature_table_to_setup(plate_setup_df, feature_table)
     return feature_table
-

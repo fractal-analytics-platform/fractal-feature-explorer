@@ -27,7 +27,7 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
     point_dict = feature_df.select("image_url", "label", "reference_label").to_dicts()[
         point
     ]
-    token = st.session_state.get(f"{Scope.GLOBAL}:token")
+    token = st.session_state.get(f"{Scope.PRIVATE}:token")
     container = get_ome_zarr_container(
         point_dict["image_url"],
         token=token,
