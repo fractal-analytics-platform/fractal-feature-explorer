@@ -167,13 +167,13 @@ def _feature_table_selection_widget(
         f"{t_name}{image_feature_tables_suffix}" for t_name in image_feature_tables
     ]
     feature_tables = plate_feature_tables + image_feature_tables
-    
+
     if len(feature_tables) == 0:
         error_msg = "No feature table is common to the selected plates/images."
         st.error(error_msg)
         logger.error(error_msg)
         st.stop()
-    
+
     selected_table = selectbox_component(
         key=f"{Scope.SETUP}:feature_table_selection",
         label="Select Feature Table",
@@ -200,7 +200,6 @@ def load_feature_table(
     image_feature_tables = list_images_tables(
         plate_setup_df, token=token, filter_types="feature_table"
     )
-    
 
     selected_table, mode = _feature_table_selection_widget(
         plate_feature_tables, image_feature_tables

@@ -38,10 +38,10 @@ def sanifiy_http_url(url: str, token: str | None) -> str | None:
 
 def sanify_path_url(url: str) -> str | None:
     """Sanitize a local path URL."""
-    
+
     # Remove any leading spaces
     url = url.lstrip(" ")
-    
+
     # Remove string quotes
     url = url.lstrip('"').rstrip('"')
     url = url.lstrip("'").rstrip("'")
@@ -49,7 +49,7 @@ def sanify_path_url(url: str) -> str | None:
     # If start with a ~, expand the user directory
     if url.startswith("~"):
         url = str(Path.home()) + url[1:]
-    
+
     path = Path(url).absolute()
     if not path.exists():
         st.error(f"Path {path} does not exist.")

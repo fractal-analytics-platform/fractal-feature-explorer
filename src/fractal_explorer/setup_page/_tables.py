@@ -24,7 +24,10 @@ logger = get_logger(__name__)
 
 
 def list_plate_tables(
-    plate_setup_df: pl.DataFrame, token=None, filter_types: str = "condition_table", mode: Literal["all", "common"] = "common"
+    plate_setup_df: pl.DataFrame,
+    token=None,
+    filter_types: str = "condition_table",
+    mode: Literal["all", "common"] = "common",
 ) -> list[str]:
     """Collect existing tables from the plate URLs."""
     plate_urls = plate_setup_df["plate_url"].unique().to_list()
@@ -45,29 +48,30 @@ def list_plate_tables(
                 plate_tables[table_name].append(url)
             logger.debug(f"List of plate tables in {url}: {list_tables}")
         except Exception as e:
-            erro_msg = (
-                f"Error loading {filter_types} tables from {url}. ")
+            erro_msg = f"Error loading {filter_types} tables from {url}. "
             st.error(erro_msg)
             logger.error(erro_msg)
             raise e
-        
+
     if mode == "all":
+        logger.debug(f"List of plate level tables: {plate_tables}")
         return list(plate_tables.keys())
     elif mode == "common":
         common_tables = []
+        logger.debug(f"List of common plate level tables: {plate_tables}")
         for table_name, urls in plate_tables.items():
             if len(urls) == len(plate_urls):
                 common_tables.append(table_name)
         return common_tables
     else:
-        raise ValueError(
-            f"Invalid mode {mode}. Must be 'all' or 'common'."
-        )
-    
+        raise ValueError(f"Invalid mode {mode}. Must be 'all' or 'common'.")
 
 
 def list_images_tables(
-    plate_setup_df: pl.DataFrame, token=None, filter_types: str = "condition_table", mode: Literal["all", "common"] = "common"
+    plate_setup_df: pl.DataFrame,
+    token=None,
+    filter_types: str = "condition_table",
+    mode: Literal["all", "common"] = "common",
 ) -> list[str]:
     """Collect existing image tables from the plate URLs."""
     images_urls = plate_setup_df["image_url"].unique().to_list()
@@ -77,6 +81,10 @@ def list_images_tables(
     images_condition_tables = asyncio.run(
         list_image_tables_async(images=images, filter_types=filter_types, mode=mode)
     )
+    if mode == "all":
+        logger.debug(f"List of image level tables: {images_condition_tables}")
+    elif mode == "common":
+        logger.debug(f"List of common image level tables: {images_condition_tables}")
     return images_condition_tables
 
 

@@ -10,6 +10,9 @@ from fractal_explorer.utils.st_components import (
     number_input_component,
     selectbox_component,
 )
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class HistogramFilter(BaseModel):
@@ -45,6 +48,11 @@ def histogram_filter_component(
     Create a histogram filter for the feature frame
     And return the filtered feature frame
     """
+    if len(feature_frame.features) == 0:
+        error_msg = "No features found in the feature table."
+        st.error(error_msg)
+        logger.error(error_msg)
+        st.stop()
 
     col1, col2 = st.columns(2)
     with col1:
@@ -74,7 +82,6 @@ def histogram_filter_component(
         help="Select the range to filter the histogram.",
     )
     filtered_values = values[np.logical_and(values >= min_filter, values <= max_filter)]
-
     # original
 
     common_bins = dict(
@@ -108,7 +115,7 @@ def histogram_filter_component(
         yaxis_title="Count",
     )
     st.plotly_chart(fig, key=f"{key}:histogram_filter_plot_overlay")
-
+    logger.debug("Histogram filter plot created")
     state = HistogramFilter(
         column=column,
         min=min_filter,
@@ -117,4 +124,6 @@ def histogram_filter_component(
 
     st.session_state[f"{key}:type"] = "histogram"
     st.session_state[f"{key}:state"] = state.model_dump_json()
-    return state.apply(feature_frame)
+    feature_frame = state.apply(feature_frame)
+    logger.debug(f"Histogram filter applied: {state.column} [{state.min}, {state.max}]")
+    return feature_frame

@@ -17,6 +17,9 @@ from fractal_explorer.utils.st_components import (
     selectbox_component,
     single_slider_component,
 )
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 @st.dialog("Cell Preview")
@@ -170,6 +173,15 @@ def scatter_filter_component(
     Create a scatter filter for the feature frame
     And return the filtered feature frame
     """
+    if len(feature_frame.features) < 2:
+        error_msg = (
+            "Not enough features found in the feature table. ",
+            "At least 2 features are required for the scatter filter.",
+        )
+        st.error(error_msg)
+        logger.error(error_msg)
+        st.stop()
+
     col1, col2 = st.columns(2)
     features_columns = feature_frame.features
     with col1:
@@ -283,6 +295,7 @@ def scatter_filter_component(
     )
 
     if len(state.sel_x) > 0:
+        logger.debug("Adding filtered points to the scatter plot")
         filtered_df = state.apply_to_df(feature_df)
         fig.add_trace(
             go.Scattergl(
@@ -319,6 +332,7 @@ def scatter_filter_component(
         on_select="rerun",
         selection_mode=["points", "lasso"],
     )
+    logger.debug("Scatter plot created")
     selection = event.get("selection")
     if selection is not None:
         is_event_selection = (
@@ -334,13 +348,16 @@ def scatter_filter_component(
                     sel_y=selection.get("lasso", [])[0].get("y", []),
                 )
                 st.session_state[f"{key}:state"] = scatter_state.model_dump_json()
+                logger.debug(f"Adding scatter filter state: {scatter_state}")
                 st.rerun()
             else:
                 if f"{key}:state" in st.session_state:
+                    logger.debug("Removing scatter filter state")
                     del st.session_state[f"{key}:state"]
                     st.rerun()
 
         elif is_click_selection:
+            logger.debug("Click selection on the scatter plot")
             view_point(
                 point=selection.get("point_indices", [])[0],
                 feature_df=feature_df,
@@ -351,7 +368,11 @@ def scatter_filter_component(
         scatter_state = ScatterFilter.model_validate_json(
             st.session_state[f"{key}:state"]
         )
-        return scatter_state.apply(feature_frame=feature_frame)
+        feature_frame = scatter_state.apply(feature_frame=feature_frame)
+        logger.debug(
+            f"Scatter filter applied: {scatter_state.column_x} [{scatter_state.sel_x}, {scatter_state.sel_y}]"
+        )
+        return feature_frame
     scatter_state = ScatterFilter(
         column_x=x_column,
         column_y=y_column,

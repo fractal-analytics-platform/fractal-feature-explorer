@@ -2,13 +2,15 @@ import copy
 
 import plotly.express as px
 import streamlit as st
-
+from streamlit.logger import get_logger
 from fractal_explorer.filters_utils.common import FeatureFrame
 from fractal_explorer.filters_utils.scatter_filter import view_point
 from fractal_explorer.utils.st_components import (
     selectbox_component,
     single_slider_component,
 )
+
+logger = get_logger(__name__)
 
 
 def scatter_plot_component(
@@ -19,6 +21,14 @@ def scatter_plot_component(
     Create a scatter plot for the feature frame
     And return the filtered feature frame
     """
+    if len(feature_frame.features) < 2:
+        error_msg = (
+            "Not enough features found in the feature table. ",
+            "At least 2 features are required for the scatter filter.",
+        )
+        st.error(error_msg)
+        logger.error(error_msg)
+        st.stop()
 
     features_columns = feature_frame.features
     x_column = selectbox_component(
@@ -66,6 +76,7 @@ def scatter_plot_component(
         for col in columns_needed:
             if col in possible_color_columns:
                 possible_color_columns.remove(col)
+
         color_column = selectbox_component(
             key=f"{key}:scatter_plot_color_column",
             label="Select **Color**",
@@ -131,6 +142,7 @@ def scatter_plot_component(
     fig.update_yaxes(showgrid=True)  # type: ignore
 
     event = st.plotly_chart(fig, key=f"{key}:scatter_plot", on_select="rerun")
+    logger.debug("Scatter plot created")
     selection = event.get("selection")
     if selection is not None:
         is_event_selection = (
