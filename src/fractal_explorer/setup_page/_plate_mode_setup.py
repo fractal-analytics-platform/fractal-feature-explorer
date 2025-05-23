@@ -160,13 +160,20 @@ def plate_name_selection(
 
 def _feature_table_selection_widget(
     plate_feature_tables: list[str], image_feature_tables: list[str]
-) -> tuple[str | None, str | None]:
+) -> tuple[str, str]:
     """Create a widget for selecting the feature table."""
     image_feature_tables_suffix = " (Require Agg.)"
     image_feature_tables = [
         f"{t_name}{image_feature_tables_suffix}" for t_name in image_feature_tables
     ]
     feature_tables = plate_feature_tables + image_feature_tables
+    
+    if len(feature_tables) == 0:
+        error_msg = "No feature table is common to the selected plates/images."
+        st.error(error_msg)
+        logger.error(error_msg)
+        st.stop()
+    
     selected_table = selectbox_component(
         key=f"{Scope.SETUP}:feature_table_selection",
         label="Select Feature Table",
@@ -193,11 +200,11 @@ def load_feature_table(
     image_feature_tables = list_images_tables(
         plate_setup_df, token=token, filter_types="feature_table"
     )
+    
+
     selected_table, mode = _feature_table_selection_widget(
         plate_feature_tables, image_feature_tables
     )
-    if selected_table is None:
-        st.stop()
 
     with st.spinner("Loading feature table...", show_time=True):
         if mode == "image":
