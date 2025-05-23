@@ -341,15 +341,16 @@ def scatter_filter_component(
         is_click_selection = len(selection.get("point_indices", [])) > 0
         if is_event_selection:
             if len(selection.get("lasso", [])) > 0:
-                scatter_state = ScatterFilter(
-                    column_x=x_column,
-                    column_y=y_column,
-                    sel_x=selection.get("lasso", [])[0].get("x", []),
-                    sel_y=selection.get("lasso", [])[0].get("y", []),
-                )
-                st.session_state[f"{key}:state"] = scatter_state.model_dump_json()
-                logger.info(f"Adding scatter filter state: {scatter_state}")
-                st.rerun()
+                if st.button("Confirm selection", key=f"{key}:confirm_selection", icon="✅"):
+                    scatter_state = ScatterFilter(
+                        column_x=x_column,
+                        column_y=y_column,
+                        sel_x=selection.get("lasso", [])[0].get("x", []),
+                        sel_y=selection.get("lasso", [])[0].get("y", []),
+                    )
+                    st.session_state[f"{key}:state"] = scatter_state.model_dump_json()
+                    logger.info(f"Adding scatter filter state: {scatter_state}")
+                    st.rerun()
             else:
                 if f"{key}:state" in st.session_state:
                     logger.info("Removing scatter filter state")
