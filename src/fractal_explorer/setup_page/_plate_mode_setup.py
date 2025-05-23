@@ -42,7 +42,7 @@ def user_plate_url_input_component(token=None):
     """Create a widget for inputting plate URLs."""
     st.markdown("## Input Plate URLs")
     global_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
-    logger.debug(f"Global URLs: {global_urls}")
+    logger.info(f"Global URLs: {global_urls}")
     token = st.session_state.get(f"{Scope.SETUP}:token", None)
 
     if f"{Scope.SETUP}:plate_setup:urls" not in st.session_state:
@@ -247,7 +247,7 @@ def plate_mode_setup_component():
     global_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
 
     local_urls = user_plate_url_input_component(token=token)
-    logger.debug(f"Local URLs: {local_urls}")
+    logger.info(f"Local URLs: {local_urls}")
     urls = global_urls + list(local_urls)
     urls = list(set(urls))
 

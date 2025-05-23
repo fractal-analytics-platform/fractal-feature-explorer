@@ -295,7 +295,7 @@ def scatter_filter_component(
     )
 
     if len(state.sel_x) > 0:
-        logger.debug("Adding filtered points to the scatter plot")
+        logger.info("Adding filtered points to the scatter plot")
         filtered_df = state.apply_to_df(feature_df)
         fig.add_trace(
             go.Scattergl(
@@ -332,7 +332,7 @@ def scatter_filter_component(
         on_select="rerun",
         selection_mode=["points", "lasso"],
     )
-    logger.debug("Scatter plot created")
+    logger.info("Scatter plot created")
     selection = event.get("selection")
     if selection is not None:
         is_event_selection = (
@@ -348,16 +348,16 @@ def scatter_filter_component(
                     sel_y=selection.get("lasso", [])[0].get("y", []),
                 )
                 st.session_state[f"{key}:state"] = scatter_state.model_dump_json()
-                logger.debug(f"Adding scatter filter state: {scatter_state}")
+                logger.info(f"Adding scatter filter state: {scatter_state}")
                 st.rerun()
             else:
                 if f"{key}:state" in st.session_state:
-                    logger.debug("Removing scatter filter state")
+                    logger.info("Removing scatter filter state")
                     del st.session_state[f"{key}:state"]
                     st.rerun()
 
         elif is_click_selection:
-            logger.debug("Click selection on the scatter plot")
+            logger.info("Click selection on the scatter plot")
             view_point(
                 point=selection.get("point_indices", [])[0],
                 feature_df=feature_df,
@@ -369,7 +369,7 @@ def scatter_filter_component(
             st.session_state[f"{key}:state"]
         )
         feature_frame = scatter_state.apply(feature_frame=feature_frame)
-        logger.debug(
+        logger.info(
             f"Scatter filter applied: {scatter_state.column_x} [{scatter_state.sel_x}, {scatter_state.sel_y}]"
         )
         return feature_frame

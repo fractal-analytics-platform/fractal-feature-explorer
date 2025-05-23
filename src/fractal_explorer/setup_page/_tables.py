@@ -34,6 +34,8 @@ def list_plate_tables(
     plate_tables = {}
 
     for url in plate_urls:
+        logger.warning(f"Loading plate {url}...")
+        
         plate = get_ome_zarr_plate(url, token=token)
         if plate._tables_container is None:
             logger.warning(
@@ -46,7 +48,7 @@ def list_plate_tables(
                 if table_name not in plate_tables:
                     plate_tables[table_name] = []
                 plate_tables[table_name].append(url)
-            logger.debug(f"List of plate tables in {url}: {list_tables}")
+            logger.info(f"List of plate tables in {url}: {list_tables}")
         except Exception as e:
             erro_msg = f"Error loading {filter_types} tables from {url}. "
             st.error(erro_msg)
@@ -54,11 +56,11 @@ def list_plate_tables(
             raise e
 
     if mode == "all":
-        logger.debug(f"List of plate level tables: {plate_tables}")
+        logger.info(f"List of plate level tables: {plate_tables}")
         return list(plate_tables.keys())
     elif mode == "common":
         common_tables = []
-        logger.debug(f"List of common plate level tables: {plate_tables}")
+        logger.info(f"List of common plate level tables: {plate_tables}")
         for table_name, urls in plate_tables.items():
             if len(urls) == len(plate_urls):
                 common_tables.append(table_name)
@@ -82,9 +84,9 @@ def list_images_tables(
         list_image_tables_async(images=images, filter_types=filter_types, mode=mode)
     )
     if mode == "all":
-        logger.debug(f"List of image level tables: {images_condition_tables}")
+        logger.info(f"List of image level tables: {images_condition_tables}")
     elif mode == "common":
-        logger.debug(f"List of common image level tables: {images_condition_tables}")
+        logger.info(f"List of common image level tables: {images_condition_tables}")
     return images_condition_tables
 
 

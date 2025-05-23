@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 def validate_http_url(url: str, token: str | None) -> bool:
     """Validate the URL by checking if it is a valid HTTP URL."""
     try:
-        logger.debug(f"Attempting to open URL: {url}")
+        logger.info(f"Attempting to open URL: {url}")
         fractal_fsspec_store(url, fractal_token=token)
     except NgioValueError as e:
         st.error(e)

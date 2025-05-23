@@ -142,7 +142,7 @@ def scatter_plot_component(
     fig.update_yaxes(showgrid=True)  # type: ignore
 
     event = st.plotly_chart(fig, key=f"{key}:scatter_plot", on_select="rerun")
-    logger.debug("Scatter plot created")
+    logger.info("Scatter plot created")
     selection = event.get("selection")
     if selection is not None:
         is_event_selection = (

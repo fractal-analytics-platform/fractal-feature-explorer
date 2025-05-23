@@ -115,7 +115,7 @@ def histogram_filter_component(
         yaxis_title="Count",
     )
     st.plotly_chart(fig, key=f"{key}:histogram_filter_plot_overlay")
-    logger.debug("Histogram filter plot created")
+    logger.info("Histogram filter plot created")
     state = HistogramFilter(
         column=column,
         min=min_filter,
@@ -125,5 +125,5 @@ def histogram_filter_component(
     st.session_state[f"{key}:type"] = "histogram"
     st.session_state[f"{key}:state"] = state.model_dump_json()
     feature_frame = state.apply(feature_frame)
-    logger.debug(f"Histogram filter applied: {state.column} [{state.min}, {state.max}]")
+    logger.info(f"Histogram filter applied: {state.column} [{state.min}, {state.max}]")
     return feature_frame
