@@ -1512,8 +1512,8 @@ packages:
   requires_python: '>=2.7,!=3.0,!=3.1,!=3.2,!=3.3,!=3.4,<4'
 - pypi: ./
   name: fractal-explorer
-  version: 0.1.1.dev0+g6873f68.d20250530
-  sha256: 03077d7013fc1fb91bd636a193dfdd11195ece4a2e6694067777f04fd3a1dea0
+  version: 0.1.1.dev3+g5695a6b.d20250530
+  sha256: f55ed65f1f14de9fe1ccb76c156ffe8f4d983a5157c70332121dd70b273385c7
   requires_dist:
   - matplotlib
   - ngio>=0.3.0a0,<0.4.0

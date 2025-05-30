@@ -8,6 +8,8 @@ from fractal_explorer.pages.setup_page._plate_mode_setup import (
 )
 from fractal_explorer.utils import Scope, invalidate_session_state
 import polars as pl
+import os
+from pathlib import Path
 
 logger = get_logger(__name__)
 
@@ -43,6 +45,12 @@ def parse_cli_args():
         default=None,
         help="Fractal token to use for authentication.",
     )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to the configuration file.",
+    )
 
     args = parser.parse_args()
     if args.setup_mode is not None:
@@ -57,6 +65,13 @@ def parse_cli_args():
         zarr_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
         st.session_state[f"{Scope.SETUP}:zarr_urls"] = zarr_urls + args.zarr_urls
         logger.info(f"zarr_urls: {args.zarr_urls} (set from CLI args)")
+        
+    if args.config is not None:
+        os.environ["FRACTAL_EXPLORER_CONFIG"] = str(args.config)
+        logger.info(
+            f"Configuration file set to: {args.config} (set from CLI args)"
+        )
+
 
 
 def parse_query_params():
