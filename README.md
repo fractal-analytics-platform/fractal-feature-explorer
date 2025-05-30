@@ -33,6 +33,16 @@
     pixi run -e dev explorer
     ```
 
+## Change log
+
+### v0.1.1
+
+- Add a config file to allow for fine-tuning the dashboard behavior between centralized and local deployments, see an example in `configs/`.
+- config should either be passed as a CLI argument `--config path/to/config.toml`, or set as an environment variable `FRACTAL_EXPLORER_CONFIG=path/to/config.toml`, or saved in the `~/.fractal_explorer/config.toml` file.
+- Add guardrails for fractal token usage, now the token is bundled in the request headers only if the url is in the `fractal_token_subdomains`.
+- Fix [#28](https://github.com/fractal-analytics-platform/fractal-explorer/issues/28)
+- Fix [#29](https://github.com/fractal-analytics-platform/fractal-explorer/issues/29)
+
 ## URL query parameters
 
 - `setup_mode`: either `Plates` or `Images`. This will determine the setup page of the dashboard.
