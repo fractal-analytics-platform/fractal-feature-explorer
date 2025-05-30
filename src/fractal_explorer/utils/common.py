@@ -40,7 +40,13 @@ class FractalExplorerConfig(BaseModel):
     """
 
     allow_local_paths: bool = True
-    fractal_token_subdomains: list[str] = Field(default_factory=list)
+    fractal_token_subdomains: list[str] = Field(
+        default_factory=lambda: [
+            "https://fractal-bvc.mls.uzh.ch/",
+            "https://fractal-beta.mls.uzh.ch/",
+            "https://fractal.mls.uzh.ch",
+        ]
+    )
 
 
 @st.cache_data

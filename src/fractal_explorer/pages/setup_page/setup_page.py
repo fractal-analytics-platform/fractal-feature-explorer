@@ -124,13 +124,18 @@ def main():
     setup_mode = setup_global_state()
     with st.sidebar:
         with st.expander("Advanced Options", expanded=False):
+            current_token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
+            current_token = current_token if current_token else ""
             token = st.text_input(
                 label="Fractal Authentication Token",
-                value=st.session_state.get(f"{Scope.PRIVATE}:token", ""),
+                value=current_token,
                 key="_fractal_token",
                 type="password",
             )
-            st.session_state[f"{Scope.PRIVATE}:token"] = token
+            if token == "":
+                st.session_state[f"{Scope.PRIVATE}:token"] = None
+            else:
+                st.session_state[f"{Scope.PRIVATE}:token"] = token
 
             st.divider()
             if st.button(
