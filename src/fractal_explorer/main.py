@@ -44,7 +44,8 @@ def main():
 
     setup_page = st.Page(
         "pages/setup_page/setup_page.py",
-        title="OME-Zarr Setup", icon=":material/settings:"
+        title="OME-Zarr Setup",
+        icon=":material/settings:",
     )
     filter_page = st.Page(
         "pages/filters_page/filters_page.py",
@@ -52,8 +53,7 @@ def main():
         icon=":material/filter:",
     )
     explore_page = st.Page(
-        "pages/explore_page/explore_page.py",
-        title="Explore", icon=":material/search:"
+        "pages/explore_page/explore_page.py", title="Explore", icon=":material/search:"
     )
     export_page = st.Page(
         "pages/export_page.py", title="Export", icon=":material/download:"

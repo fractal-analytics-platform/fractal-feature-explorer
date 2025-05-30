@@ -3,9 +3,13 @@ from argparse import ArgumentParser
 import streamlit as st
 from streamlit.logger import get_logger
 
-from fractal_explorer.pages.setup_page._plate_mode_setup import plate_mode_setup_component
+from fractal_explorer.pages.setup_page._plate_mode_setup import (
+    plate_mode_setup_component,
+)
 from fractal_explorer.utils import Scope, invalidate_session_state
 import polars as pl
+import os
+from pathlib import Path
 
 logger = get_logger(__name__)
 
@@ -41,6 +45,12 @@ def parse_cli_args():
         default=None,
         help="Fractal token to use for authentication.",
     )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to the configuration file.",
+    )
 
     args = parser.parse_args()
     if args.setup_mode is not None:
@@ -55,6 +65,13 @@ def parse_cli_args():
         zarr_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
         st.session_state[f"{Scope.SETUP}:zarr_urls"] = zarr_urls + args.zarr_urls
         logger.info(f"zarr_urls: {args.zarr_urls} (set from CLI args)")
+        
+    if args.config is not None:
+        os.environ["FRACTAL_EXPLORER_CONFIG"] = str(args.config)
+        logger.info(
+            f"Configuration file set to: {args.config} (set from CLI args)"
+        )
+
 
 
 def parse_query_params():
@@ -122,13 +139,18 @@ def main():
     setup_mode = setup_global_state()
     with st.sidebar:
         with st.expander("Advanced Options", expanded=False):
+            current_token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
+            current_token = current_token if current_token else ""
             token = st.text_input(
                 label="Fractal Authentication Token",
-                value=st.session_state.get(f"{Scope.PRIVATE}:token", ""),
+                value=current_token,
                 key="_fractal_token",
                 type="password",
             )
-            st.session_state[f"{Scope.PRIVATE}:token"] = token
+            if token == "":
+                st.session_state[f"{Scope.PRIVATE}:token"] = None
+            else:
+                st.session_state[f"{Scope.PRIVATE}:token"] = token
 
             st.divider()
             if st.button(

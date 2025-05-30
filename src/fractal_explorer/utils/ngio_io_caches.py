@@ -15,59 +15,178 @@ from ngio.ome_zarr_meta.ngio_specs import PixelSize
 from ngio.tables import MaskingRoiTable
 from ngio.utils import fractal_fsspec_store
 
+from pathlib import Path
+
+import fsspec
+from ngio.utils import NgioValueError
+from fractal_explorer.utils import get_config, get_fractal_token
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+def is_http_fractal_url(url: str) -> bool:
+    """Check if the URL is a valid HTTP Fractal URL."""
+    config = get_config()
+    for subdomain in config.fractal_token_subdomains:
+        if url.startswith(subdomain):
+            return True
+    return False
+
+
+def is_http_url(url: str) -> bool:
+    """Check if the URL is a valid HTTP URL."""
+    return url.startswith("http://") or url.startswith("https://")
+
+
+@st.cache_data
+def _get_http_store(
+    url: str, fractal_token: str | None = None
+) -> fsspec.mapping.FSMap | None:
+    """Ping the URL to check if it is reachable."""
+    try:
+        logger.info(f"Attempting to open URL: {url}")
+        store = fractal_fsspec_store(url, fractal_token=fractal_token)
+    except NgioValueError as e:
+        st.error(e)
+        logger.error(e)
+        return None
+    return store
+
+
+def get_http_store(
+    url: str, fractal_token: str | None = None
+) -> fsspec.mapping.FSMap | None:
+    """Ping the URL to check if it is reachable."""
+    if is_http_fractal_url(url):
+        fractal_token = fractal_token
+    else:
+        # Do not use a fractal token for non-Fractal URLs
+        # Maybe we should have a more generic auth
+        fractal_token = None
+
+    return _get_http_store(url, fractal_token=fractal_token)
+
+
+def get_path(url: str) -> str | None:
+    """Sanitize the URL by removing the trailing slash."""
+    config = get_config()
+    if not config.allow_local_paths:
+        st.error("Local paths are not allowed in this configuration.")
+        logger.error("Local paths are not allowed in this configuration.")
+        return None
+
+    if url.startswith("~/"):
+        url = url.replace("~", str(Path.home()))
+
+    path = Path(url).resolve()
+    if not path.exists():
+        st.error(f"Path does not exist: {path}")
+        logger.error(f"Path does not exist: {path}")
+        return None
+    return str(path)
+
+
+def _get_and_validate_store(
+    url: str, fractal_token: str | None = None
+) -> fsspec.mapping.FSMap | str | None:
+    """Get the store for the given URL."""
+    if is_http_url(url):
+        return get_http_store(url, fractal_token=fractal_token)
+
+    return get_path(url)
+
+
+def get_and_validate_store(url: str) -> fsspec.mapping.FSMap | str | None:
+    """Get the store for the given URL."""
+    fractal_token = get_fractal_token()
+    return _get_and_validate_store(url, fractal_token=fractal_token)
+
 
 @st.cache_resource
-def get_ome_zarr_plate(url: str, token: str | None = None) -> OmeZarrPlate:
-    is_http = url.startswith("http://") or url.startswith("https://")
-    if token is not None and is_http:
-        store = fractal_fsspec_store(url, fractal_token=token)
-    else:
-        store = url
+def _get_ome_zarr_plate(url: str, fractal_token: str | None = None) -> OmeZarrPlate:
+    store = _get_and_validate_store(url, fractal_token=fractal_token)
+    if store is None:
+        raise ValueError(f"Could not get store for URL: {url}")
     plate = open_ome_zarr_plate(store, cache=True, parallel_safe=False, mode="r")
     return plate
 
 
-def _get_ome_zarr_container(url: str, token: str | None = None) -> OmeZarrContainer:
-    is_http = url.startswith("http://") or url.startswith("https://")
-    if token is not None and is_http:
-        store = fractal_fsspec_store(url, fractal_token=token)
-    else:
-        store = url
+def get_ome_zarr_plate(url: str) -> OmeZarrPlate:
+    fractal_token = get_fractal_token()
+    return _get_ome_zarr_plate(url, fractal_token=fractal_token)
+
+
+@st.cache_resource
+def _get_ome_zarr_image_container(
+    url: str, fractal_token: str | None = None
+) -> OmeZarrContainer:
+    store = _get_and_validate_store(url, fractal_token=fractal_token)
+    if store is None:
+        raise ValueError(f"Could not get store for URL: {url}")
     container = open_ome_zarr_container(store, cache=True, mode="r")
     return container
 
 
-def _get_ome_zarr_container_in_plate_cached(
-    url: str, token: str | None = None
+def _get_ome_zarr_container_in_plate(
+    url: str, fractal_token: str | None = None
 ) -> OmeZarrContainer:
     *_plate_url, row, col, path_in_well = url.split("/")
     plate_url = "/".join(_plate_url)
-    plate = get_ome_zarr_plate(plate_url, token=token)
+    plate = _get_ome_zarr_plate(plate_url, fractal_token=fractal_token)
     images = asyncio.run(plate.get_images_async())
     path = f"{row}/{col}/{path_in_well}"
     return images[path]
 
 
 @st.cache_resource
-def get_ome_zarr_container(
-    url: str, token: str | None = None, mode: Literal["image", "plate"] = "image"
-) -> OmeZarrContainer:
+def _get_ome_zarr_container(
+    url: str,
+    fractal_token: str | None = None,
+    mode: Literal["image", "plate"] = "image",
+):
     if mode == "plate":
-        container = _get_ome_zarr_container_in_plate_cached(url, token=token)
-    else:
-        container = _get_ome_zarr_container(url, token=token)
-    return container
+        return _get_ome_zarr_container_in_plate(url, fractal_token=fractal_token)
+
+    return _get_ome_zarr_image_container(url, fractal_token=fractal_token)
+
+
+def get_ome_zarr_container(
+    url: str, mode: Literal["image", "plate"] = "image"
+) -> OmeZarrContainer:
+    fractal_token = get_fractal_token()
+    if mode == "plate":
+        return _get_ome_zarr_container_in_plate(url, fractal_token=fractal_token)
+
+    return _get_ome_zarr_image_container(url, fractal_token=fractal_token)
+
+
+@st.cache_data
+def _list_image_tables(
+    urls: list[str],
+    fractal_token: str | None = None,
+    mode: Literal["image", "plate"] = "image",
+) -> list[str]:
+    images = [
+        _get_ome_zarr_container(url, fractal_token=fractal_token, mode=mode)
+        for url in urls
+    ]
+    image_list = asyncio.run(list_image_tables_async(images))
+    return image_list
 
 
 @st.cache_data
 def list_image_tables(
     urls: list[str],
-    token: str | None = None,
+    fractal_token: str | None = None,
     mode: Literal["image", "plate"] = "image",
 ) -> list[str]:
-    images = [get_ome_zarr_container(url, token=token, mode=mode) for url in urls]
-    image_list = asyncio.run(list_image_tables_async(images))
-    return image_list
+    fractal_token = get_fractal_token()
+    return _list_image_tables(
+        urls=urls,
+        fractal_token=fractal_token,
+        mode=mode,
+    )
 
 
 def roi_to_slice_kwargs(
@@ -92,14 +211,14 @@ def roi_to_slice_kwargs(
 
 
 @st.cache_resource
-def get_masking_roi(
+def _get_masking_roi(
     image_url: str,
     ref_label: str,
-    token: str | None = None,
+    fractal_token: str | None = None,
 ) -> MaskingRoiTable:
-    container = get_ome_zarr_container(
+    container = _get_ome_zarr_container(
         image_url,
-        token=token,
+        fractal_token=fractal_token,
         mode="image",
     )
 
@@ -115,7 +234,7 @@ def get_masking_roi(
 
 
 @st.cache_data
-def get_image_array(
+def _get_image_array(
     image_url: str,
     ref_label: str,
     label: int,
@@ -124,18 +243,18 @@ def get_image_array(
     t_slice: int = 0,
     level_path: str = "0",
     zoom_factor: float = 1,
-    token: str | None = None,
+    fractal_token: str | None = None,
 ) -> np.ndarray:
-    container = get_ome_zarr_container(
+    container = _get_ome_zarr_container(
         image_url,
-        token=token,
+        fractal_token=fractal_token,
         mode="image",
     )
     image = container.get_image(path=level_path)
-    masking_roi = get_masking_roi(
+    masking_roi = _get_masking_roi(
         image_url=image_url,
         ref_label=ref_label,
-        token=token,
+        fractal_token=fractal_token,
     )
     roi = masking_roi.get(label=label)
     roi = roi.zoom(zoom_factor=zoom_factor)
@@ -156,7 +275,7 @@ def get_image_array(
 
 
 @st.cache_data
-def get_label_array(
+def _get_label_array(
     image_url: str,
     ref_label: str,
     label: int,
@@ -164,21 +283,21 @@ def get_label_array(
     t_slice: int = 0,
     level_path: str = "0",
     zoom_factor: float = 1,
-    token: str | None = None,
+    fractal_token: str | None = None,
 ) -> np.ndarray:
-    container = get_ome_zarr_container(
+    container = _get_ome_zarr_container(
         image_url,
-        token=token,
+        fractal_token=fractal_token,
         mode="image",
     )
     image = container.get_image(path=level_path)
     label_img = container.get_label(
         name=ref_label, pixel_size=image.pixel_size, strict=False
     )
-    masking_roi = get_masking_roi(
+    masking_roi = _get_masking_roi(
         image_url=image_url,
         ref_label=ref_label,
-        token=token,
+        fractal_token=fractal_token,
     )
     roi = masking_roi.get(label=label)
     roi = roi.zoom(zoom_factor=zoom_factor)
@@ -207,12 +326,12 @@ def get_single_label_image(
     level_path: str = "0",
     show_label: bool = True,
     zoom_factor: float = 1,
-    token: str | None = None,
 ) -> np.ndarray:
     """
     Get the region of interest from the image url
     """
-    image_array = get_image_array(
+    fractal_token = get_fractal_token()
+    image_array = _get_image_array(
         image_url=image_url,
         ref_label=ref_label,
         label=label,
@@ -221,7 +340,7 @@ def get_single_label_image(
         t_slice=t_slice,
         level_path=level_path,
         zoom_factor=zoom_factor,
-        token=token,
+        fractal_token=fractal_token,
     )
     image_array = image_array.squeeze()
     image_array = np.clip(image_array, 0, 255)
@@ -235,7 +354,7 @@ def get_single_label_image(
     if not show_label:
         return image_rgba
 
-    label_array = get_label_array(
+    label_array = _get_label_array(
         image_url=image_url,
         ref_label=ref_label,
         label=label,
@@ -243,7 +362,7 @@ def get_single_label_image(
         t_slice=t_slice,
         level_path=level_path,
         zoom_factor=zoom_factor,
-        token=token,
+        fractal_token=fractal_token,
     )
     label_array = label_array.squeeze()
     label_array = np.where(label_array == label, 255, 0)
