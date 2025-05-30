@@ -29,9 +29,7 @@ def is_http_fractal_url(url: str) -> bool:
     """Check if the URL is a valid HTTP Fractal URL."""
     config = get_config()
     for subdomain in config.fractal_token_subdomains:
-        if url.startswith(f"http://{subdomain}") or url.startswith(
-            f"https://{subdomain}"
-        ):
+        if url.startswith(subdomain):
             return True
     return False
 
@@ -89,7 +87,7 @@ def get_path(url: str) -> str | None:
     return str(path)
 
 
-def get_and_validate_store(
+def _get_and_validate_store(
     url: str, fractal_token: str | None = None
 ) -> fsspec.mapping.FSMap | str | None:
     """Get the store for the given URL."""
@@ -99,9 +97,15 @@ def get_and_validate_store(
     return get_path(url)
 
 
+def get_and_validate_store(url: str) -> fsspec.mapping.FSMap | str | None:
+    """Get the store for the given URL."""
+    fractal_token = get_fractal_token()
+    return _get_and_validate_store(url, fractal_token=fractal_token)
+
+
 @st.cache_resource
 def _get_ome_zarr_plate(url: str, fractal_token: str | None = None) -> OmeZarrPlate:
-    store = get_and_validate_store(url, fractal_token=fractal_token)
+    store = _get_and_validate_store(url, fractal_token=fractal_token)
     if store is None:
         raise ValueError(f"Could not get store for URL: {url}")
     plate = open_ome_zarr_plate(store, cache=True, parallel_safe=False, mode="r")
@@ -117,7 +121,7 @@ def get_ome_zarr_plate(url: str) -> OmeZarrPlate:
 def _get_ome_zarr_image_container(
     url: str, fractal_token: str | None = None
 ) -> OmeZarrContainer:
-    store = get_and_validate_store(url, fractal_token=fractal_token)
+    store = _get_and_validate_store(url, fractal_token=fractal_token)
     if store is None:
         raise ValueError(f"Could not get store for URL: {url}")
     container = open_ome_zarr_container(store, cache=True, mode="r")
