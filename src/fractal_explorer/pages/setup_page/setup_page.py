@@ -3,7 +3,9 @@ from argparse import ArgumentParser
 import streamlit as st
 from streamlit.logger import get_logger
 
-from fractal_explorer.pages.setup_page._plate_mode_setup import plate_mode_setup_component
+from fractal_explorer.pages.setup_page._plate_mode_setup import (
+    plate_mode_setup_component,
+)
 from fractal_explorer.utils import Scope, invalidate_session_state
 import polars as pl
 

@@ -9,7 +9,7 @@ from fractal_explorer.utils.st_components import (
     selectbox_component,
 )
 
-from fractal_explorer.pages.setup_page._tables import (
+from fractal_explorer.pages.setup_page._tables_io import (
     list_images_tables,
     list_plate_tables,
     collect_condition_table_from_images,
@@ -224,14 +224,13 @@ def _join_condition_table_widget(
 
 def join_condition_tables(
     plate_setup_df: pl.DataFrame,
-    token=None,
 ) -> pl.DataFrame:
     """Join the condition table with the plate setup DataFrame."""
     plate_condition_tables = list_plate_tables(
-        plate_setup_df, token=token, filter_types="condition_table"
+        plate_setup_df, filter_types="condition_table"
     )
     image_condition_tables = list_images_tables(
-        plate_setup_df, token=token, filter_types="condition_table"
+        plate_setup_df, filter_types="condition_table"
     )
     selected_table, mode = _join_condition_table_widget(
         plate_condition_tables, image_condition_tables
@@ -243,16 +242,13 @@ def join_condition_tables(
         new_plate_setup_df = collect_condition_table_from_plates(
             plate_setup_df=plate_setup_df,
             table_name=selected_table,
-            token=token,
         )
         if new_plate_setup_df is None:
             st.warning(f"Condition table {selected_table} not found in the plates.")
             return plate_setup_df
         return new_plate_setup_df
 
-    return collect_condition_table_from_images(
-        plate_setup_df, selected_table, token=token
-    )
+    return collect_condition_table_from_images(plate_setup_df, selected_table)
 
 
 # ====================================================================
@@ -369,7 +365,6 @@ def show_selected_images_widget(images_df: pl.DataFrame):
 
 def advanced_plate_selection_component(
     plate_setup_df: pl.DataFrame,
-    token=None,
 ) -> pl.DataFrame:
     """Advanced selection of images from a plate."""
     empty_selection_warn_msg = "No plates selected. Please select at least one plate."
@@ -394,7 +389,7 @@ def advanced_plate_selection_component(
 
     st.markdown("## Condition Tables")
     with st.spinner("Loading condition tables...", show_time=True):
-        plate_setup_df = join_condition_tables(plate_setup_df, token=token)
+        plate_setup_df = join_condition_tables(plate_setup_df)
         plate_setup_df = filter_based_on_condition(plate_setup_df)
 
     if plate_setup_df.is_empty():

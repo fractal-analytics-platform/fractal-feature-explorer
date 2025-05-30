@@ -4,7 +4,7 @@ import polars as pl
 import streamlit as st
 
 from fractal_explorer.utils.common import Scope
-from fractal_explorer.utils.ngio_caches import (
+from fractal_explorer.utils.ngio_io_caches import (
     get_ome_zarr_plate,
 )
 from fractal_explorer.utils.st_components import (
@@ -17,14 +17,14 @@ from streamlit.logger import get_logger
 from fractal_explorer.pages.setup_page._plate_advanced_selection import (
     advanced_plate_selection_component,
 )
-from fractal_explorer.pages.setup_page._tables import (
+from fractal_explorer.pages.setup_page._tables_io import (
     list_images_tables,
     list_plate_tables,
     collect_feature_table_from_images,
     collect_feature_table_from_plates,
 )
 from fractal_explorer.pages.setup_page._utils import (
-    sanifiy_url,
+    sanify_and_validate_url,
     extras_from_url,
 )
 
@@ -38,12 +38,11 @@ logger = get_logger(__name__)
 # ====================================================================
 
 
-def user_plate_url_input_component(token=None):
+def user_plate_url_input_component():
     """Create a widget for inputting plate URLs."""
     st.markdown("## Input Plate URLs")
     global_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
     logger.info(f"Global URLs: {global_urls}")
-    token = st.session_state.get(f"{Scope.SETUP}:token", None)
 
     if f"{Scope.SETUP}:plate_setup:urls" not in st.session_state:
         st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = set()
@@ -51,10 +50,10 @@ def user_plate_url_input_component(token=None):
     new_url = st.text_input("Plate URL")
     if st.button("Add Plate URL", icon="➕"):
         # Validate the URL
-        new_url = sanifiy_url(new_url, token=token)
+        new_url = sanify_and_validate_url(new_url)
         if new_url is not None:
             try:
-                _ = get_ome_zarr_plate(new_url, token=token)
+                _ = get_ome_zarr_plate(new_url)
                 current_urls = st.session_state[f"{Scope.SETUP}:plate_setup:urls"]
                 current_urls.add(new_url)
                 st.session_state[f"{Scope.SETUP}:plate_setup:urls"] = current_urls
@@ -67,17 +66,17 @@ def user_plate_url_input_component(token=None):
     return local_urls
 
 
-def build_plate_setup_df(plate_urls: list[str], token=None) -> pl.DataFrame:
+def build_plate_setup_df(plate_urls: list[str]) -> pl.DataFrame:
     plates = []
     for plate_url in plate_urls:
-        plate_url = sanifiy_url(plate_url, token=token)
+        plate_url = sanify_and_validate_url(plate_url)
         if plate_url is None:
             continue
-        plate = get_ome_zarr_plate(plate_url, token=token)
+        plate = get_ome_zarr_plate(plate_url)
         images_paths = asyncio.run(plate.images_paths_async())
         for path_in_plate in images_paths:
             image_url = f"{plate_url}/{path_in_plate}"
-            image_url = sanifiy_url(image_url, token=token)
+            image_url = sanify_and_validate_url(image_url)
             if image_url is None:
                 continue
             extras = extras_from_url(image_url)
@@ -191,14 +190,13 @@ def _feature_table_selection_widget(
 
 def load_feature_table(
     plate_setup_df: pl.DataFrame,
-    token=None,
 ) -> tuple[pl.DataFrame, str]:
     """Load the feature table from the plate URLs."""
     plate_feature_tables = list_plate_tables(
-        plate_setup_df, token=token, filter_types="feature_table"
+        plate_setup_df, filter_types="feature_table"
     )
     image_feature_tables = list_images_tables(
-        plate_setup_df, token=token, filter_types="feature_table"
+        plate_setup_df, filter_types="feature_table"
     )
 
     selected_table, mode = _feature_table_selection_widget(
@@ -208,12 +206,12 @@ def load_feature_table(
     with st.spinner("Loading feature table...", show_time=True):
         if mode == "image":
             feature_table = collect_feature_table_from_images(
-                plate_setup_df, selected_table, token=token
+                plate_setup_df, selected_table
             )
             return feature_table, selected_table
 
         feature_table = collect_feature_table_from_plates(
-            plate_setup_df, selected_table, token=token
+            plate_setup_df, selected_table
         )
         if feature_table is None:
             st.error(f"Feature table `{selected_table}` not found in the plate URLs.")
@@ -243,10 +241,9 @@ def features_infos(feature_table: pl.DataFrame, name: str = "Feature Table"):
 
 def plate_mode_setup_component():
     """Setup the plate mode for the dashboard."""
-    token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
     global_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
 
-    local_urls = user_plate_url_input_component(token=token)
+    local_urls = user_plate_url_input_component()
     logger.info(f"Local URLs: {local_urls}")
     urls = global_urls + list(local_urls)
     urls = list(set(urls))
@@ -258,7 +255,7 @@ def plate_mode_setup_component():
         st.stop()
 
     st.markdown("## Plates Selection")
-    plate_setup_df = build_plate_setup_df(urls, token=token)
+    plate_setup_df = build_plate_setup_df(urls)
     plate_setup_df = plate_name_selection(plate_setup_df)
 
     empty_selection_warn_msg = "No plates selected. Please select at least one plate."
@@ -268,9 +265,9 @@ def plate_mode_setup_component():
         st.stop()
 
     with st.expander("Advanced Selection", expanded=False):
-        images_setup = advanced_plate_selection_component(plate_setup_df, token=token)
+        images_setup = advanced_plate_selection_component(plate_setup_df)
 
-    feature_table, table_name = load_feature_table(images_setup, token=token)
+    feature_table, table_name = load_feature_table(images_setup)
     st.markdown("## Feature Table Selection")
     features_infos(feature_table, table_name)
     return feature_table.lazy(), table_name

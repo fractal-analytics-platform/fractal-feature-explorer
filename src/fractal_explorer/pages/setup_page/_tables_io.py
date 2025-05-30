@@ -8,15 +8,15 @@ from ngio.common import (
 )
 from ngio.tables import FeatureTable
 from typing import Literal
-from fractal_explorer.utils.ngio_caches import (
+from fractal_explorer.utils import (
     get_ome_zarr_container,
     get_ome_zarr_plate,
-    list_image_tables_async,
 )
 from fractal_explorer.pages.setup_page._utils import (
     plate_name_from_url,
     extras_from_url,
 )
+from ngio.common import list_image_tables_async
 
 from streamlit.logger import get_logger
 
@@ -25,7 +25,6 @@ logger = get_logger(__name__)
 
 def list_plate_tables(
     plate_setup_df: pl.DataFrame,
-    token=None,
     filter_types: str = "condition_table",
     mode: Literal["all", "common"] = "common",
 ) -> list[str]:
@@ -36,7 +35,7 @@ def list_plate_tables(
     for url in plate_urls:
         logger.warning(f"Loading plate {url}...")
 
-        plate = get_ome_zarr_plate(url, token=token)
+        plate = get_ome_zarr_plate(url)
         if plate._tables_container is None:
             logger.warning(
                 f"Plate {url} does not contain any Plate level tables. Skipping."
@@ -71,15 +70,12 @@ def list_plate_tables(
 
 def list_images_tables(
     plate_setup_df: pl.DataFrame,
-    token=None,
     filter_types: str = "condition_table",
     mode: Literal["all", "common"] = "common",
 ) -> list[str]:
     """Collect existing image tables from the plate URLs."""
     images_urls = plate_setup_df["image_url"].unique().to_list()
-    images = [
-        get_ome_zarr_container(url, token=token, mode="plate") for url in images_urls
-    ]
+    images = [get_ome_zarr_container(url, mode="plate") for url in images_urls]
     images_condition_tables = asyncio.run(
         list_image_tables_async(images=images, filter_types=filter_types, mode=mode)
     )
@@ -101,10 +97,9 @@ def list_images_tables(
 def _load_single_plate_condition_table(
     url: str,
     table_name: str,
-    token=None,
 ) -> pl.DataFrame | None:
     """Load the condition table from a single plate URL."""
-    plate = get_ome_zarr_plate(url, token=token)
+    plate = get_ome_zarr_plate(url)
     try:
         table = plate.get_table(table_name)
     except Exception as e:
@@ -131,12 +126,11 @@ def _load_single_plate_condition_table(
 def _collect_condition_table_from_plates_cached(
     list_urls: list[str],
     table_name: str,
-    token=None,
 ) -> pl.DataFrame | None:
     """Load the condition table from the plate URLs."""
     condition_tables = []
     for url in list_urls:
-        table_df = _load_single_plate_condition_table(url, table_name, token=token)
+        table_df = _load_single_plate_condition_table(url, table_name)
         if table_df is None:
             continue
         condition_tables.append(table_df)
@@ -149,11 +143,10 @@ def _collect_condition_table_from_plates_cached(
 def _collect_condition_table_from_images_cached(
     list_urls: list[str],
     table_name: str,
-    token=None,
     mode: Literal["plate", "image"] = "plate",
 ) -> pl.DataFrame:
     """Load the condition table from the image URLs."""
-    images = [get_ome_zarr_container(url, token=token, mode=mode) for url in list_urls]
+    images = [get_ome_zarr_container(url, mode=mode) for url in list_urls]
 
     extras = [extras_from_url(url) for url in list_urls]
     # For more efficient loading, we should reimplement this
@@ -191,13 +184,10 @@ def _join_setup_to_condition_table(
 def collect_condition_table_from_plates(
     plate_setup_df: pl.DataFrame,
     table_name: str,
-    token=None,
 ) -> pl.DataFrame | None:
     """Load the condition table from the plate URLs."""
     plate_urls = plate_setup_df["plate_url"].unique().sort().to_list()
-    condition_df = _collect_condition_table_from_plates_cached(
-        plate_urls, table_name, token=token
-    )
+    condition_df = _collect_condition_table_from_plates_cached(plate_urls, table_name)
     if condition_df is None:
         return None
     return _join_setup_to_condition_table(plate_setup_df, condition_df)
@@ -206,14 +196,13 @@ def collect_condition_table_from_plates(
 def collect_condition_table_from_images(
     plate_setup_df: pl.DataFrame,
     table_name: str,
-    token=None,
     on=("plate_name", "row", "column", "path_in_well"),
     mode: Literal["plate", "image"] = "plate",
 ) -> pl.DataFrame:
     """Load the condition table from the image URLs."""
     images_urls = plate_setup_df["image_url"].unique().sort().to_list()
     condition_df = _collect_condition_table_from_images_cached(
-        images_urls, table_name, token=token, mode=mode
+        images_urls, table_name, mode=mode
     )
     return _join_setup_to_condition_table(plate_setup_df, condition_df, on=on)
 
@@ -229,10 +218,9 @@ def collect_condition_table_from_images(
 def _load_plate_feature_table(
     url: str,
     table_name: str,
-    token=None,
 ) -> pl.DataFrame:
     """Load the feature table from a single plate URL."""
-    plate = get_ome_zarr_plate(url, token=token)
+    plate = get_ome_zarr_plate(url)
     try:
         table = plate.get_table_as(table_name, FeatureTable)
         reference_label = table.reference_label
@@ -265,12 +253,11 @@ def _load_plate_feature_table(
 def _collect_feature_table_from_plates_cached(
     list_urls: list[str],
     table_name: str,
-    token=None,
 ) -> pl.DataFrame:
     """Load the feature table from the plate URLs."""
     feature_tables = []
     for url in list_urls:
-        table_df = _load_plate_feature_table(url, table_name, token=token)
+        table_df = _load_plate_feature_table(url, table_name)
         feature_tables.append(table_df)
 
     feature_table = pl.concat(feature_tables)
@@ -281,13 +268,10 @@ def _collect_feature_table_from_plates_cached(
 def _collect_feature_table_from_images_cached(
     list_urls: list[str],
     table_name: str,
-    token=None,
     mode: Literal["plate", "image"] = "plate",
 ) -> pl.DataFrame:
     """Load the feature table from the image URLs."""
-    images = [
-        get_ome_zarr_container(url, token=token, mode="plate") for url in list_urls
-    ]
+    images = [get_ome_zarr_container(url, mode="plate") for url in list_urls]
 
     extras = [extras_from_url(url) for url in list_urls]
     # For more efficient loading, we should reimplement this
@@ -334,13 +318,10 @@ def _join_feature_table_to_setup(
 def collect_feature_table_from_plates(
     plate_setup_df: pl.DataFrame,
     table_name: str,
-    token=None,
 ) -> pl.DataFrame | None:
     """Load the feature table from the plate URLs."""
     plate_urls = plate_setup_df["plate_url"].unique().sort().to_list()
-    feature_table = _collect_feature_table_from_plates_cached(
-        plate_urls, table_name, token=token
-    )
+    feature_table = _collect_feature_table_from_plates_cached(plate_urls, table_name)
     if feature_table is None:
         return None
     feature_table = _join_feature_table_to_setup(plate_setup_df, feature_table)
@@ -350,12 +331,9 @@ def collect_feature_table_from_plates(
 def collect_feature_table_from_images(
     plate_setup_df: pl.DataFrame,
     table_name: str,
-    token=None,
 ) -> pl.DataFrame:
     """Load the feature table from the image URLs."""
     images_urls = plate_setup_df["image_url"].unique().sort().to_list()
-    feature_table = _collect_feature_table_from_images_cached(
-        images_urls, table_name, token=token
-    )
+    feature_table = _collect_feature_table_from_images_cached(images_urls, table_name)
     feature_table = _join_feature_table_to_setup(plate_setup_df, feature_table)
     return feature_table

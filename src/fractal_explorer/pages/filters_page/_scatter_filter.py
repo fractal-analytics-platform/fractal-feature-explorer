@@ -8,8 +8,7 @@ from matplotlib.path import Path
 from pydantic import BaseModel, Field
 
 from fractal_explorer.pages.filters_page._common import FeatureFrame
-from fractal_explorer.utils import Scope
-from fractal_explorer.utils.ngio_caches import (
+from fractal_explorer.utils.ngio_io_caches import (
     get_ome_zarr_container,
     get_single_label_image,
 )
@@ -42,12 +41,10 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
         point
     ]
     logger.info(f"Opening point: {point_dict} in dialog")
-    token = st.session_state.get(f"{Scope.PRIVATE}:token")
-    
+
     try:
         container = get_ome_zarr_container(
             point_dict["image_url"],
-            token=token,
             mode="image",
         )
         image = container.get_image()
@@ -56,7 +53,6 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
         st.error("Error opening image")
         _show_point_info(point_dict)
         return
-        
 
     channels = container.image_meta.channel_labels
     if len(channels) > 1:
@@ -124,7 +120,6 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             t_slice=t_slice,
             show_label=show_label,
             zoom_factor=zoom_factor,
-            token=token,
         )
         st.image(image, use_container_width=True)
     except Exception as e:

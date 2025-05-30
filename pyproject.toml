@@ -4,7 +4,6 @@ dependencies = [
     "streamlit",
     "ngio>=0.3.0a0, <0.4.0",
     "plotly",
-    "numpy",
     "matplotlib",
     "orjson",
     "rich",
