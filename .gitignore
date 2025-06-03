@@ -14,3 +14,5 @@ __pycache__/
 
 # profiling
 psrecord-output/
+
+.*.swp
