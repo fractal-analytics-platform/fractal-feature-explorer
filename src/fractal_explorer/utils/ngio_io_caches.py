@@ -28,6 +28,7 @@ logger = get_logger(__name__)
 def is_http_fractal_url(url: str) -> bool:
     """Check if the URL is a valid HTTP Fractal URL."""
     config = get_config()
+    print(config.fractal_token_subdomains)
     for subdomain in config.fractal_token_subdomains:
         if url.startswith(subdomain):
             return True
