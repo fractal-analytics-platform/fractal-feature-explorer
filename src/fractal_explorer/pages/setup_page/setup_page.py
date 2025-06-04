@@ -9,7 +9,7 @@ from fractal_explorer.pages.setup_page._plate_mode_setup import (
 from fractal_explorer.utils import Scope, invalidate_session_state
 import polars as pl
 import os
-from pathlib import Path
+from fractal_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 
@@ -136,7 +136,11 @@ def filter_cache_invalidations(
 
 
 def main():
+
+    verify_authentication()
+
     setup_mode = setup_global_state()
+
     with st.sidebar:
         with st.expander("Advanced Options", expanded=False):
             current_token = st.session_state.get(f"{Scope.PRIVATE}:token", None)

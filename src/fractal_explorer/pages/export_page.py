@@ -5,6 +5,7 @@ import streamlit as st
 
 from fractal_explorer.pages.filters_page import apply_filters, build_feature_frame
 from fractal_explorer.utils import Scope
+from fractal_explorer.authentication import verify_authentication
 
 
 def table_to_csv_buffer(table: pl.LazyFrame) -> io.BytesIO:
@@ -30,6 +31,7 @@ def table_to_parquet_buffer(table: pl.LazyFrame) -> io.BytesIO:
 
 
 def main():
+    verify_authentication()
     feature_table = st.session_state.get(f"{Scope.DATA}:feature_table", None)
     feature_table_name = st.session_state.get(f"{Scope.DATA}:feature_table_name", "")
     if feature_table is None:

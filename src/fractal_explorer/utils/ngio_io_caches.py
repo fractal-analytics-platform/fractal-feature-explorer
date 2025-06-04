@@ -19,8 +19,10 @@ from pathlib import Path
 
 import fsspec
 from ngio.utils import NgioValueError
-from fractal_explorer.utils import get_config, get_fractal_token
+from fractal_explorer.utils import get_fractal_token
 from streamlit.logger import get_logger
+
+from fractal_explorer.utils.config import get_config
 
 logger = get_logger(__name__)
 
@@ -28,9 +30,9 @@ logger = get_logger(__name__)
 def is_http_fractal_url(url: str) -> bool:
     """Check if the URL is a valid HTTP Fractal URL."""
     config = get_config()
-    for subdomain in config.fractal_token_subdomains:
-        if url.startswith(subdomain):
-            return True
+    # FIXME: replace startswith with protocol/domain check
+    if url.startswith(config.fractal_data_domain):
+        return True
     return False
 
 

@@ -7,6 +7,7 @@ dependencies = [
     "matplotlib",
     "orjson",
     "rich",
+    "requests",
 ]
 name = "fractal-explorer"
 requires-python = "==3.12"
