@@ -1,5 +1,6 @@
+import urllib3.util
 from fractal_explorer.utils.config import get_config
-import requests
+import urllib3
 import streamlit as st
 from fractal_explorer.utils import Scope
 from streamlit.logger import get_logger
@@ -13,7 +14,7 @@ def _verify_authentication():
 
     config = get_config()
 
-    if config.skip_authentication:
+    if config.deployment_type == "local":
         return
 
     current_email = st.session_state.get(f"{Scope.PRIVATE}:fractal-email", None)
@@ -41,14 +42,15 @@ def _verify_authentication():
         # Get user information from Fractal backend
         logger.info("Now obtain user information.")
         current_user_url = f"{config.fractal_backend_url}/auth/current-user/"
-        response = requests.get(
+
+        response = urllib3.request(
+            "GET",
             current_user_url,
             headers={"Authorization": f"Bearer {token}"},
         )
-        if response.ok:
-            st.session_state[f"{Scope.PRIVATE}:fractal-email"] = response.json()[
-                "email"
-            ]
+        if response.status == 200:
+            email_address = response.json()["email"]
+            st.session_state[f"{Scope.PRIVATE}:fractal-email"] = email_address
             st.session_state[f"{Scope.PRIVATE}:fractal-token"] = token
             logger.info("Obtained user information.")
         else:
@@ -63,10 +65,11 @@ def verify_authentication():
     except Exception as e:
         logger.info(f"Authentication failed. Original error: {str(e)}.")
         config = get_config()
+        login_url = f"{config.fractal_frontend_url}/auth/login"
         MSG = (
             "You are not authenticated as a Fractal user. "
-            f"Please login at {config.fractal_login_url} and "
+            f"Please login at {login_url} and "
             "then refresh the current page."
         )
-        st.markdown(MSG)
+        st.error(MSG)
         st.stop()
