@@ -7,10 +7,10 @@ dependencies = [
     "matplotlib",
     "orjson",
     "rich",
-    "requests",
+    "urllib3",
 ]
 name = "fractal-explorer"
-requires-python = "==3.12"
+requires-python = ">=3.12,<3.13"
 dynamic = ["version"]
 
 [project.optional-dependencies]
