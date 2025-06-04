@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 
 
 def _verify_authentication():
-    logger.info("Enter _verify_authentication.")
+    logger.debug("Enter _verify_authentication.")
 
     config = get_config()
 
