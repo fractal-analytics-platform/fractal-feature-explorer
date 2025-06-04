@@ -1,11 +1,15 @@
 from pathlib import Path
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, AfterValidator
 import toml
 import os
-from fractal_explorer.utils.common import logger
 import streamlit as st
 from typing import Literal
 from typing import Annotated
+
+from streamlit.logger import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class BaseConfig(BaseModel):
@@ -18,18 +22,17 @@ class LocalConfig(BaseConfig):
     allow_local_paths: bool = True
 
 
-def remove_trailing_slash(self, value: str) -> str:
-    new_value = value.rstrip("/")
-    return new_value
+def remove_trailing_slash(value: str) -> str:
+    return value.rstrip("/")
 
 
-class ProductionConfig(BaseModel):
+class ProductionConfig(BaseConfig):
     model_config = ConfigDict(extra="forbid")
     deployment_type: Literal["production"]
     allow_local_paths: Literal[False] = False
-    fractal_data_url: str
-    fractal_backend_url: Annotated[str, remove_trailing_slash]
-    fractal_frontend_url: Annotated[str, remove_trailing_slash]
+    fractal_data_url: Annotated[str, AfterValidator(remove_trailing_slash)]
+    fractal_backend_url: Annotated[str, AfterValidator(remove_trailing_slash)]
+    fractal_frontend_url: Annotated[str, AfterValidator(remove_trailing_slash)]
     fractal_cookie_name: str = "fastapiusersauth"
 
 
@@ -66,4 +69,5 @@ def get_config() -> LocalConfig | ProductionConfig:
             deployment_type="local",
             allow_local_paths=False,
         )
+    logger.debug(f"{config=}")
     return config

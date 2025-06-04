@@ -29,25 +29,28 @@ from fractal_explorer.config import get_config
 logger = get_logger(__name__)
 
 
-def is_http_fractal_url(url: str) -> bool:
-    """Check if the URL is a valid HTTP Fractal URL."""
+def _include_token_for_url(url: str) -> bool:
+    """
+    Check if the URL is a valid HTTP Fractal URL.
+    """
     config = get_config()
     if config.deployment_type == "production":
         main_url = urllib3.util.parse_url(config.fractal_data_url)
-        requested_url = urllib3.util.parse_url(url)
-        if main_url.scheme != requested_url.scheme:
+        this_url = urllib3.util.parse_url(url)
+        if (main_url.scheme, main_url.host) != (this_url.scheme, this_url.host):
+            logger.debug(f"Not including token for {url=}, case 1.")
             return False
-        elif main_url.host != requested_url.host:
-            return False
-        elif main_url.path is not None and not requested_url.path.startswith(
-            main_url.path
+        elif main_url.path is not None and (
+            this_url.path is None or not this_url.path.startswith(main_url.path)
         ):
+            logger.debug(f"Not including token for {url=}, case 2.")
             return False
         else:
+            logger.debug(f"Including token for {url=}.")
             return True
     else:
+        logger.debug("Never including token for local configuration..")
         return False
-
 
 
 def is_http_url(url: str) -> bool:
@@ -74,11 +77,8 @@ def get_http_store(
     url: str, fractal_token: str | None = None
 ) -> fsspec.mapping.FSMap | None:
     """Ping the URL to check if it is reachable."""
-    if is_http_fractal_url(url):
-        fractal_token = fractal_token
-    else:
+    if not _include_token_for_url(url):
         # Do not use a fractal token for non-Fractal URLs
-        # Maybe we should have a more generic auth
         fractal_token = None
 
     return _get_http_store(url, fractal_token=fractal_token)
