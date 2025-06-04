@@ -15,8 +15,8 @@ logger = get_logger(__name__)
 
 
 def init_global_state():
-    if f"{Scope.PRIVATE}:token" not in st.session_state:
-        st.session_state[f"{Scope.PRIVATE}:token"] = None
+    if f"{Scope.PRIVATE}:fractal-token" not in st.session_state:
+        st.session_state[f"{Scope.PRIVATE}:fractal-token"] = None
     if f"{Scope.SETUP}:setup_mode" not in st.session_state:
         st.session_state[f"{Scope.SETUP}:setup_mode"] = "Plates"
     if f"{Scope.SETUP}:zarr_urls" not in st.session_state:
@@ -39,12 +39,13 @@ def parse_cli_args():
         default=None,
         help="List of Zarr URLs to add to the DataFrame",
     )
-    parser.add_argument(
-        "--token",
-        type=str,
-        default=None,
-        help="Fractal token to use for authentication.",
-    )
+    # FIXME: re-include or drop?
+    # parser.add_argument(
+    #     "--token",
+    #     type=str,
+    #     default=None,
+    #     help="Fractal token to use for authentication.",
+    # )
     parser.add_argument(
         "--config",
         type=str,
@@ -57,9 +58,10 @@ def parse_cli_args():
         st.session_state[f"{Scope.SETUP}:setup_mode"] = args.setup_mode
         logger.info(f"setup_mode: {args.setup_mode} (set from CLI args)")
 
-    if args.token is not None:
-        st.session_state[f"{Scope.PRIVATE}:token"] = args.token
-        logger.info("token: *** (set from CLI args)")
+    # FIXME: re-include or drop?
+    # if args.token is not None:
+    #     st.session_state[f"{Scope.PRIVATE}:token"] = args.token
+    #     logger.info("token: *** (set from CLI args)")
 
     if args.zarr_urls is not None:
         zarr_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
@@ -141,30 +143,31 @@ def main():
 
     setup_mode = setup_global_state()
 
-    with st.sidebar:
-        with st.expander("Advanced Options", expanded=False):
-            current_token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
-            current_token = current_token if current_token else ""
-            token = st.text_input(
-                label="Fractal Authentication Token",
-                value=current_token,
-                key="_fractal_token",
-                type="password",
-            )
-            if token == "":
-                st.session_state[f"{Scope.PRIVATE}:token"] = None
-            else:
-                st.session_state[f"{Scope.PRIVATE}:token"] = token
+    # FIXME: re-include or drop?
+    # with st.sidebar:
+    #     with st.expander("Advanced Options", expanded=False):
+    #         current_token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
+    #         current_token = current_token if current_token else ""
+    #         token = st.text_input(
+    #             label="Fractal Authentication Token",
+    #             value=current_token,
+    #             key="_fractal_token",
+    #             type="password",
+    #         )
+    #         if token == "":
+    #             st.session_state[f"{Scope.PRIVATE}:token"] = None
+    #         else:
+    #             st.session_state[f"{Scope.PRIVATE}:token"] = token
 
-            st.divider()
-            if st.button(
-                "Reset Setup",
-                key=f"{Scope.SETUP}:reset_setup",
-                icon="🔄",
-                help="Reset the setup state. This will clear all filters and the feature table.",
-            ):
-                invalidate_session_state(f"{Scope.SETUP}")
-                st.rerun()
+    #         st.divider()
+    #         if st.button(
+    #             "Reset Setup",
+    #             key=f"{Scope.SETUP}:reset_setup",
+    #             icon="🔄",
+    #             help="Reset the setup state. This will clear all filters and the feature table.",
+    #         ):
+    #             invalidate_session_state(f"{Scope.SETUP}")
+    #             st.rerun()
 
     match setup_mode:
         case "Plates":
