@@ -3,7 +3,7 @@ from fractal_explorer.utils.common import (
     invalidate_session_state,
     get_fractal_token,
 )
-from fractal_explorer.utils.config import get_config
+from fractal_explorer.config import get_config
 from fractal_explorer.utils.st_components import (
     double_slider_component,
     multiselect_component,

@@ -8,7 +8,7 @@ from fractal_explorer.pages.setup_page._plate_mode_setup import (
 )
 from fractal_explorer.utils import Scope, invalidate_session_state
 import polars as pl
-import os
+from fractal_explorer.config import get_config
 from fractal_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
@@ -24,6 +24,10 @@ def init_global_state():
 
 
 def parse_cli_args():
+    config = get_config()
+    if config.deployment_type == "production":
+        raise ValueError(f"CLI arguments not supported for {config.deployment_type=}.")
+
     parser = ArgumentParser(description="Fractal Plate Explorer")
     parser.add_argument(
         "--setup-mode",
@@ -46,12 +50,6 @@ def parse_cli_args():
     #     default=None,
     #     help="Fractal token to use for authentication.",
     # )
-    parser.add_argument(
-        "--config",
-        type=str,
-        default=None,
-        help="Path to the configuration file.",
-    )
 
     args = parser.parse_args()
     if args.setup_mode is not None:
@@ -67,12 +65,6 @@ def parse_cli_args():
         zarr_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
         st.session_state[f"{Scope.SETUP}:zarr_urls"] = zarr_urls + args.zarr_urls
         logger.info(f"zarr_urls: {args.zarr_urls} (set from CLI args)")
-        
-    if args.config is not None:
-        os.environ["FRACTAL_EXPLORER_CONFIG"] = str(args.config)
-        logger.info(
-            f"Configuration file set to: {args.config} (set from CLI args)"
-        )
 
 
 
@@ -94,8 +86,11 @@ def setup_global_state():
     Setup the global state for the Streamlit app.
     """
     init_global_state()
-    parse_cli_args()
-    parse_query_params()
+    parse_query_params() # This may be useful e.g. when linking from fractal-web
+    
+    config = get_config()
+    if config.deployment_type == "local":
+        parse_cli_args()
 
     default_setup_mode = st.session_state.get(f"{Scope.SETUP}:setup_mode", "Plates")
     setup_mode = st.pills(

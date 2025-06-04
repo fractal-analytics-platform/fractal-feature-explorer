@@ -1,3 +1,4 @@
+import urllib3
 import asyncio
 from collections.abc import Iterable
 from typing import Literal
@@ -19,10 +20,11 @@ from pathlib import Path
 
 import fsspec
 from ngio.utils import NgioValueError
+import urllib3.util
 from fractal_explorer.utils import get_fractal_token
 from streamlit.logger import get_logger
 
-from fractal_explorer.utils.config import get_config
+from fractal_explorer.config import get_config
 
 logger = get_logger(__name__)
 
@@ -30,10 +32,22 @@ logger = get_logger(__name__)
 def is_http_fractal_url(url: str) -> bool:
     """Check if the URL is a valid HTTP Fractal URL."""
     config = get_config()
-    # FIXME: replace startswith with protocol/domain check
-    if url.startswith(config.fractal_data_domain):
-        return True
-    return False
+    if config.deployment_type == "production":
+        main_url = urllib3.util.parse_url(config.fractal_data_url)
+        requested_url = urllib3.util.parse_url(url)
+        if main_url.scheme != requested_url.scheme:
+            return False
+        elif main_url.host != requested_url.host:
+            return False
+        elif main_url.path is not None and not requested_url.path.startswith(
+            main_url.path
+        ):
+            return False
+        else:
+            return True
+    else:
+        return False
+
 
 
 def is_http_url(url: str) -> bool:

@@ -4,7 +4,7 @@ from fractal_explorer.utils import Scope
 
 from fractal_explorer.authentication import verify_authentication
 
-from fractal_explorer.utils.config import get_config
+from fractal_explorer.config import get_config
 
 logger = get_logger(__name__)
 

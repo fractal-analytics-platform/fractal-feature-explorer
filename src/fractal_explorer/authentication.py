@@ -1,5 +1,5 @@
 import urllib3.util
-from fractal_explorer.utils.config import get_config
+from fractal_explorer.config import get_config
 import urllib3
 import streamlit as st
 from fractal_explorer.utils import Scope
