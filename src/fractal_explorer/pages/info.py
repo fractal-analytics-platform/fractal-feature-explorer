@@ -18,6 +18,8 @@ def main():
         st.write(f"Fractal server URL: {config.fractal_frontend_url}")
         st.write(f"User email: {current_email}.")
     else:
+        # FIXME Lorenzo: handle `config.deployment_type="local"` if relevant,
+        # or disable the "info" page.
         st.write("This is a local deployment.")
 
 

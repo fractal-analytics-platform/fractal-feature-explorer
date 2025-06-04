@@ -49,6 +49,7 @@ def _include_token_for_url(url: str) -> bool:
             logger.debug(f"Including token for {url=}.")
             return True
     else:
+        # FIXME Lorenzo: handle `config.deployment_type="local"`
         logger.debug("Never including token for local configuration..")
         return False
 
