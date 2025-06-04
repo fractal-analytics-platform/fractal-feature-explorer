@@ -43,7 +43,7 @@ def parse_cli_args():
         default=None,
         help="List of Zarr URLs to add to the DataFrame",
     )
-    # FIXME: re-include or drop?
+    # FIXME Lorenzo: re-include or drop?
     # parser.add_argument(
     #     "--token",
     #     type=str,
@@ -56,9 +56,9 @@ def parse_cli_args():
         st.session_state[f"{Scope.SETUP}:setup_mode"] = args.setup_mode
         logger.info(f"setup_mode: {args.setup_mode} (set from CLI args)")
 
-    # FIXME: re-include or drop?
+    # FIXME Lorenzo: re-include or drop?
     # if args.token is not None:
-    #     st.session_state[f"{Scope.PRIVATE}:token"] = args.token
+    #     st.session_state[f"{Scope.PRIVATE}:fractal-token"] = args.token
     #     logger.info("token: *** (set from CLI args)")
 
     if args.zarr_urls is not None:
@@ -138,10 +138,10 @@ def main():
 
     setup_mode = setup_global_state()
 
-    # FIXME: re-include or drop?
+    # FIXME Lorenzo: re-include or drop?
     # with st.sidebar:
     #     with st.expander("Advanced Options", expanded=False):
-    #         current_token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
+    #         current_token = st.session_state.get(f"{Scope.PRIVATE}:fractal-token", None)
     #         current_token = current_token if current_token else ""
     #         token = st.text_input(
     #             label="Fractal Authentication Token",
@@ -150,9 +150,9 @@ def main():
     #             type="password",
     #         )
     #         if token == "":
-    #             st.session_state[f"{Scope.PRIVATE}:token"] = None
+    #             st.session_state[f"{Scope.PRIVATE}:fractal-token"] = None
     #         else:
-    #             st.session_state[f"{Scope.PRIVATE}:token"] = token
+    #             st.session_state[f"{Scope.PRIVATE}:fractal-token"] = token
 
     #         st.divider()
     #         if st.button(
