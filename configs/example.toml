@@ -1,6 +1,5 @@
-# If true allow opening local paths in the browser
+deployment_type = "production"
 allow_local_paths = false
-skip_authentication = false
 fractal_data_domain = "http://localhost"
 fractal_backend_url = "http://localhost:8000"
-fractal_login_url = "http://localhost:5173/auth/login"
+fractal_frontend_url = "http://localhost:5173"
