@@ -33,6 +33,7 @@ def main():
         }
     </style>
     """
+
     footer_content = f"""
     <div class='footer'>
         Fractal Explorer Version: {fractal_explorer.__version__} |
@@ -58,7 +59,10 @@ def main():
     export_page = st.Page(
         "pages/export_page.py", title="Export", icon=":material/download:"
     )
-    pg = st.navigation([setup_page, filter_page, explore_page, export_page])
+    user_info_page = st.Page(
+        "pages/info.py", title="Info", icon=":material/info:"
+    )
+    pg = st.navigation([setup_page, filter_page, explore_page, export_page, user_info_page])
     pg.run()
 
 

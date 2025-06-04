@@ -8,15 +8,15 @@ from fractal_explorer.pages.setup_page._plate_mode_setup import (
 )
 from fractal_explorer.utils import Scope, invalidate_session_state
 import polars as pl
-import os
-from pathlib import Path
+from fractal_explorer.config import get_config
+from fractal_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 
 
 def init_global_state():
-    if f"{Scope.PRIVATE}:token" not in st.session_state:
-        st.session_state[f"{Scope.PRIVATE}:token"] = None
+    if f"{Scope.PRIVATE}:fractal-token" not in st.session_state:
+        st.session_state[f"{Scope.PRIVATE}:fractal-token"] = None
     if f"{Scope.SETUP}:setup_mode" not in st.session_state:
         st.session_state[f"{Scope.SETUP}:setup_mode"] = "Plates"
     if f"{Scope.SETUP}:zarr_urls" not in st.session_state:
@@ -24,6 +24,10 @@ def init_global_state():
 
 
 def parse_cli_args():
+    config = get_config()
+    if config.deployment_type == "production":
+        raise ValueError(f"CLI arguments not supported for {config.deployment_type=}.")
+
     parser = ArgumentParser(description="Fractal Plate Explorer")
     parser.add_argument(
         "--setup-mode",
@@ -39,38 +43,28 @@ def parse_cli_args():
         default=None,
         help="List of Zarr URLs to add to the DataFrame",
     )
-    parser.add_argument(
-        "--token",
-        type=str,
-        default=None,
-        help="Fractal token to use for authentication.",
-    )
-    parser.add_argument(
-        "--config",
-        type=str,
-        default=None,
-        help="Path to the configuration file.",
-    )
+    # FIXME Lorenzo: re-include or drop?
+    # parser.add_argument(
+    #     "--token",
+    #     type=str,
+    #     default=None,
+    #     help="Fractal token to use for authentication.",
+    # )
 
     args = parser.parse_args()
     if args.setup_mode is not None:
         st.session_state[f"{Scope.SETUP}:setup_mode"] = args.setup_mode
         logger.info(f"setup_mode: {args.setup_mode} (set from CLI args)")
 
-    if args.token is not None:
-        st.session_state[f"{Scope.PRIVATE}:token"] = args.token
-        logger.info("token: *** (set from CLI args)")
+    # FIXME Lorenzo: re-include or drop?
+    # if args.token is not None:
+    #     st.session_state[f"{Scope.PRIVATE}:fractal-token"] = args.token
+    #     logger.info("token: *** (set from CLI args)")
 
     if args.zarr_urls is not None:
         zarr_urls = st.session_state.get(f"{Scope.SETUP}:zarr_urls", [])
         st.session_state[f"{Scope.SETUP}:zarr_urls"] = zarr_urls + args.zarr_urls
         logger.info(f"zarr_urls: {args.zarr_urls} (set from CLI args)")
-        
-    if args.config is not None:
-        os.environ["FRACTAL_EXPLORER_CONFIG"] = str(args.config)
-        logger.info(
-            f"Configuration file set to: {args.config} (set from CLI args)"
-        )
 
 
 
@@ -92,8 +86,11 @@ def setup_global_state():
     Setup the global state for the Streamlit app.
     """
     init_global_state()
-    parse_cli_args()
-    parse_query_params()
+    parse_query_params() # This may be useful e.g. when linking from fractal-web
+    
+    config = get_config()
+    if config.deployment_type == "local":
+        parse_cli_args()
 
     default_setup_mode = st.session_state.get(f"{Scope.SETUP}:setup_mode", "Plates")
     setup_mode = st.pills(
@@ -136,31 +133,36 @@ def filter_cache_invalidations(
 
 
 def main():
-    setup_mode = setup_global_state()
-    with st.sidebar:
-        with st.expander("Advanced Options", expanded=False):
-            current_token = st.session_state.get(f"{Scope.PRIVATE}:token", None)
-            current_token = current_token if current_token else ""
-            token = st.text_input(
-                label="Fractal Authentication Token",
-                value=current_token,
-                key="_fractal_token",
-                type="password",
-            )
-            if token == "":
-                st.session_state[f"{Scope.PRIVATE}:token"] = None
-            else:
-                st.session_state[f"{Scope.PRIVATE}:token"] = token
 
-            st.divider()
-            if st.button(
-                "Reset Setup",
-                key=f"{Scope.SETUP}:reset_setup",
-                icon="🔄",
-                help="Reset the setup state. This will clear all filters and the feature table.",
-            ):
-                invalidate_session_state(f"{Scope.SETUP}")
-                st.rerun()
+    verify_authentication()
+
+    setup_mode = setup_global_state()
+
+    # FIXME Lorenzo: re-include or drop?
+    # with st.sidebar:
+    #     with st.expander("Advanced Options", expanded=False):
+    #         current_token = st.session_state.get(f"{Scope.PRIVATE}:fractal-token", None)
+    #         current_token = current_token if current_token else ""
+    #         token = st.text_input(
+    #             label="Fractal Authentication Token",
+    #             value=current_token,
+    #             key="_fractal_token",
+    #             type="password",
+    #         )
+    #         if token == "":
+    #             st.session_state[f"{Scope.PRIVATE}:fractal-token"] = None
+    #         else:
+    #             st.session_state[f"{Scope.PRIVATE}:fractal-token"] = token
+
+    #         st.divider()
+    #         if st.button(
+    #             "Reset Setup",
+    #             key=f"{Scope.SETUP}:reset_setup",
+    #             icon="🔄",
+    #             help="Reset the setup state. This will clear all filters and the feature table.",
+    #         ):
+    #             invalidate_session_state(f"{Scope.SETUP}")
+    #             st.rerun()
 
     match setup_mode:
         case "Plates":

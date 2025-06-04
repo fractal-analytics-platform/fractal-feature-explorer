@@ -1,9 +1,0 @@
-# If true allow opening local paths in the browser
-allow_local_paths = false
-
-# List of subdomains for which the fractal token should be used
-fractal_token_subdomains = [
-    "https://fractal-bvc.mls.uzh.ch/",
-    "https://fractal-beta.mls.uzh.ch/",
-    "https://fractal.mls.uzh.ch",
-]

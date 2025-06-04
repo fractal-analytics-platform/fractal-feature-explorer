@@ -7,6 +7,7 @@ from fractal_explorer.pages.explore_page._scatter_plot import scatter_plot_compo
 from fractal_explorer.pages.filters_page import apply_filters, build_feature_frame
 from fractal_explorer.pages.filters_page._common import FeatureFrame
 from fractal_explorer.utils import Scope, invalidate_session_state
+from fractal_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 
@@ -133,6 +134,7 @@ def feature_explore_manager(
 
 
 def main():
+    verify_authentication()
     with st.sidebar:
         with st.expander("Advanced Options", expanded=False):
             skip_filters = st.toggle(

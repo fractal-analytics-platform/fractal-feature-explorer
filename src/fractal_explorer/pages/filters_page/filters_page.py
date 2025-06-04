@@ -16,6 +16,7 @@ from fractal_explorer.pages.filters_page._scatter_filter import (
 )
 from fractal_explorer.utils import Scope, invalidate_session_state
 from streamlit.logger import get_logger
+from fractal_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 
@@ -243,6 +244,7 @@ def feature_filters_manger(
 
 
 def main():
+    verify_authentication()
     with st.sidebar:
         with st.expander("Advanced Options", expanded=False):
             if st.button(

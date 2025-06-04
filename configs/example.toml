@@ -1,0 +1,5 @@
+deployment_type = "production"
+allow_local_paths = false
+fractal_data_url = "http://localhost/subdomain/"
+fractal_backend_url = "http://localhost:8000"
+fractal_frontend_url = "http://localhost:5173"
