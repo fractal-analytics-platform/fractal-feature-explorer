@@ -23,6 +23,8 @@ dev = [
     "psrecord[plot]",
 ]
 
+test = ["pytest", "pytest-cov", "devtools"]
+
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
@@ -42,6 +44,7 @@ fractal_feature_explorer = { path = ".", editable = true }
 [tool.pixi.environments]
 default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "dev" }
+test = { features = ["test"], solve-group = "test" }
 
 
 [tool.pixi.tasks]
