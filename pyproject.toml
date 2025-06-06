@@ -10,7 +10,7 @@ dependencies = [
     "urllib3",
 ]
 name = "fractal-feature-explorer"
-requires-python = "3.12.*"
+requires-python = "==3.12.*"
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -40,6 +40,7 @@ platforms = ["osx-arm64", "linux-64"]
 [tool.pixi.pypi-dependencies]
 fractal_feature_explorer = { path = ".", editable = true }
 # ngio = { path = "../ngio", editable = true }
+
 
 
 [tool.pixi.environments]

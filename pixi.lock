@@ -1687,8 +1687,8 @@ packages:
   requires_python: '>=2.7,!=3.0,!=3.1,!=3.2,!=3.3,!=3.4,<4'
 - pypi: ./
   name: fractal-feature-explorer
-  version: 0.1.3.dev3+g5fdbe93.d20250606
-  sha256: f6a0f29ea3d1a8ce9f934bc1d833faf49922bf55e31c76f01cf905c9ed2a5ffb
+  version: 0.1.3.dev6+gf2d4b38.d20250606
+  sha256: b9f8156d7ded0be3f34748bf9ebdca1a34779a62f3a231806af9f7a2575ff725
   requires_dist:
   - matplotlib
   - ngio>=0.3.0a0,<0.4.0
@@ -1706,7 +1706,7 @@ packages:
   - devtools ; extra == 'test'
   - pytest ; extra == 'test'
   - pytest-cov ; extra == 'test'
-  requires_python: '>=3.12,<3.13'
+  requires_python: ==3.12.*
   editable: true
 - pypi: https://files.pythonhosted.org/packages/2a/fe/6697c1242126dc344840a43bffd5d5013cf5d61b272567f68025274622e1/frozenlist-1.6.2-cp312-cp312-macosx_11_0_arm64.whl
   name: frozenlist
