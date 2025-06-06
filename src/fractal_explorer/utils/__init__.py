@@ -1,10 +1,10 @@
-from fractal_explorer.utils.common import (
+from fractal_feature_explorer.utils.common import (
     Scope,
     invalidate_session_state,
     get_fractal_token,
 )
-from fractal_explorer.config import get_config
-from fractal_explorer.utils.st_components import (
+from fractal_feature_explorer.config import get_config
+from fractal_feature_explorer.utils.st_components import (
     double_slider_component,
     multiselect_component,
     number_input_component,
@@ -13,7 +13,7 @@ from fractal_explorer.utils.st_components import (
     single_slider_component,
 )
 
-from fractal_explorer.utils.ngio_io_caches import (
+from fractal_feature_explorer.utils.ngio_io_caches import (
     get_ome_zarr_plate,
     get_ome_zarr_container,
     get_and_validate_store,

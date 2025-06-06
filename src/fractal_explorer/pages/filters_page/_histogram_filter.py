@@ -4,8 +4,8 @@ import polars as pl
 import streamlit as st
 from pydantic import BaseModel, ConfigDict
 
-from fractal_explorer.pages.filters_page._common import FeatureFrame
-from fractal_explorer.utils.st_components import (
+from fractal_feature_explorer.pages.filters_page._common import FeatureFrame
+from fractal_feature_explorer.utils.st_components import (
     double_slider_component,
     number_input_component,
     selectbox_component,

@@ -3,13 +3,13 @@ from argparse import ArgumentParser
 import streamlit as st
 from streamlit.logger import get_logger
 
-from fractal_explorer.pages.setup_page._plate_mode_setup import (
+from fractal_feature_explorer.pages.setup_page._plate_mode_setup import (
     plate_mode_setup_component,
 )
-from fractal_explorer.utils import Scope, invalidate_session_state
+from fractal_feature_explorer.utils import Scope, invalidate_session_state
 import polars as pl
-from fractal_explorer.config import get_config
-from fractal_explorer.authentication import verify_authentication
+from fractal_feature_explorer.config import get_config
+from fractal_feature_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 

@@ -1,6 +1,6 @@
 import streamlit as st
 
-from fractal_explorer.utils import get_and_validate_store, is_http_url
+from fractal_feature_explorer.utils import get_and_validate_store, is_http_url
 from streamlit.logger import get_logger
 
 logger = get_logger(__name__)

@@ -8,11 +8,11 @@ from ngio.common import (
 )
 from ngio.tables import FeatureTable
 from typing import Literal
-from fractal_explorer.utils import (
+from fractal_feature_explorer.utils import (
     get_ome_zarr_container,
     get_ome_zarr_plate,
 )
-from fractal_explorer.pages.setup_page._utils import (
+from fractal_feature_explorer.pages.setup_page._utils import (
     plate_name_from_url,
     extras_from_url,
 )

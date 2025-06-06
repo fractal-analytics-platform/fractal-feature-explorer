@@ -3,7 +3,7 @@
 from importlib.metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("fractal-explorer")
+    __version__ = version("fractal-feature-explorer")
 except PackageNotFoundError:  # pragma: no cover
     __version__ = "uninstalled"
 __author__ = "Lorenzo Cerrone"

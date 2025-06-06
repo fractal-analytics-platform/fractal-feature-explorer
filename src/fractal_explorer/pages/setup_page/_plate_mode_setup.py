@@ -3,27 +3,27 @@ import asyncio
 import polars as pl
 import streamlit as st
 
-from fractal_explorer.utils.common import Scope
-from fractal_explorer.utils.ngio_io_caches import (
+from fractal_feature_explorer.utils.common import Scope
+from fractal_feature_explorer.utils.ngio_io_caches import (
     get_ome_zarr_plate,
 )
-from fractal_explorer.utils.st_components import (
+from fractal_feature_explorer.utils.st_components import (
     pills_component,
     selectbox_component,
 )
 
 
 from streamlit.logger import get_logger
-from fractal_explorer.pages.setup_page._plate_advanced_selection import (
+from fractal_feature_explorer.pages.setup_page._plate_advanced_selection import (
     advanced_plate_selection_component,
 )
-from fractal_explorer.pages.setup_page._tables_io import (
+from fractal_feature_explorer.pages.setup_page._tables_io import (
     list_images_tables,
     list_plate_tables,
     collect_feature_table_from_images,
     collect_feature_table_from_plates,
 )
-from fractal_explorer.pages.setup_page._utils import (
+from fractal_feature_explorer.pages.setup_page._utils import (
     sanify_and_validate_url,
     extras_from_url,
 )

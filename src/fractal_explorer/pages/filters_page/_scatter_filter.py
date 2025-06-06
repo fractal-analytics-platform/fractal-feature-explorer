@@ -7,12 +7,12 @@ import streamlit as st
 from matplotlib.path import Path
 from pydantic import BaseModel, Field
 
-from fractal_explorer.pages.filters_page._common import FeatureFrame
-from fractal_explorer.utils.ngio_io_caches import (
+from fractal_feature_explorer.pages.filters_page._common import FeatureFrame
+from fractal_feature_explorer.utils.ngio_io_caches import (
     get_ome_zarr_container,
     get_single_label_image,
 )
-from fractal_explorer.utils.st_components import (
+from fractal_feature_explorer.utils.st_components import (
     selectbox_component,
     single_slider_component,
 )
