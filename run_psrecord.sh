@@ -14,5 +14,5 @@ psrecord \
   --include-children \
   --log psrecord-output/${TIMESTAMP}.txt \
   --plot psrecord-output/${TIMESTAMP}.png \
-  "streamlit run src/fractal_explorer/main.py"
+  "streamlit run src/fractal_feature_explorer/main.py"
 

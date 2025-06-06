@@ -44,8 +44,8 @@ def get_config() -> LocalConfig | ProductionConfig:
 
     # Define expected config path
     config_path = os.getenv(
-        "FRACTAL_EXPLORER_CONFIG",
-        (Path.home() / ".fractal_explorer" / "config.toml").as_posix(),
+        "fractal_feature_explorer_CONFIG",
+        (Path.home() / ".fractal_feature_explorer" / "config.toml").as_posix(),
     )
     config_path = Path(config_path)
 

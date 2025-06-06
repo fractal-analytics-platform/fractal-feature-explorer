@@ -21,10 +21,10 @@ from pathlib import Path
 import fsspec
 from ngio.utils import NgioValueError
 import urllib3.util
-from fractal_explorer.utils import get_fractal_token
+from fractal_feature_explorer.utils import get_fractal_token
 from streamlit.logger import get_logger
 
-from fractal_explorer.config import get_config
+from fractal_feature_explorer.config import get_config
 
 logger = get_logger(__name__)
 

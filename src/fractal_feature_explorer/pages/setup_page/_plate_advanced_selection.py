@@ -1,15 +1,15 @@
 import polars as pl
 import streamlit as st
 
-from fractal_explorer.utils.common import Scope
-from fractal_explorer.utils.st_components import (
+from fractal_feature_explorer.utils.common import Scope
+from fractal_feature_explorer.utils.st_components import (
     double_slider_component,
     multiselect_component,
     pills_component,
     selectbox_component,
 )
 
-from fractal_explorer.pages.setup_page._tables_io import (
+from fractal_feature_explorer.pages.setup_page._tables_io import (
     list_images_tables,
     list_plate_tables,
     collect_condition_table_from_images,

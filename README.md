@@ -1,4 +1,4 @@
-# fractal-explorer
+# fractal-feature-explorer
 
 ## Setup
 
@@ -18,7 +18,7 @@
 - from streamlit directly
 
     ```bash
-    pixi run streamlit run src/fractal_explorer/main.py
+    pixi run streamlit run src/fractal_feature_explorer/main.py
     ```
 
 - passing cli arguments
@@ -38,10 +38,10 @@
 ### v0.1.1
 
 - Add a config file to allow for fine-tuning the dashboard behavior between centralized and local deployments, see an example in `configs/`.
-- config should either be passed as a CLI argument `--config path/to/config.toml`, or set as an environment variable `FRACTAL_EXPLORER_CONFIG=path/to/config.toml`, or saved in the `~/.fractal_explorer/config.toml` file.
+- config should either be passed as a CLI argument `--config path/to/config.toml`, or set as an environment variable `fractal_feature_explorer_CONFIG=path/to/config.toml`, or saved in the `~/.fractal_feature_explorer/config.toml` file.
 - Add guardrails for fractal token usage, now the token is bundled in the request headers only if the url is in the `fractal_token_subdomains`.
-- Fix [#28](https://github.com/fractal-analytics-platform/fractal-explorer/issues/28)
-- Fix [#29](https://github.com/fractal-analytics-platform/fractal-explorer/issues/29)
+- Fix [#28](https://github.com/fractal-analytics-platform/fractal-feature-explorer/issues/28)
+- Fix [#29](https://github.com/fractal-analytics-platform/fractal-feature-explorer/issues/29)
 
 ## URL query parameters
 
@@ -69,7 +69,7 @@ example URL: `http://localhost:8501/?zarr_url=/Users/locerr/data/20200812-23well
 
     ```bash
     $ pixi run explorer
-    × Failed to load lock file from `/xxx/fractal-explorer/pixi.lock`
+    × Failed to load lock file from `/xxx/fractal-feature-explorer/pixi.lock`
     ╰─▶ found newer lockfile format version 6, but only up to including version 5 is supported
     ```
 

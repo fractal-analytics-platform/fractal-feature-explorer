@@ -3,9 +3,9 @@ import io
 import polars as pl
 import streamlit as st
 
-from fractal_explorer.pages.filters_page import apply_filters, build_feature_frame
-from fractal_explorer.utils import Scope
-from fractal_explorer.authentication import verify_authentication
+from fractal_feature_explorer.pages.filters_page import apply_filters, build_feature_frame
+from fractal_feature_explorer.utils import Scope
+from fractal_feature_explorer.authentication import verify_authentication
 
 
 def table_to_csv_buffer(table: pl.LazyFrame) -> io.BytesIO:
