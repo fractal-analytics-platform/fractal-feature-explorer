@@ -34,6 +34,9 @@
     ```
 
 ## Change log
+### v0.1.4
+
+- Fix name of `FRACTAL_FEATURE_EXPLORER_CONFIG` env variable.
 
 ### v0.1.1
 
