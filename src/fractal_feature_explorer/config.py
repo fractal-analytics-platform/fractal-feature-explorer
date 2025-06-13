@@ -12,11 +12,7 @@ from streamlit.logger import get_logger
 logger = get_logger(__name__)
 
 
-class BaseConfig(BaseModel):
-    deployment_type: Literal["local", "production"]
-
-
-class LocalConfig(BaseConfig):
+class LocalConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     deployment_type: Literal["local"]
     allow_local_paths: bool = True
@@ -26,7 +22,7 @@ def remove_trailing_slash(value: str) -> str:
     return value.rstrip("/")
 
 
-class ProductionConfig(BaseConfig):
+class ProductionConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     deployment_type: Literal["production"]
     allow_local_paths: Literal[False] = False
@@ -57,9 +53,14 @@ def get_config() -> LocalConfig | ProductionConfig:
         elif config_data[key] == "local":
             config = LocalConfig(**config_data)
             logger.info(f"Local configuration read from {config_path.as_posix()}.")
-        else:
+        elif config_data[key] == "production":
             config = ProductionConfig(**config_data)
             logger.info(f"Production configuration read from {config_path.as_posix()}.")
+        else:
+            raise ValueError(
+                f"Invalid {key=} in {config_path=}. "
+                "Expected 'local' or 'production'."
+            )
     else:
         logger.warning(
             f"Config file {config_path} does not exist; "
