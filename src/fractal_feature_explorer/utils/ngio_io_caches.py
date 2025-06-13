@@ -29,29 +29,40 @@ from fractal_feature_explorer.config import get_config
 logger = get_logger(__name__)
 
 
+def _compare_urls(url1: str, url2: str) -> bool:
+    """
+    Compare two URLs to check if they are the same.
+    This is a helper function to compare URLs in a case-insensitive manner.
+    """
+    parsed_url1 = urllib3.util.parse_url(url1)
+    parsed_url2 = urllib3.util.parse_url(url2)
+    if (parsed_url1.scheme, parsed_url1.host) != (parsed_url2.scheme, parsed_url2.host):
+        logger.debug(f"Not including token for {url1=}, case 1.")
+        return False
+    elif parsed_url1.path is not None and (
+        parsed_url2.path is None or not parsed_url2.path.startswith(parsed_url1.path)
+    ):
+        logger.debug(f"Not including token for {url1=}, case 2.")
+        return False
+    else:
+        logger.debug(f"Including token for {url1=}.")
+        return True
+
 def _include_token_for_url(url: str) -> bool:
     """
     Check if the URL is a valid HTTP Fractal URL.
     """
     config = get_config()
     if config.deployment_type == "production":
-        main_url = urllib3.util.parse_url(config.fractal_data_url)
-        this_url = urllib3.util.parse_url(url)
-        if (main_url.scheme, main_url.host) != (this_url.scheme, this_url.host):
-            logger.debug(f"Not including token for {url=}, case 1.")
-            return False
-        elif main_url.path is not None and (
-            this_url.path is None or not this_url.path.startswith(main_url.path)
-        ):
-            logger.debug(f"Not including token for {url=}, case 2.")
-            return False
-        else:
-            logger.debug(f"Including token for {url=}.")
-            return True
+        return _compare_urls(config.fractal_data_url, url)
     else:
-        # FIXME Lorenzo: handle `config.deployment_type="local"`
-        logger.debug("Never including token for local configuration..")
-        return False
+        for data_url in config.fractal_data_urls:
+            if _compare_urls(data_url, url):
+                logger.debug(f"Including token for {url=}, matched with {data_url=}.")
+                return True
+        else:
+            logger.debug(f"Not including token for {url=}, not a Fractal URL.")
+            return False
 
 
 def is_http_url(url: str) -> bool:
