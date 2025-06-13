@@ -13,14 +13,12 @@ def main():
     verify_authentication()
     current_email = st.session_state.get(f"{Scope.PRIVATE}:fractal-email", None)
     config = get_config()
-    if config.deployment_type == "production":
-        st.write("You are currently logged in as a Fractal user.")
-        st.write(f"Fractal server URL: {config.fractal_frontend_url}")
-        st.write(f"User email: {current_email}.")
-    else:
-        # FIXME Lorenzo: handle `config.deployment_type="local"` if relevant,
-        # or disable the "info" page.
-        st.write("This is a local deployment.")
+    if config.deployment_type == "local":
+        return None
+    
+    st.write("You are currently logged in as a Fractal user.")
+    st.write(f"Fractal server URL: {config.fractal_frontend_url}")
+    st.write(f"User email: {current_email}.")
 
 
 if __name__ == "__main__":

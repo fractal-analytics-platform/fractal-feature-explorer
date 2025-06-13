@@ -1,6 +1,7 @@
 import streamlit as st
 import fractal_feature_explorer
 import ngio
+from fractal_feature_explorer.config import get_config
 
 
 def main():
@@ -59,10 +60,17 @@ def main():
     export_page = st.Page(
         "pages/export_page.py", title="Export", icon=":material/download:"
     )
-    user_info_page = st.Page(
-        "pages/info.py", title="Info", icon=":material/info:"
-    )
-    pg = st.navigation([setup_page, filter_page, explore_page, export_page, user_info_page])
+    
+    pages = [setup_page, filter_page, explore_page, export_page]
+    
+    config = get_config()
+    if config.deployment_type == "production":
+        user_info_page = st.Page(
+            "pages/info.py", title="Info", icon=":material/info:"
+        )
+        pages.append(user_info_page)
+
+    pg = st.navigation(pages)
     pg.run()
 
 
