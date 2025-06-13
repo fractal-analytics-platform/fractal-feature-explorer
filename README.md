@@ -34,6 +34,15 @@
     ```
 
 ## Change log
+
+### v0.1.5
+
+- Remove cli
+- Reintroduce token input widget for local deployments
+- Refactor local config handling
+- Save default config to `~/.fractal_feature_explorer/config.toml` on first run
+- Add default data service url for local deployments
+
 ### v0.1.4
 
 - Fix name of `FRACTAL_FEATURE_EXPLORER_CONFIG` env variable.
