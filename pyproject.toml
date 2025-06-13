@@ -2,7 +2,7 @@
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
 dependencies = [
     "streamlit",
-    "ngio>=0.3.0a0, <0.4.0",
+    "ngio>=0.3.2, <0.4.0",
     "plotly",
     "matplotlib",
     "orjson",
