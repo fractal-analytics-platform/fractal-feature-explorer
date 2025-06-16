@@ -48,6 +48,7 @@ def _compare_urls(url1: str, url2: str) -> bool:
         logger.debug(f"Including token for {url1=}.")
         return True
 
+
 def _include_token_for_url(url: str) -> bool:
     """
     Check if the URL is a valid HTTP Fractal URL.

@@ -3,6 +3,7 @@
 TODO This is just a placeholder for the app testing. TBD what to test.
 
 """
+
 import os
 from streamlit.testing.v1 import AppTest
 
@@ -19,5 +20,5 @@ def test_app():
 
     app = AppTest.from_file("src/fractal_feature_explorer/main.py")
     app.run(timeout=15)
-    
+
     assert not app.exception, "App raised an exception during execution."

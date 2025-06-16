@@ -15,7 +15,7 @@ def main():
     config = get_config()
     if config.deployment_type == "local":
         return None
-    
+
     st.write("You are currently logged in as a Fractal user.")
     st.write(f"Fractal server URL: {config.fractal_frontend_url}")
     st.write(f"User email: {current_email}.")

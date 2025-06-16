@@ -58,7 +58,7 @@ def verify_authentication():
     config = get_config()
     if config.deployment_type == "local":
         return
-    
+
     try:
         _verify_authentication(config)
     except Exception as e:

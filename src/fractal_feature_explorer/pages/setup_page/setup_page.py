@@ -1,6 +1,7 @@
 """
 Fractal Feature Explorer - Setup Page
 """
+
 import streamlit as st
 from streamlit.logger import get_logger
 
@@ -42,7 +43,7 @@ def setup_global_state():
     Setup the global state for the Streamlit app.
     """
     init_global_state()
-    parse_query_params() # This may be useful e.g. when linking from fractal-web
+    parse_query_params()  # This may be useful e.g. when linking from fractal-web
 
     default_setup_mode = st.session_state.get(f"{Scope.SETUP}:setup_mode", "Plates")
     setup_mode = st.pills(
@@ -106,24 +107,23 @@ def _token_input_widget():
 
 
 def main():
-
     verify_authentication()
 
     setup_mode = setup_global_state()
 
     with st.sidebar:
-         with st.expander("Advanced Options", expanded=False):
-             _token_input_widget()
+        with st.expander("Advanced Options", expanded=False):
+            _token_input_widget()
 
-             st.divider()
-             if st.button(
-                 "Reset Setup",
-                 key=f"{Scope.SETUP}:reset_setup",
-                 icon="🔄",
-                 help="Reset the setup state. This will clear all filters and the feature table.",
-             ):
-                 invalidate_session_state(f"{Scope.SETUP}")
-                 st.rerun()
+            st.divider()
+            if st.button(
+                "Reset Setup",
+                key=f"{Scope.SETUP}:reset_setup",
+                icon="🔄",
+                help="Reset the setup state. This will clear all filters and the feature table.",
+            ):
+                invalidate_session_state(f"{Scope.SETUP}")
+                st.rerun()
 
     match setup_mode:
         case "Plates":
