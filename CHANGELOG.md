@@ -2,12 +2,12 @@
 
 ## v0.1.5
 
-- Remove cli
+- Remove cli argments
 - Reintroduce token input widget for local deployments
 - Refactor local config handling
 - Save default config to `~/.fractal_feature_explorer/config.toml` on first run
 - Add default data service url for local deployments
-- Add `explore` cli entry point.
+- Add `explore` cli entry point for local users
 
 ## v0.1.4
 
