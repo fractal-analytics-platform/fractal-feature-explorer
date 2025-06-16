@@ -1,18 +1,49 @@
 # fractal-feature-explorer
 
-## Setup
+## Installation
+
+The easiest way to install the `fractal-feature-explorer` is to use `pixi`, which is a tool for managing Python projects and their dependencies.
+
+```bash
+pixi global install fractal-feature-explorer
+```
+
+Alternatively, you can install it in a standart Conda/Venv using `pip`:
+
+```bash
+pip install fractal-feature-explorer
+```
+
+## Usage
+
+You can run the dashboard using the `explorer` command:
+
+```bash
+explorer
+```
+
+at the first run, it will ask you for permission to create a configuration file in your home directory (`~/.fractal_feature_explorer/config.toml`), which will be used for future runs.
+
+Alternatively, you can expose a configuration file using the `FRACTAL_FEATURE_EXPLORER_CONFIG` environment variable:
+
+```bash
+export FRACTAL_FEATURE_EXPLORER_CONFIG=/path/to/config.toml
+explorer
+```
+
+More details on the configuration file will be availble soon.
+
+## Local development setup
 
 - pixi (lockfile create with pixi 0.47)
-- local clone of the ngio dev branch
 - local clone of this repo
-- make sure that the ngio relative path is correct in the pyproject.toml file
 
 ## running the dashboard
 
 - using pixi task
 
   ```bash
-  pixi run explorer
+  pixi run -e dev explorer-dev
   ```
 
 - from streamlit directly
@@ -21,39 +52,9 @@
     pixi run streamlit run src/fractal_feature_explorer/main.py
     ```
 
-- passing cli arguments
-
-    ```bash
-    pixi run explorer -- --setup-mode Images
-    ```
-
-- Use the dev env for auto-reload
-
-    ```bash
-    pixi run -e dev explorer
-    ```
-
 ## Change log
 
-### v0.1.5
-
-- Remove cli
-- Reintroduce token input widget for local deployments
-- Refactor local config handling
-- Save default config to `~/.fractal_feature_explorer/config.toml` on first run
-- Add default data service url for local deployments
-
-### v0.1.4
-
-- Fix name of `FRACTAL_FEATURE_EXPLORER_CONFIG` env variable.
-
-### v0.1.1
-
-- Add a config file to allow for fine-tuning the dashboard behavior between centralized and local deployments, see an example in `configs/`.
-- config should either be passed as a CLI argument `--config path/to/config.toml`, or set as an environment variable `fractal_feature_explorer_CONFIG=path/to/config.toml`, or saved in the `~/.fractal_feature_explorer/config.toml` file.
-- Add guardrails for fractal token usage, now the token is bundled in the request headers only if the url is in the `fractal_token_subdomains`.
-- Fix [#28](https://github.com/fractal-analytics-platform/fractal-feature-explorer/issues/28)
-- Fix [#29](https://github.com/fractal-analytics-platform/fractal-feature-explorer/issues/29)
+See [CHANGELOG.md](CHANGELOG.md) for details on changes and updates.
 
 ## URL query parameters
 
