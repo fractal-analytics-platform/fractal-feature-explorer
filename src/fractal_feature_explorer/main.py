@@ -2,20 +2,21 @@ import streamlit as st
 import fractal_feature_explorer
 import ngio
 from fractal_feature_explorer.config import get_config
+from pathlib import Path
 
 
 def main():
+    icon_path = Path(__file__).parent / "resources" / "fractal_favicon.png"
+    logo_path = Path(__file__).parent / "resources" / "fractal_logo.png"
+
     st.set_page_config(
         layout="wide",
         page_title="Fractal Plate Explorer",
-        page_icon="https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/main/common/fractal_favicon.png",
+        page_icon=icon_path,
     )
     t_col1, t_col2 = st.columns([1, 5])
     with t_col1:
-        st.image(
-            "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/main/common/fractal_logo.png",
-            width=100,
-        )
+        st.image(logo_path, width=100)
     with t_col2:
         st.title("Fractal Explorer")
 

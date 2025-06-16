@@ -18,3 +18,5 @@ psrecord-output/
 .*.swp
 venv
 .vscode
+
+.DS_Store
