@@ -25,6 +25,10 @@ dev = [
 
 test = ["pytest", "pytest-cov", "devtools"]
 
+
+[project.scripts]
+explorer = "fractal_feature_explorer.cli:cli"
+
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
@@ -32,6 +36,7 @@ build-backend = "hatchling.build"
 # https://hatch.pypa.io/latest/config/metadata/
 [tool.hatch.version]
 source = "vcs"
+
 
 [tool.pixi.project]
 channels = ["conda-forge"]
@@ -49,4 +54,5 @@ test = { features = ["test"], solve-group = "test" }
 
 
 [tool.pixi.tasks]
-explorer = { cmd = "streamlit run src/fractal_feature_explorer/main.py" }
+explorer-dev = { cmd = "streamlit run src/fractal_feature_explorer/main.py" }
+
