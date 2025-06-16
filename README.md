@@ -2,10 +2,16 @@
 
 ## Installation
 
-The easiest way to install the `fractal-feature-explorer` is to use `pixi`, which is a tool for managing Python projects and their dependencies.
+The easiest way to install the `fractal-feature-explorer` is to use `uv` or `pipx`:
 
 ```bash
-pixi global install fractal-feature-explorer
+pipx install fractal-feature-explorer
+```
+
+or
+
+```bash
+uv tool install fractal-feature-explorer
 ```
 
 Alternatively, you can install it in a standart Conda/Venv using `pip`:
@@ -42,9 +48,9 @@ More details on the configuration file will be availble soon.
 
 - using pixi task
 
-  ```bash
-  pixi run -e dev explorer-dev
-  ```
+    ```bash
+    pixi run -e dev explorer-dev
+    ```
 
 - from streamlit directly
 
