@@ -1,5 +1,10 @@
 # fractal-feature-explorer
 
+[![License](https://img.shields.io/pypi/l/fractal-feature-explorer.svg?color=green)](https://github.com/fractal-analytics-platform/fractal-feature-explorer/raw/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/fractal-feature-explorer.svg?color=green)](https://pypi.org/project/fractal-feature-explorer)
+[![Python Version](https://img.shields.io/pypi/pyversions/fractal-feature-explorer.svg?color=green)](https://python.org)
+[![CI](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml)
+
 ## Installation
 
 The easiest way to install the `fractal-feature-explorer` is to use `uv` or `pipx`:
