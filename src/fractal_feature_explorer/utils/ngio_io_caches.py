@@ -12,6 +12,7 @@ from ngio import (
     open_ome_zarr_plate,
 )
 from ngio.common import Dimensions, Roi, list_image_tables_async
+from ngio.common._zoom import numpy_zoom
 from ngio.ome_zarr_meta.ngio_specs import PixelSize
 from ngio.tables import MaskingRoiTable
 from ngio.utils import fractal_fsspec_store
@@ -29,29 +30,45 @@ from fractal_feature_explorer.config import get_config
 logger = get_logger(__name__)
 
 
+def _url_belongs_to_base(url: str, base_url: str) -> bool:
+    """
+    Check if the url has the same protocol and host as the base_url,
+    and if the path of the url is a subpath of the base_url.
+    """
+    parsed_url = urllib3.util.parse_url(url)
+    parsed_base_url = urllib3.util.parse_url(base_url)
+    if (parsed_url.scheme, parsed_url.host) != (
+        parsed_base_url.scheme,
+        parsed_base_url.host,
+    ):
+        logger.debug(f"Not including token for {url=}, case 1.")
+        return False
+    elif parsed_url.path is not None and (
+        parsed_base_url.path is None
+        or not parsed_url.path.startswith(parsed_base_url.path)
+    ):
+        logger.debug(f"Not including token for {url=}, case 2.")
+        return False
+    else:
+        logger.debug(f"Including token for {url=}.")
+        return True
+
+
 def _include_token_for_url(url: str) -> bool:
     """
     Check if the URL is a valid HTTP Fractal URL.
     """
     config = get_config()
     if config.deployment_type == "production":
-        main_url = urllib3.util.parse_url(config.fractal_data_url)
-        this_url = urllib3.util.parse_url(url)
-        if (main_url.scheme, main_url.host) != (this_url.scheme, this_url.host):
-            logger.debug(f"Not including token for {url=}, case 1.")
-            return False
-        elif main_url.path is not None and (
-            this_url.path is None or not this_url.path.startswith(main_url.path)
-        ):
-            logger.debug(f"Not including token for {url=}, case 2.")
-            return False
-        else:
-            logger.debug(f"Including token for {url=}.")
-            return True
+        return _url_belongs_to_base(url, config.fractal_data_url)
     else:
-        # FIXME Lorenzo: handle `config.deployment_type="local"`
-        logger.debug("Never including token for local configuration..")
-        return False
+        for data_url in config.fractal_data_urls:
+            if _url_belongs_to_base(url, data_url):
+                logger.debug(f"Including token for {url=}, matched with {data_url=}.")
+                return True
+        else:
+            logger.debug(f"Not including token for {url=}, not a Fractal URL.")
+            return False
 
 
 def is_http_url(url: str) -> bool:
@@ -381,8 +398,16 @@ def get_single_label_image(
         zoom_factor=zoom_factor,
         fractal_token=fractal_token,
     )
+
     label_array = label_array.squeeze()
     label_array = np.where(label_array == label, 255, 0)
+
+    # Scale the label array to match the image size
+    label_array = numpy_zoom(
+        label_array,
+        target_shape=image_rgba.shape[:2],
+        order=0,  # Always use nearest neighbor for labels
+    )
 
     image_rgba[label_array > 0, 0] = 255
 

@@ -1,20 +1,22 @@
 import streamlit as st
 import fractal_feature_explorer
 import ngio
+from fractal_feature_explorer.config import get_config
+from pathlib import Path
 
 
 def main():
+    icon_path = Path(__file__).parent / "resources" / "fractal_favicon.png"
+    logo_path = Path(__file__).parent / "resources" / "fractal_logo.png"
+
     st.set_page_config(
         layout="wide",
         page_title="Fractal Plate Explorer",
-        page_icon="https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/main/common/fractal_favicon.png",
+        page_icon=icon_path,
     )
     t_col1, t_col2 = st.columns([1, 5])
     with t_col1:
-        st.image(
-            "https://raw.githubusercontent.com/fractal-analytics-platform/fractal-logos/main/common/fractal_logo.png",
-            width=100,
-        )
+        st.image(logo_path, width=100)
     with t_col2:
         st.title("Fractal Explorer")
 
@@ -59,10 +61,14 @@ def main():
     export_page = st.Page(
         "pages/export_page.py", title="Export", icon=":material/download:"
     )
-    user_info_page = st.Page(
-        "pages/info.py", title="Info", icon=":material/info:"
-    )
-    pg = st.navigation([setup_page, filter_page, explore_page, export_page, user_info_page])
+
+    pages = [setup_page, filter_page, explore_page, export_page]
+    config = get_config()
+    if config.deployment_type == "production":
+        user_info_page = st.Page("pages/info.py", title="Info", icon=":material/info:")
+        pages.append(user_info_page)
+
+    pg = st.navigation(pages)
     pg.run()
 
 
