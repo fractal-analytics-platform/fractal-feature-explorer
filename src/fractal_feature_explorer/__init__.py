@@ -11,7 +11,7 @@ except PackageNotFoundError:  # pragma: no cover
 __author__ = "Lorenzo Cerrone"
 __email__ = "lorenzo.cerrone@uzh.ch"
 
-CONFIG_PATH = config_path = os.getenv(
+CONFIG_PATH = os.getenv(
     "FRACTAL_FEATURE_EXPLORER_CONFIG",
     (Path.home() / ".fractal_feature_explorer" / "config.toml"),
 )
