@@ -12,6 +12,7 @@ from ngio import (
     open_ome_zarr_plate,
 )
 from ngio.common import Dimensions, Roi, list_image_tables_async
+from ngio.common._zoom import numpy_zoom
 from ngio.ome_zarr_meta.ngio_specs import PixelSize
 from ngio.tables import MaskingRoiTable
 from ngio.utils import fractal_fsspec_store
@@ -36,11 +37,15 @@ def _url_belongs_to_base(url: str, base_url: str) -> bool:
     """
     parsed_url = urllib3.util.parse_url(url)
     parsed_base_url = urllib3.util.parse_url(base_url)
-    if (parsed_url.scheme, parsed_url.host) != (parsed_base_url.scheme, parsed_base_url.host):
+    if (parsed_url.scheme, parsed_url.host) != (
+        parsed_base_url.scheme,
+        parsed_base_url.host,
+    ):
         logger.debug(f"Not including token for {url=}, case 1.")
         return False
     elif parsed_url.path is not None and (
-        parsed_base_url.path is None or not parsed_url.path.startswith(parsed_base_url.path)
+        parsed_base_url.path is None
+        or not parsed_url.path.startswith(parsed_base_url.path)
     ):
         logger.debug(f"Not including token for {url=}, case 2.")
         return False
@@ -393,8 +398,16 @@ def get_single_label_image(
         zoom_factor=zoom_factor,
         fractal_token=fractal_token,
     )
+
     label_array = label_array.squeeze()
     label_array = np.where(label_array == label, 255, 0)
+
+    # Scale the label array to match the image size
+    label_array = numpy_zoom(
+        label_array,
+        target_shape=image_rgba.shape[:2],
+        order=0,  # Always use nearest neighbor for labels
+    )
 
     image_rgba[label_array > 0, 0] = 255
 
