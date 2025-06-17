@@ -6,10 +6,16 @@ from typing import Literal
 from typing import Annotated
 
 from streamlit.logger import get_logger
-from fractal_feature_explorer import CONFIG_PATH, DEFAULT_CONFIG_PATH
+import os
 
 logger = get_logger(__name__)
 
+CONFIG_PATH = os.getenv(
+    "FRACTAL_FEATURE_EXPLORER_CONFIG",
+    (Path.home() / ".fractal_feature_explorer" / "config.toml"),
+)
+
+DEFAULT_CONFIG_PATH = Path(__file__).parent / "resources" / "config.toml"
 
 def remove_trailing_slash(value: str) -> str:
     return value.rstrip("/")
