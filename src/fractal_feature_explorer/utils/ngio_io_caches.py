@@ -29,23 +29,23 @@ from fractal_feature_explorer.config import get_config
 logger = get_logger(__name__)
 
 
-def _compare_urls(url1: str, url2: str) -> bool:
+def _url_belongs_to_base(url: str, base_url: str) -> bool:
     """
-    Compare two URLs to check if they are the same.
-    This is a helper function to compare URLs in a case-insensitive manner.
+    Check if the url has the same protocol and host as the base_url,
+    and if the path of the url is a subpath of the base_url.
     """
-    parsed_url1 = urllib3.util.parse_url(url1)
-    parsed_url2 = urllib3.util.parse_url(url2)
-    if (parsed_url1.scheme, parsed_url1.host) != (parsed_url2.scheme, parsed_url2.host):
-        logger.debug(f"Not including token for {url1=}, case 1.")
+    parsed_url = urllib3.util.parse_url(url)
+    parsed_base_url = urllib3.util.parse_url(base_url)
+    if (parsed_url.scheme, parsed_url.host) != (parsed_base_url.scheme, parsed_base_url.host):
+        logger.debug(f"Not including token for {url=}, case 1.")
         return False
-    elif parsed_url1.path is not None and (
-        parsed_url2.path is None or not parsed_url2.path.startswith(parsed_url1.path)
+    elif parsed_url.path is not None and (
+        parsed_base_url.path is None or not parsed_url.path.startswith(parsed_base_url.path)
     ):
-        logger.debug(f"Not including token for {url1=}, case 2.")
+        logger.debug(f"Not including token for {url=}, case 2.")
         return False
     else:
-        logger.debug(f"Including token for {url1=}.")
+        logger.debug(f"Including token for {url=}.")
         return True
 
 
@@ -55,10 +55,10 @@ def _include_token_for_url(url: str) -> bool:
     """
     config = get_config()
     if config.deployment_type == "production":
-        return _compare_urls(config.fractal_data_url, url)
+        return _url_belongs_to_base(url, config.fractal_data_url)
     else:
         for data_url in config.fractal_data_urls:
-            if _compare_urls(data_url, url):
+            if _url_belongs_to_base(url, data_url):
                 logger.debug(f"Including token for {url=}, matched with {data_url=}.")
                 return True
         else:
