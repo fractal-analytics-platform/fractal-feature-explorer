@@ -12,6 +12,20 @@ dependencies = [
 name = "fractal-feature-explorer"
 requires-python = ">=3.12,<3.13"
 dynamic = ["version"]
+license = { text = "BSD-3-Clause" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+
+
+[project.urls]
+homepage = "https://github.com/fractal-analytics-platform/fractal-feature-explorer"
+repository = "https://github.com/fractal-analytics-platform/fractal-feature-explorer"
 
 [project.optional-dependencies]
 dev = [
@@ -55,4 +69,3 @@ test = { features = ["test"], solve-group = "test" }
 
 [tool.pixi.tasks]
 explorer-dev = { cmd = "streamlit run src/fractal_feature_explorer/main.py" }
-
