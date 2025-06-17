@@ -17,6 +17,7 @@ CONFIG_PATH = os.getenv(
 
 DEFAULT_CONFIG_PATH = Path(__file__).parent / "resources" / "config.toml"
 
+
 def remove_trailing_slash(value: str) -> str:
     return value.rstrip("/")
 
