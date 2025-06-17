@@ -1,5 +1,9 @@
 # Change log
 
+## v0.1.6
+
+- Correct PyPI metadata
+
 ## v0.1.5
 
 - Remove cli argments
