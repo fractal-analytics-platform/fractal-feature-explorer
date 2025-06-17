@@ -15,8 +15,8 @@ def heat_map_component(
 ) -> None:
     features_columns = feature_frame.features
     selected_feature = selectbox_component(
-        key=f"{key}:scatter_plot_x_column",
-        label="Select **X-axis**",
+        key=f"{key}:scatter_plot_feature",
+        label="**Feature**",
         options=features_columns,
     )
 
@@ -28,7 +28,7 @@ def heat_map_component(
 
     x_axis = selectbox_component(
         key=f"{key}:scatter_plot_x_axis",
-        label="Select **X-axis**",
+        label="**X-axis**",
         options=cathegorical_columns,
     )
 
@@ -41,12 +41,12 @@ def heat_map_component(
 
     y_axis = selectbox_component(
         key=f"{key}:scatter_plot_y_axis",
-        label="Select **Y-axis**",
+        label="**Y-axis**",
         options=cathegorical_columns,
     )
 
     aggregation = st.pills(
-        label="Aggregation",
+        label="**Aggregation**",
         options=["Mean", "Sum", "Median", "Counts"],
         default="Mean",
         key=f"{key}:scatter_plot_aggregation",
