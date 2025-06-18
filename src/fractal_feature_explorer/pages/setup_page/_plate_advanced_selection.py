@@ -387,15 +387,20 @@ def advanced_plate_selection_component(
         logger.warning(empty_selection_warn_msg)
         st.stop()
 
-    st.markdown("## Condition Tables")
-    with st.spinner("Loading condition tables...", show_time=True):
-        plate_setup_df = join_condition_tables(plate_setup_df)
-        plate_setup_df = filter_based_on_condition(plate_setup_df)
+    if st.toggle(
+        key=f"{Scope.SETUP}:plate_setup:toggle_condition_table",
+        label="Load Condition Table",
+        value=False,
+    ):
+        st.markdown("## Condition Tables")
+        with st.spinner("Loading condition tables...", show_time=True):
+            plate_setup_df = join_condition_tables(plate_setup_df)
+            plate_setup_df = filter_based_on_condition(plate_setup_df)
 
-    if plate_setup_df.is_empty():
-        st.warning(empty_selection_warn_msg)
-        logger.warning(empty_selection_warn_msg)
-        st.stop()
+        if plate_setup_df.is_empty():
+            st.warning(empty_selection_warn_msg)
+            logger.warning(empty_selection_warn_msg)
+            st.stop()
 
     st.markdown("## Final Images Selection")
     images_setup = into_images_df(plate_setup_df)

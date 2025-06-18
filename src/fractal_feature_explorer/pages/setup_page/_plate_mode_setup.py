@@ -267,7 +267,7 @@ def plate_mode_setup_component():
     with st.expander("Advanced Selection", expanded=False):
         images_setup = advanced_plate_selection_component(plate_setup_df)
 
-    feature_table, table_name = load_feature_table(images_setup)
     st.markdown("## Feature Table Selection")
+    feature_table, table_name = load_feature_table(images_setup)
     features_infos(feature_table, table_name)
     return feature_table.lazy(), table_name
