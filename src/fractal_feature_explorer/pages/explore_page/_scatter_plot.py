@@ -32,7 +32,7 @@ def scatter_plot_component(
     features_columns = feature_frame.features
     x_column = selectbox_component(
         key=f"{key}:scatter_plot_x_column",
-        label="Select **X-axis**",
+        label="**X-axis**",
         options=features_columns,
     )
     # remove x_column from the list of options
@@ -40,7 +40,7 @@ def scatter_plot_component(
     _features_columns.remove(x_column)
     y_column = selectbox_component(
         key=f"{key}:scatter_plot_y_column",
-        label="Select **Y-axis**",
+        label="**Y-axis**",
         options=_features_columns,
     )
     columns_needed = {x_column, y_column, "image_url", "label", "reference_label"}
@@ -78,7 +78,7 @@ def scatter_plot_component(
 
         color_column = selectbox_component(
             key=f"{key}:scatter_plot_color_column",
-            label="Select **Color**",
+            label="**Color**",
             options=possible_color_columns,
             help="Select the column to color the points by.",
         )
@@ -95,7 +95,7 @@ def scatter_plot_component(
                 possible_size_columns.remove(col)
         size_column = selectbox_component(
             key=f"{key}:scatter_plot_size_column",
-            label="Select **Size**",
+            label="**Size**",
             options=possible_size_columns,
         )
         if size_column != "--No Size--":
@@ -106,7 +106,7 @@ def scatter_plot_component(
         # marginal x
         marginal_x = selectbox_component(
             key=f"{key}:scatter_plot_marginal_x",
-            label="Select **Marginal X**",
+            label="**Marginal X**",
             options=["--No Marginal--", "histogram", "violin"],
         )
         if marginal_x == "--No Marginal--":
@@ -115,7 +115,7 @@ def scatter_plot_component(
         # marginal y
         marginal_y = selectbox_component(
             key=f"{key}:scatter_plot_marginal_y",
-            label="Select **Marginal Y**",
+            label="**Marginal Y**",
             options=["--No Marginal--", "histogram", "violin"],
         )
         if marginal_y == "--No Marginal--":

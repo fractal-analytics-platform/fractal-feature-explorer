@@ -22,9 +22,9 @@ def heat_map_component(
 
     cathegorical_columns = copy.deepcopy(feature_frame.cathegorical)
 
-    if "row" in cathegorical_columns:
-        cathegorical_columns.remove("row")
-        cathegorical_columns = ["row"] + cathegorical_columns
+    if "column" in cathegorical_columns:
+        cathegorical_columns.remove("column")
+        cathegorical_columns = ["column"] + cathegorical_columns
 
     x_axis = selectbox_component(
         key=f"{key}:scatter_plot_x_axis",
@@ -32,18 +32,21 @@ def heat_map_component(
         options=cathegorical_columns,
     )
 
-    x_axis_index = feature_frame.cathegorical.index(x_axis)
+    x_axis_index = cathegorical_columns.index(x_axis)
     cathegorical_columns.pop(x_axis_index)
 
-    if "column" in cathegorical_columns:
-        cathegorical_columns.remove("column")
-        cathegorical_columns = ["column"] + cathegorical_columns
+    if "row" in cathegorical_columns:
+        cathegorical_columns.remove("row")
+        cathegorical_columns = ["row"] + cathegorical_columns
 
     y_axis = selectbox_component(
         key=f"{key}:scatter_plot_y_axis",
         label="**Y-axis**",
         options=cathegorical_columns,
     )
+
+    y_axis_index = cathegorical_columns.index(y_axis)
+    cathegorical_columns.pop(y_axis_index)
 
     aggregation = st.pills(
         label="**Aggregation**",
@@ -53,11 +56,12 @@ def heat_map_component(
         selection_mode="single",
         help="Select the type of aggregation to apply.",
     )
-    columns_needed = {selected_feature, x_axis, y_axis}
+    axes_names = [x_axis, y_axis]
+    columns_needed = [selected_feature] + axes_names
     feature_df = feature_frame.table.select(columns_needed).collect()
     feature_df = feature_df.to_pandas()
 
-    df_piv = feature_df.groupby([x_axis, y_axis], as_index=False)
+    df_piv = feature_df.groupby(axes_names, as_index=False)
     if aggregation == "Mean":
         df_piv = df_piv.mean(numeric_only=True)
     elif aggregation == "Sum":
@@ -74,11 +78,12 @@ def heat_map_component(
     df_piv = df_piv.pivot(index=x_axis, columns=y_axis, values=new_feature_name)
     img = df_piv.to_numpy()
     fig = px.imshow(
-        img,
-        x=df_piv.columns.to_list(),
-        y=df_piv.index.to_list(),
+        img.T,
+        x=df_piv.index.to_list(),
+        y=df_piv.columns.to_list(),
         labels={"x": x_axis, "y": y_axis, "color": new_feature_name},
     )
+
     fig.update_xaxes(  # type: ignore
         type="category", showgrid=True, title=x_axis, tickson="boundaries", ticklen=0
     )
