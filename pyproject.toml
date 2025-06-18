@@ -12,6 +12,8 @@ dependencies = [
 name = "fractal-feature-explorer"
 requires-python = ">=3.12,<3.13"
 dynamic = ["version"]
+description = "A Dashboard for exploring features in OME-Zarr datasets."
+readme = "README.md"
 license = { text = "BSD-3-Clause" }
 classifiers = [
     "Development Status :: 3 - Alpha",
