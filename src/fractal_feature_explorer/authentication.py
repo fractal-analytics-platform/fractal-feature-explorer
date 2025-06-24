@@ -6,6 +6,9 @@ from fractal_feature_explorer.utils import Scope
 from streamlit.logger import get_logger
 
 
+class FractalUserNonVerifiedException(ValueError):
+    pass
+
 logger = get_logger(__name__)
 
 
@@ -44,14 +47,20 @@ def _verify_authentication(config: ProductionConfig):
             headers={"Authorization": f"Bearer {token}"},
         )
         if response.status == 200:
-            email_address = response.json()["email"]
+            logger.info("Obtained user information.")
+            response_body = response.json()
+            email_address = response_body["email"]
+            is_verified = response_body["is_verified"]
+            if not is_verified:
+                logger.info(f"{email_address} user has {is_verified=}.")
+                raise FractalUserNonVerifiedException()
             st.session_state[f"{Scope.PRIVATE}:fractal-email"] = email_address
             st.session_state[f"{Scope.PRIVATE}:fractal-token"] = token
-            logger.info("Obtained user information.")
         else:
             msg = f"Could not obtain Fractal user information from {current_user_url}."
             logger.info(msg)
             raise ValueError(msg)
+        
 
 
 def verify_authentication():
@@ -61,6 +70,11 @@ def verify_authentication():
 
     try:
         _verify_authentication(config)
+    except FractalUserNonVerifiedException as e:
+        logger.info(f"Authentication failed. Original error: {str(e)}.")
+        MSG = "Access is restricted to verified Fractal users."
+        st.error(MSG)
+        st.stop()
     except Exception as e:
         logger.info(f"Authentication failed. Original error: {str(e)}.")
         login_url = f"{config.fractal_frontend_url}/auth/login"
