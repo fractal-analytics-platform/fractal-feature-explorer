@@ -1,5 +1,9 @@
 # Change log
 
+## v0.1.8
+
+- Restrict access to verified Fractal users.
+
 ## v0.1.6
 
 - Correct PyPI metadata
