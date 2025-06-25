@@ -98,3 +98,19 @@ example URL: `http://localhost:8501/?zarr_url=/Users/locerr/data/20200812-23well
     ```
 
     If you get an error like this you need to either update your local pixi version (`pixi self-update`) or create a new lock file with your local version of pixi. To do this, delete the `pixi.lock`, a new lock will be created when your run the dashboard again.
+
+## Contributing
+
+Releasing a new version on PyPI:
+
+1. Create a new local tag with the format `vX.Y.Z`, where `X.Y.Z` is the new version number.
+
+    ```bash
+    git tag v0.1.8 -m "v0.1.8"
+    ```
+
+2. Push the tag to the remote repository.
+
+    ```bash
+    git push --tags
+    ```
