@@ -1,5 +1,7 @@
 # Change log
 
+- Fix #52, affecting streaming of remote data from local deployments.
+
 ## v0.1.8
 
 - Restrict access to verified Fractal users.

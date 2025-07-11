@@ -1,3 +1,7 @@
 deployment_type = "local"
 allow_local_paths = true
-fractal_data_urls = ["https://fractal-bvc.mls.uzh.ch/","https://fractal-beta.mls.uzh.ch/","https://fractal.mls.uzh.ch/"]
+fractal_data_urls = [
+    "https://fractal-bvc.mls.uzh.ch/",
+    "https://fractal-beta.mls.uzh.ch/",
+    "https://fractal.mls.uzh.ch/",
+]

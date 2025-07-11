@@ -44,8 +44,8 @@ def _url_belongs_to_base(url: str, base_url: str) -> bool:
         logger.debug(f"Not including token for {url=}, case 1.")
         return False
     elif parsed_url.path is not None and (
-        parsed_base_url.path is None
-        or not parsed_url.path.startswith(parsed_base_url.path)
+        parsed_base_url.path is not None and
+        not parsed_url.path.startswith(parsed_base_url.path)
     ):
         logger.debug(f"Not including token for {url=}, case 2.")
         return False
@@ -62,6 +62,7 @@ def _include_token_for_url(url: str) -> bool:
     if config.deployment_type == "production":
         return _url_belongs_to_base(url, config.fractal_data_url)
     else:
+        print(f"Config fractal_data_urls: {config.fractal_data_urls}")
         for data_url in config.fractal_data_urls:
             if _url_belongs_to_base(url, data_url):
                 logger.debug(f"Including token for {url=}, matched with {data_url=}.")
@@ -95,10 +96,10 @@ def get_http_store(
     url: str, fractal_token: str | None = None
 ) -> fsspec.mapping.FSMap | None:
     """Ping the URL to check if it is reachable."""
+    print(f"get_http_store: {url=}, {fractal_token=}, {_include_token_for_url(url)=}")
     if not _include_token_for_url(url):
         # Do not use a fractal token for non-Fractal URLs
         fractal_token = None
-
     return _get_http_store(url, fractal_token=fractal_token)
 
 
