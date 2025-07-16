@@ -1,6 +1,6 @@
 """Expose a simple API endpoint using Tornado.
 
-Code adapeted from:
+Code adapted from:
 https://discuss.streamlit.io/t/streamlit-restful-app/409/19
 
 """
