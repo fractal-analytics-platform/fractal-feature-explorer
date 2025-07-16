@@ -14,4 +14,4 @@ def test_app():
     app = AppTest.from_file("src/fractal_feature_explorer/main.py")
     app.run(timeout=15)
 
-    assert not app.exception, "App raised an exception during execution."
+    assert not app.exception, app.exception._list[0].stack_trace[0]
