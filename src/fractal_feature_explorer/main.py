@@ -3,6 +3,7 @@ import fractal_feature_explorer
 import ngio
 from fractal_feature_explorer.config import get_config
 from pathlib import Path
+from fractal_feature_explorer.api import setup_api_handler, AliveHandler
 
 
 def main():
@@ -69,6 +70,9 @@ def main():
         pages.append(user_info_page)
 
     pg = st.navigation(pages)
+
+    setup_api_handler('/api/alive', AliveHandler)
+
     pg.run()
 
 

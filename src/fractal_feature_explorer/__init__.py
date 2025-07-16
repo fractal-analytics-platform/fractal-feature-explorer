@@ -8,3 +8,4 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = "uninstalled"
 __author__ = "Lorenzo Cerrone"
 __email__ = "lorenzo.cerrone@uzh.ch"
+
