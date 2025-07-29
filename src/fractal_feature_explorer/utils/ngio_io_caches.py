@@ -62,7 +62,7 @@ def _include_token_for_url(url: str) -> bool:
     if config.deployment_type == "production":
         return _url_belongs_to_base(url, config.fractal_data_url)
     else:
-        print(f"Config fractal_data_urls: {config.fractal_data_urls}")
+        logger.debug(f"Config fractal_data_urls: {config.fractal_data_urls}")
         for data_url in config.fractal_data_urls:
             if _url_belongs_to_base(url, data_url):
                 logger.debug(f"Including token for {url=}, matched with {data_url=}.")
@@ -96,8 +96,9 @@ def get_http_store(
     url: str, fractal_token: str | None = None
 ) -> fsspec.mapping.FSMap | None:
     """Ping the URL to check if it is reachable."""
-    print(f"get_http_store: {url=}, {fractal_token=}, {_include_token_for_url(url)=}")
-    if not _include_token_for_url(url):
+    include_token = _include_token_for_url(url)
+    logger.debug(f"get_http_store: {url=}, {include_token=}")
+    if not include_token:
         # Do not use a fractal token for non-Fractal URLs
         fractal_token = None
     return _get_http_store(url, fractal_token=fractal_token)
