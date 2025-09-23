@@ -1,7 +1,10 @@
-## v0.1.9
+## v0.1.11
+
+- Replace `print` statements with `logger.debug` statements.
+
+## Unknown
 
 - Fix #52, affecting streaming of remote data from local deployments.
-- Replace `print` statements with `logger.debug` statements.
 
 ## v0.1.8
 
