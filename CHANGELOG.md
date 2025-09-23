@@ -1,4 +1,4 @@
-# Change log
+## v0.1.9
 
 - Fix #52, affecting streaming of remote data from local deployments.
 - Replace `print` statements with `logger.debug` statements.
