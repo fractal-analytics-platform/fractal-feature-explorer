@@ -1,3 +1,7 @@
+## v0.1.13
+
+- Bump streamlit to `1.50.*`
+
 ## V0.1.12
 
 - Drop `/api/alive` endpoint.
