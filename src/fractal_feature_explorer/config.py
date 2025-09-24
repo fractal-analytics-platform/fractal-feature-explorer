@@ -101,4 +101,5 @@ def get_config() -> LocalConfig | ProductionConfig:
         )
         config = _init_local_config()
     logger.debug(f"{config=}")
+    logger.info(f"Streamlit version: {st.__version__}")
     return config
