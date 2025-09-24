@@ -1,3 +1,8 @@
+## V0.1.12
+
+- Drop `/api/alive` endpoint.
+- Pin streamlit to 1.49.0 version.
+
 ## v0.1.11
 
 - Replace `print` statements with `logger.debug` statements.
