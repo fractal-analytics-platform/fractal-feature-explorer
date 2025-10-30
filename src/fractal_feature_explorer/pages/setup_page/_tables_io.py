@@ -5,7 +5,7 @@ import streamlit as st
 from ngio.images._table_ops import (
     concatenate_image_tables_async,
     concatenate_image_tables_as_async,
-    list_image_tables_async
+    list_image_tables_async,
 )
 from ngio.tables import FeatureTable
 from typing import Literal

@@ -242,7 +242,7 @@ def roi_to_slice_kwargs(
     if dimensions.axes_handler.has_axis(axis_name="t"):
         raster_roi["t"] = t_slice  # type: ignore
 
-    return raster_roi # type: ignore
+    return raster_roi  # type: ignore
 
 
 @st.cache_resource
