@@ -9,6 +9,7 @@ from streamlit.logger import get_logger
 class FractalUserNonVerifiedException(ValueError):
     pass
 
+
 logger = get_logger(__name__)
 
 
@@ -60,7 +61,6 @@ def _verify_authentication(config: ProductionConfig):
             msg = f"Could not obtain Fractal user information from {current_user_url}."
             logger.info(msg)
             raise ValueError(msg)
-        
 
 
 def verify_authentication():

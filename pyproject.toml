@@ -2,7 +2,7 @@
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
 dependencies = [
     "streamlit>=1.50.0, <1.51.0",
-    "ngio>=0.3.2, <0.4.0",
+    "ngio==0.4.2",
     "plotly",
     "matplotlib",
     "orjson",
@@ -54,7 +54,7 @@ build-backend = "hatchling.build"
 source = "vcs"
 
 
-[tool.pixi.project]
+[tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "linux-64", "win-64"]
 
