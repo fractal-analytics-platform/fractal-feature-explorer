@@ -2215,8 +2215,8 @@ packages:
   requires_python: '>=2.7,!=3.0,!=3.1,!=3.2,!=3.3,!=3.4,<4'
 - pypi: ./
   name: fractal-feature-explorer
-  version: 0.1.14.dev0+g0e536dd71.d20251030
-  sha256: 52486b31772f94575ceb86d3f740c6e050318a9fdda45f5bb1437015a89abc90
+  version: 0.1.14.dev2+g2623d2975.d20251030
+  sha256: 7bbef418b4bc35a7ccaf8fd14c34a2706b69aef529609b5d9f964bb0d7cda210
   requires_dist:
   - matplotlib
   - ngio==0.4.2
