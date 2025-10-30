@@ -11,7 +11,8 @@ from ngio import (
     open_ome_zarr_container,
     open_ome_zarr_plate,
 )
-from ngio.common import Dimensions, Roi, list_image_tables_async
+from ngio.common import Dimensions, Roi
+from ngio.images._table_ops import list_image_tables_async
 from ngio.common._zoom import numpy_zoom
 from ngio.ome_zarr_meta.ngio_specs import PixelSize
 from ngio.tables import MaskingRoiTable
@@ -44,8 +45,8 @@ def _url_belongs_to_base(url: str, base_url: str) -> bool:
         logger.debug(f"Not including token for {url=}, case 1.")
         return False
     elif parsed_url.path is not None and (
-        parsed_base_url.path is not None and
-        not parsed_url.path.startswith(parsed_base_url.path)
+        parsed_base_url.path is not None
+        and not parsed_url.path.startswith(parsed_base_url.path)
     ):
         logger.debug(f"Not including token for {url=}, case 2.")
         return False
@@ -233,17 +234,15 @@ def roi_to_slice_kwargs(
     t_slice: int = 0,
 ) -> dict[str, slice | int | Iterable[int]]:
     """Convert a WorldCooROI to slice_kwargs."""
-    raster_roi = roi.to_pixel_roi(
-        pixel_size=pixel_size, dimensions=dimensions
-    ).to_slices()
+    raster_roi = roi.to_slicing_dict(pixel_size=pixel_size)
 
-    if dimensions.has_axis(axis_name="z"):
+    if dimensions.axes_handler.has_axis(axis_name="z"):
         raster_roi["z"] = z_slice  # type: ignore
 
-    if dimensions.has_axis(axis_name="t"):
+    if dimensions.axes_handler.has_axis(axis_name="t"):
         raster_roi["t"] = t_slice  # type: ignore
 
-    return raster_roi  # type: ignore
+    return raster_roi # type: ignore
 
 
 @st.cache_resource
@@ -292,7 +291,7 @@ def _get_image_array(
         ref_label=ref_label,
         fractal_token=fractal_token,
     )
-    roi = masking_roi.get(label=label)
+    roi = masking_roi.get_label(label=label)
     roi = roi.zoom(zoom_factor=zoom_factor)
     roi_slice = roi_to_slice_kwargs(
         roi=roi,
@@ -335,7 +334,7 @@ def _get_label_array(
         ref_label=ref_label,
         fractal_token=fractal_token,
     )
-    roi = masking_roi.get(label=label)
+    roi = masking_roi.get_label(label=label)
     roi = roi.zoom(zoom_factor=zoom_factor)
     roi_slice = roi_to_slice_kwargs(
         roi=roi,
@@ -408,7 +407,7 @@ def get_single_label_image(
     label_array = numpy_zoom(
         label_array,
         target_shape=image_rgba.shape[:2],
-        order=0,  # Always use nearest neighbor for labels
+        order="nearest",  # Always use nearest neighbor for labels
     )
 
     image_rgba[label_array > 0, 0] = 255

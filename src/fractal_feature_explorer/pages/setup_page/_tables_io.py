@@ -2,9 +2,10 @@ import asyncio
 
 import polars as pl
 import streamlit as st
-from ngio.common import (
+from ngio.images._table_ops import (
     concatenate_image_tables_async,
     concatenate_image_tables_as_async,
+    list_image_tables_async
 )
 from ngio.tables import FeatureTable
 from typing import Literal
@@ -16,7 +17,6 @@ from fractal_feature_explorer.pages.setup_page._utils import (
     plate_name_from_url,
     extras_from_url,
 )
-from ngio.common import list_image_tables_async
 
 from streamlit.logger import get_logger
 
@@ -155,7 +155,7 @@ def _collect_condition_table_from_images_cached(
         concatenate_image_tables_async(
             images=images,
             extras=extras,
-            table_name=table_name,
+            name=table_name,
         )
     )
     condition_table = condition_table.lazy_frame.collect()
@@ -280,7 +280,7 @@ def _collect_feature_table_from_images_cached(
         concatenate_image_tables_as_async(
             images=images,
             extras=extras,
-            table_name=table_name,
+            name=table_name,
             table_cls=FeatureTable,
             mode="lazy",
         )
