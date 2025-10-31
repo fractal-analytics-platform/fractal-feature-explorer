@@ -97,7 +97,7 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             label="Zoom Factor",
             min_value=0.5,
             max_value=10.0,
-            value=1.5,
+            value=5.0,
             step=0.1,
             help="Zoom factor for the image",
         )
