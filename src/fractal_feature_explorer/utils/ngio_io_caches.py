@@ -26,7 +26,11 @@ import urllib3.util
 from fractal_feature_explorer.utils import get_fractal_token
 from streamlit.logger import get_logger
 
-from fractal_feature_explorer.config import get_config
+from fractal_feature_explorer.config import (
+    get_config,
+    st_cache_data_wrapper,
+    st_cache_resource_wrapper,
+)
 
 logger = get_logger(__name__)
 
@@ -78,7 +82,7 @@ def is_http_url(url: str) -> bool:
     return url.startswith("http://") or url.startswith("https://")
 
 
-@st.cache_data
+@st_cache_resource_wrapper
 def _get_http_store(
     url: str, fractal_token: str | None = None
 ) -> fsspec.mapping.FSMap | None:
@@ -140,7 +144,7 @@ def get_and_validate_store(url: str) -> fsspec.mapping.FSMap | str | None:
     return _get_and_validate_store(url, fractal_token=fractal_token)
 
 
-@st.cache_resource
+@st_cache_resource_wrapper
 def _get_ome_zarr_plate(url: str, fractal_token: str | None = None) -> OmeZarrPlate:
     store = _get_and_validate_store(url, fractal_token=fractal_token)
     if store is None:
@@ -154,7 +158,7 @@ def get_ome_zarr_plate(url: str) -> OmeZarrPlate:
     return _get_ome_zarr_plate(url, fractal_token=fractal_token)
 
 
-@st.cache_resource
+@st_cache_resource_wrapper
 def _get_ome_zarr_image_container(
     url: str, fractal_token: str | None = None
 ) -> OmeZarrContainer:
@@ -176,7 +180,7 @@ def _get_ome_zarr_container_in_plate(
     return images[path]
 
 
-@st.cache_resource
+@st_cache_resource_wrapper
 def _get_ome_zarr_container(
     url: str,
     fractal_token: str | None = None,
@@ -198,7 +202,7 @@ def get_ome_zarr_container(
     return _get_ome_zarr_image_container(url, fractal_token=fractal_token)
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _list_image_tables(
     urls: list[str],
     fractal_token: str | None = None,
@@ -212,7 +216,7 @@ def _list_image_tables(
     return image_list
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def list_image_tables(
     urls: list[str],
     fractal_token: str | None = None,
@@ -245,7 +249,7 @@ def roi_to_slice_kwargs(
     return raster_roi  # type: ignore
 
 
-@st.cache_resource
+@st_cache_resource_wrapper
 def _get_masking_roi(
     image_url: str,
     ref_label: str,
@@ -268,7 +272,7 @@ def _get_masking_roi(
     return masking_roi
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _get_image_array(
     image_url: str,
     ref_label: str,
@@ -309,7 +313,7 @@ def _get_image_array(
     return image_array
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _get_label_array(
     image_url: str,
     ref_label: str,

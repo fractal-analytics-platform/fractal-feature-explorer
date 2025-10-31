@@ -17,6 +17,7 @@ from fractal_feature_explorer.pages.setup_page._utils import (
     plate_name_from_url,
     extras_from_url,
 )
+from fractal_feature_explorer.config import st_cache_data_wrapper
 
 from streamlit.logger import get_logger
 
@@ -93,7 +94,7 @@ def list_images_tables(
 # ====================================================================
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _load_single_plate_condition_table(
     url: str,
     table_name: str,
@@ -122,7 +123,7 @@ def _load_single_plate_condition_table(
     return table_df
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _collect_condition_table_from_plates_cached(
     list_urls: list[str],
     table_name: str,
@@ -139,7 +140,7 @@ def _collect_condition_table_from_plates_cached(
     return condition_table
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _collect_condition_table_from_images_cached(
     list_urls: list[str],
     table_name: str,
@@ -214,7 +215,7 @@ def collect_condition_table_from_images(
 # ====================================================================
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _load_plate_feature_table(
     url: str,
     table_name: str,
@@ -249,7 +250,7 @@ def _load_plate_feature_table(
     return table_df
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _collect_feature_table_from_plates_cached(
     list_urls: list[str],
     table_name: str,
@@ -264,7 +265,7 @@ def _collect_feature_table_from_plates_cached(
     return feature_table
 
 
-@st.cache_data
+@st_cache_data_wrapper
 def _collect_feature_table_from_images_cached(
     list_urls: list[str],
     table_name: str,
