@@ -70,6 +70,9 @@ def heat_map_component(
         df_piv = df_piv.median(numeric_only=True)
     elif aggregation == "Counts":
         df_piv = df_piv.count()
+    elif aggregation is None:
+        st.error("Please select one aggregation")
+        st.stop()
     else:
         raise ValueError(f"Unknown aggregation: {aggregation}")
 
