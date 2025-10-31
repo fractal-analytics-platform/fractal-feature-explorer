@@ -4,7 +4,7 @@ import toml
 import streamlit as st
 from typing import Literal
 from typing import Annotated
-
+from datetime import timedelta
 from streamlit.logger import get_logger
 import os
 
@@ -22,17 +22,23 @@ def remove_trailing_slash(value: str) -> str:
     return value.rstrip("/")
 
 
-class LocalConfig(BaseModel):
+class BaseConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    deployment_type: Literal["local"]
+    deployment_type: Literal["local", "production"]
+    allow_local_paths: bool
+    cache_ttl: float | timedelta | str | None = None
+    cache_max_entries: int | None = None
+
+
+class LocalConfig(BaseConfig):
+    deployment_type: Literal["local"]  # type: ignore override type
     fractal_data_urls: list[Annotated[str, AfterValidator(remove_trailing_slash)]]
     allow_local_paths: bool = True
 
 
-class ProductionConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    deployment_type: Literal["production"]
-    allow_local_paths: Literal[False] = False
+class ProductionConfig(BaseConfig):
+    deployment_type: Literal["production"]  # type: ignore override type
+    allow_local_paths: Literal[False] = False  # type: ignore override type
     fractal_data_url: Annotated[str, AfterValidator(remove_trailing_slash)]
     fractal_backend_url: Annotated[str, AfterValidator(remove_trailing_slash)]
     fractal_frontend_url: Annotated[str, AfterValidator(remove_trailing_slash)]
@@ -103,3 +109,23 @@ def get_config() -> LocalConfig | ProductionConfig:
     logger.debug(f"{config=}")
     logger.info(f"Streamlit version: {st.__version__}")
     return config
+
+
+def st_cache_data_wrapper(func):
+    """
+    Wrapper around st.cache_data to set a default ttl.
+    """
+    config = get_config()
+    return st.cache_data(ttl=config.cache_ttl, max_entries=config.cache_max_entries)(
+        func
+    )
+
+
+def st_cache_resource_wrapper(func):
+    """
+    Wrapper around st.cache_resource to set a default ttl.
+    """
+    config = get_config()
+    return st.cache_resource(
+        ttl=config.cache_ttl, max_entries=config.cache_max_entries
+    )(func)
