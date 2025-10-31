@@ -56,13 +56,13 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
 
     channels = container.channel_labels
     if len(channels) > 1:
-        channel = st.selectbox(
+        channel_sel = st.selectbox(
             label="Select channel",
             options=channels,
             index=0,
             help="Select the channel to display",
         )
-        channel = channels.index(channel)
+        channel = channels.index(channel_sel)
     else:
         channel = 0
 
@@ -108,7 +108,28 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             index=0,
             help="Select the level to display",
         )
-
+        
+        image_scaling = st.selectbox(
+            label="Image Scaling",
+            options=["Metadata", "Min-Max", "Custom"],
+            index=0,
+            help="Select the image scaling",
+        )
+        
+        vis_meta = image.channels_meta.channels[channel].channel_visualisation
+        if image_scaling == "Custom":
+            vis_meta = image.channels_meta.channels[channel].channel_visualisation
+            max_value = float(max(vis_meta.end * 1.5, 255.))
+            min_intensity, max_intensity = st.slider(
+                label="Intensity Range",
+                min_value=0.,
+                max_value=max_value,
+                value=(float(vis_meta.start), float(vis_meta.end)),
+            )
+        else:
+            min_intensity = vis_meta.start
+            max_intensity = vis_meta.end
+        
     try:
         image = get_single_label_image(
             image_url=point_dict["image_url"],
@@ -120,6 +141,9 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             t_slice=t_slice,
             show_label=show_label,
             zoom_factor=zoom_factor,
+            scaling_mode=image_scaling,
+            min_intensity=min_intensity,
+            max_intensity=max_intensity,
         )
         
         st.image(image, width=500)

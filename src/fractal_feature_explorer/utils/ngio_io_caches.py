@@ -351,6 +351,27 @@ def _get_label_array(
     return label_array
 
 
+def scale_image_intensity(
+    image_array: np.ndarray,
+    scaling_mode: str = "Metadata",
+    min_intensity: int | float = 0,
+    max_intensity: int | float = 255,
+) -> np.ndarray:
+    """
+    Scale the image intensity based on the selected scaling mode.
+    """
+    if scaling_mode not in ["Metadata", "Min-Max", "Custom"]:
+        raise ValueError(f"Invalid scaling mode: {scaling_mode}")
+    
+    if scaling_mode != "Min-Max":
+        image_array = np.clip(image_array, min_intensity, max_intensity)
+        
+    min_intensity = image_array.min()
+    max_intensity = image_array.max()
+    image_array = (image_array - min_intensity) / (max_intensity - min_intensity)
+    return image_array * 255
+
+
 def get_single_label_image(
     image_url: str,
     ref_label: str,
@@ -361,6 +382,9 @@ def get_single_label_image(
     level_path: str = "0",
     show_label: bool = True,
     zoom_factor: float = 1,
+    scaling_mode: str = "Metadata",
+    min_intensity: int | float = 0,
+    max_intensity: int | float = 255,
 ) -> np.ndarray:
     """
     Get the region of interest from the image url
@@ -378,7 +402,12 @@ def get_single_label_image(
         fractal_token=fractal_token,
     )
     image_array = image_array.squeeze()
-    image_array = np.clip(image_array, 0, 255)
+    image_array = scale_image_intensity(
+        image_array,
+        scaling_mode=scaling_mode,
+        min_intensity=min_intensity,
+        max_intensity=max_intensity,
+    ).astype(np.uint8)
 
     image_rgba = np.empty(
         (image_array.shape[0], image_array.shape[1], 4), dtype=np.uint8
