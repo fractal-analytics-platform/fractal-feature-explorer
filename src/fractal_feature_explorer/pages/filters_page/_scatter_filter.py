@@ -121,7 +121,8 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             show_label=show_label,
             zoom_factor=zoom_factor,
         )
-        st.image(image, use_container_width=True)
+        
+        st.image(image, width=500)
     except Exception as e:
         logger.error(f"Error opening image: {e}")
         st.error("Error opening image")
