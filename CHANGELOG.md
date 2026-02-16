@@ -1,3 +1,12 @@
+## v0.1.15
+
+- Restrict allowed URLs for `deployment_mode="production"`.
+
+## v0.1.14
+
+- Adopt ngio 0.4.
+- Add ttl and num entries to config.
+
 ## v0.1.13
 
 - Bump streamlit to `1.50.*`
