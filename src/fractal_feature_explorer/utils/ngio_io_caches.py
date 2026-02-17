@@ -46,16 +46,16 @@ def _url_belongs_to_base(url: str, base_url: str) -> bool:
         parsed_base_url.scheme,
         parsed_base_url.host,
     ):
-        logger.debug(f"Not including token for {url=}, case 1.")
+        logger.debug(f"{url=} does not belong to {base_url=}, case 1.")
         return False
     elif parsed_url.path is not None and (
         parsed_base_url.path is not None
         and not parsed_url.path.startswith(parsed_base_url.path)
     ):
-        logger.debug(f"Not including token for {url=}, case 2.")
+        logger.debug(f"{url=} does not belong to {base_url=}, case 2.")
         return False
     else:
-        logger.debug(f"Including token for {url=}.")
+        logger.debug(f"{url=} belongs to {base_url=}.")
         return True
 
 
@@ -101,6 +101,19 @@ def get_http_store(
     url: str, fractal_token: str | None = None
 ) -> fsspec.mapping.FSMap | None:
     """Ping the URL to check if it is reachable."""
+
+    config = get_config()
+    if config.deployment_type == "production":
+        msg = None
+        if urllib3.util.parse_url(url).scheme != "https":
+            msg = f"Non-https URLs are not supported (provided: {url})."
+        if msg is None and not _url_belongs_to_base(url, config.fractal_data_url):
+            msg = f"URLs must be part of {config.fractal_data_url} (provided: {url})."
+        if msg is not None:
+            logger.error(msg)
+            st.error(msg)
+            return None
+
     include_token = _include_token_for_url(url)
     logger.debug(f"get_http_store: {url=}, {include_token=}")
     if not include_token:
