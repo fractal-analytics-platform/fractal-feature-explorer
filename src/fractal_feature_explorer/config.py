@@ -1,3 +1,4 @@
+import functools
 from pathlib import Path
 from pydantic import BaseModel, ConfigDict, AfterValidator
 import toml
@@ -114,11 +115,24 @@ def get_config() -> LocalConfig | ProductionConfig:
 def st_cache_data_wrapper(func):
     """
     Wrapper around st.cache_data to set a default ttl.
+
+    Supports per-user cache busting via the 'setup:cache_buster' session state key.
+    Incrementing that value in a user's session invalidates their cached entries
+    without affecting other users.
     """
     config = get_config()
-    return st.cache_data(ttl=config.cache_ttl, max_entries=config.cache_max_entries)(
-        func
-    )
+
+    @st.cache_data(ttl=config.cache_ttl, max_entries=config.cache_max_entries)
+    @functools.wraps(func)
+    def _cached(*args, cache_buster: int = 0, **kwargs):
+        return func(*args, **kwargs)
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        cb = st.session_state.get("setup:cache_buster", 0)
+        return _cached(*args, cache_buster=cb, **kwargs)
+
+    return wrapper
 
 
 def st_cache_resource_wrapper(func):

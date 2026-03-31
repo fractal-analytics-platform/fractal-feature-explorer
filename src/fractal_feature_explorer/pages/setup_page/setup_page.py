@@ -124,6 +124,15 @@ def main():
             ):
                 invalidate_session_state(f"{Scope.SETUP}")
                 st.rerun()
+            if st.button(
+                "Clear Data Cache",
+                key=f"{Scope.SETUP}:clear_cache",
+                icon="🗑️",
+                help="Clear the data cache for your session. Use this if the data has changed on disk.",
+            ):
+                cb = st.session_state.get(f"{Scope.SETUP}:cache_buster", 0)
+                st.session_state[f"{Scope.SETUP}:cache_buster"] = cb + 1
+                st.rerun()
 
     match setup_mode:
         case "Plates":

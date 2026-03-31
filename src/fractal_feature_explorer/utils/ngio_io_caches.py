@@ -162,7 +162,7 @@ def _get_ome_zarr_plate(url: str, fractal_token: str | None = None) -> OmeZarrPl
     store = _get_and_validate_store(url, fractal_token=fractal_token)
     if store is None:
         raise ValueError(f"Could not get store for URL: {url}")
-    plate = open_ome_zarr_plate(store, cache=True, parallel_safe=False, mode="r")
+    plate = open_ome_zarr_plate(store, cache=True, mode="r")
     return plate
 
 
