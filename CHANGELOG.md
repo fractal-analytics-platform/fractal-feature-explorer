@@ -1,3 +1,10 @@
+## v0.1.17
+
+- Bump streamlit to 1.57.
+
+## v0.1.16
+
+
 ## v0.1.15
 
 - Restrict allowed URLs for `deployment_mode="production"`.
