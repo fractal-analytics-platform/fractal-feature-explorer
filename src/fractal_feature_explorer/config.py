@@ -40,6 +40,7 @@ class LocalConfig(BaseConfig):
 class ProductionConfig(BaseConfig):
     deployment_type: Literal["production"]  # type: ignore override type
     allow_local_paths: Literal[False] = False  # type: ignore override type
+    allow_http: bool = False
     fractal_data_url: Annotated[str, AfterValidator(remove_trailing_slash)]
     fractal_backend_url: Annotated[str, AfterValidator(remove_trailing_slash)]
     fractal_frontend_url: Annotated[str, AfterValidator(remove_trailing_slash)]
