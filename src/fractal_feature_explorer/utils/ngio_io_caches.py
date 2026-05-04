@@ -105,7 +105,10 @@ def get_http_store(
     config = get_config()
     if config.deployment_type == "production":
         msg = None
-        if urllib3.util.parse_url(url).scheme != "https":
+        if (
+            urllib3.util.parse_url(url).scheme != "https"
+            and not config.allow_http
+        ):
             msg = f"Non-https URLs are not supported (provided: {url})."
         if msg is None and not _url_belongs_to_base(url, config.fractal_data_url):
             msg = f"URLs must be part of {config.fractal_data_url} (provided: {url})."
