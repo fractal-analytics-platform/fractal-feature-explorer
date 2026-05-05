@@ -1,9 +1,9 @@
 ## v0.1.17
 
 - Bump streamlit to 1.57.
+- Introduce `allow_http` configuration option.
 
 ## v0.1.16
-
 
 ## v0.1.15
 
