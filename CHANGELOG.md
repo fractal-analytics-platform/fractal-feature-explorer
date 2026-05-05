@@ -1,3 +1,9 @@
+## v0.1.17
+
+- Introduce `allow_http` configuration option.
+
+## v0.1.16
+
 ## v0.1.15
 
 - Restrict allowed URLs for `deployment_mode="production"`.
