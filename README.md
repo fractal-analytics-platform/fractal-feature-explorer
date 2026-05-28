@@ -5,63 +5,58 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/fractal-feature-explorer.svg?color=green)](https://python.org)
 [![CI](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml)
 
-## Installation
 
-The easiest way to install the `fractal-feature-explorer` is to use `uv` or `pipx`:
 
-```bash
-pipx install fractal-feature-explorer
-```
+FIXME: A short description paragraph.
 
-or
+## Develoment
 
 ```bash
-uv tool install fractal-feature-explorer
+# Clone this repository
+git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
+# Install the project via pixi
+pixi install
+# Run the app
+pixi run uvicorn fractal_feature_explorer.app:app
 ```
-
-Alternatively, you can install it in a standard Conda/Venv using `pip`:
-
-```bash
-pip install fractal-feature-explorer
-```
-
-## Usage
-
-You can run the dashboard using the `explorer` command:
-
-```bash
-explorer
-```
-
-at the first run, it will ask you for permission to create a configuration file in your home directory (`~/.fractal_feature_explorer/config.toml`), which will be used for future runs.
+At the first run, it will ask you for permission to create a configuration file in your home directory (`~/.fractal_feature_explorer/config.toml`), which will be used for future runs.
 
 Alternatively, you can expose a configuration file using the `FRACTAL_FEATURE_EXPLORER_CONFIG` environment variable:
 
 ```bash
 export FRACTAL_FEATURE_EXPLORER_CONFIG=/path/to/config.toml
-explorer
+pixi run uvicorn fractal_feature_explorer.app:app
 ```
 
-More details on the configuration file will be availble soon.
 
-## Local development setup
+## Run the dashboard remotely
 
-- pixi (lockfile create with pixi 0.47)
-- local clone of this repo
+INSTALL
 
-## running the dashboard
+This can be installed with te
+```bash
+# Option 1: from within a virtual environment
+pip install fractal-feature-explorer
 
-- using pixi task
+# Option 2: as a globally-available tool
+pipx install fractal-feature-explorer
+```
 
-    ```bash
-    pixi run -e dev explorer-dev
-    ```
+RUN
 
-- from streamlit directly
+```bash
+uvicorn \
+    fractal_feature_explorer.app:app\
+    --host 0.0.0.0 \
+    --port 8000 \
+    --no-access-log \
+    --workers 1 \
+```
 
-    ```bash
-    pixi run streamlit run src/fractal_feature_explorer/main.py
-    ```
+Configuration files:
+1. FIXME / dashboard config
+2. FIXME / streamlit config, see example
+3. Uvicorn??
 
 ## Change log
 
@@ -86,18 +81,6 @@ example URL: `http://localhost:8501/?zarr_url=/Users/locerr/data/20200812-23well
 
 - Image preview is not available for 3D images.
 - Single images not supported, only plates.
-
-## Troubleshooting
-
-- pixi lock file not supported by your local pixi version:
-
-    ```bash
-    $ pixi run explorer
-    × Failed to load lock file from `/xxx/fractal-feature-explorer/pixi.lock`
-    ╰─▶ found newer lockfile format version 6, but only up to including version 5 is supported
-    ```
-
-    If you get an error like this you need to either update your local pixi version (`pixi self-update`) or create a new lock file with your local version of pixi. To do this, delete the `pixi.lock`, a new lock will be created when your run the dashboard again.
 
 ## Contributing
 
