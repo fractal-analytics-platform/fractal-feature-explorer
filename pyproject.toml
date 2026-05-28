@@ -37,7 +37,6 @@ dev = [
     "pre-commit",
     "ruff",
     "watchdog",
-    "psrecord[plot]",
 ]
 
 test = ["pytest", "pytest-cov", "devtools"]

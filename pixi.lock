@@ -447,7 +447,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/46/33/92ef41c6fad0233e41d3d84ba8e8ad18d1780f1e5d99b3c683e6d7f98b63/identify-2.6.18-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4b/32/e0f13a1c5b0f8572d0ec6ae2f6c677b7991fafd95da523159c19eff0696a/contourpy-1.3.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/4c/f4/4d0193dc5bab3af74e9560a8b45830d88ac707467d15ceff7e3df17adc41/anndata-0.12.10-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/4e/72/67fc1af72bb876ca72b9c496e6742254a3b54099d2580cc0d4b3a557f14e/psrecord-1.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4e/8c/f3147f5c4b73e7550fe5f9352eaa956ae838d5c51eb58e7a25b9f3e2643b/decorator-5.2.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4f/d3/a8b22fa575b297cd6e3e3b0155c7e25db170edf1c74783d6a31a2490b8d9/argon2_cffi-25.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/50/ea/b80cfc4dc4824f14289dd95dc83be47b77c66f8c464002fe36d87ed95b75/ngio-0.5.8-py3-none-any.whl
@@ -642,7 +641,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/46/33/92ef41c6fad0233e41d3d84ba8e8ad18d1780f1e5d99b3c683e6d7f98b63/identify-2.6.18-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4a/d2/a6c0296814556c68ee32009d9c2ad4f85f2707cdecfd7727951ec228005d/cffi-2.0.0-cp313-cp313-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/4c/f4/4d0193dc5bab3af74e9560a8b45830d88ac707467d15ceff7e3df17adc41/anndata-0.12.10-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/4e/72/67fc1af72bb876ca72b9c496e6742254a3b54099d2580cc0d4b3a557f14e/psrecord-1.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4e/8c/f3147f5c4b73e7550fe5f9352eaa956ae838d5c51eb58e7a25b9f3e2643b/decorator-5.2.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4f/d3/a8b22fa575b297cd6e3e3b0155c7e25db170edf1c74783d6a31a2490b8d9/argon2_cffi-25.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/50/ea/b80cfc4dc4824f14289dd95dc83be47b77c66f8c464002fe36d87ed95b75/ngio-0.5.8-py3-none-any.whl
@@ -843,7 +841,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/46/2c/1462b1d0a634697ae9e55b3cecdcb64788e8b7d63f54d923fcd0bb140aed/soupsieve-2.8.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/46/33/92ef41c6fad0233e41d3d84ba8e8ad18d1780f1e5d99b3c683e6d7f98b63/identify-2.6.18-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4c/f4/4d0193dc5bab3af74e9560a8b45830d88ac707467d15ceff7e3df17adc41/anndata-0.12.10-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/4e/72/67fc1af72bb876ca72b9c496e6742254a3b54099d2580cc0d4b3a557f14e/psrecord-1.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4e/8c/f3147f5c4b73e7550fe5f9352eaa956ae838d5c51eb58e7a25b9f3e2643b/decorator-5.2.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4f/c7/e54682c96a895d0c808453269e0b5928a07a127a15704fedb643e9b0a4c8/pandas-2.3.3-cp313-cp313-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/4f/d3/a8b22fa575b297cd6e3e3b0155c7e25db170edf1c74783d6a31a2490b8d9/argon2_cffi-25.1.0-py3-none-any.whl
@@ -1999,7 +1996,6 @@ packages:
   - devtools ; extra == 'dev'
   - notebook ; extra == 'dev'
   - pre-commit ; extra == 'dev'
-  - psrecord[plot] ; extra == 'dev'
   - ruff ; extra == 'dev'
   - watchdog ; extra == 'dev'
   - devtools ; extra == 'test'
@@ -3060,14 +3056,6 @@ packages:
   - scanpy>=1.10 ; extra == 'test-min'
   - scikit-learn ; extra == 'test-min'
   requires_python: '>=3.11'
-- pypi: https://files.pythonhosted.org/packages/4e/72/67fc1af72bb876ca72b9c496e6742254a3b54099d2580cc0d4b3a557f14e/psrecord-1.4-py3-none-any.whl
-  name: psrecord
-  version: '1.4'
-  sha256: d07f63ac3a838a65bc9f75f32154d587d3b060d10a994eacd1805a6a03a7e713
-  requires_dist:
-  - psutil>=5.6
-  - matplotlib ; extra == 'plot'
-  - pytest>=7.0 ; extra == 'test'
 - pypi: https://files.pythonhosted.org/packages/4e/8c/f3147f5c4b73e7550fe5f9352eaa956ae838d5c51eb58e7a25b9f3e2643b/decorator-5.2.1-py3-none-any.whl
   name: decorator
   version: 5.2.1
