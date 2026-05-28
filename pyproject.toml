@@ -68,7 +68,3 @@ fractal_feature_explorer = { path = ".", editable = true }
 default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "dev" }
 test = { features = ["test"], solve-group = "test" }
-
-
-[tool.pixi.tasks]
-explorer-dev = { cmd = "streamlit run src/fractal_feature_explorer/main.py" }
