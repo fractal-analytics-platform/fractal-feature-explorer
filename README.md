@@ -48,9 +48,9 @@ RUN
 uvicorn \
     fractal_feature_explorer.app:app\
     --host 0.0.0.0 \
-    --port 8000 \
+    --port 8501 \
     --no-access-log \
-    --workers 1 \
+    --workers 2 \
 ```
 
 Configuration files:
