@@ -8,3 +8,19 @@ font = "sans serif"
 [logger]
 level = "info"
 messageFormat = "%(asctime)s - %(levelname)s - [%(name)s:%(lineno)d] - %(message)s"
+
+[server]
+headless = true
+runOnSave = false
+enableCORS = true
+enableXsrfProtection = true
+fileWatcherType = "none"
+
+[browser]
+serverAddress = "localhost:8501"
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+allowedOrigins = []
+
