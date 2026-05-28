@@ -19,7 +19,7 @@ or
 uv tool install fractal-feature-explorer
 ```
 
-Alternatively, you can install it in a standart Conda/Venv using `pip`:
+Alternatively, you can install it in a standard Conda/Venv using `pip`:
 
 ```bash
 pip install fractal-feature-explorer
