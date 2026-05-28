@@ -12,7 +12,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 async def endpoint_alive(request: Request) -> JSONResponse:
     return JSONResponse(
         {
-            "status": "ok",
+            "alive": True,
             "version": __version__,
             "ngio_version": ngio_version,
         }
