@@ -1,5 +1,4 @@
 import asyncio
-import time
 
 import polars as pl
 import streamlit as st
@@ -68,7 +67,6 @@ def user_plate_url_input_component():
 
 
 def build_plate_setup_df(plate_urls: list[str]) -> pl.DataFrame:
-    time_start = time.perf_counter()
     plates = []
     for plate_url in plate_urls:
         plate_url = sanify_and_validate_url(plate_url)
@@ -89,7 +87,7 @@ def build_plate_setup_df(plate_urls: list[str]) -> pl.DataFrame:
                     **extras,
                 }
             )
-    
+
     plate_setup_df = pl.DataFrame(
         plates,
         schema={
@@ -101,8 +99,6 @@ def build_plate_setup_df(plate_urls: list[str]) -> pl.DataFrame:
             "image_url": pl.Utf8(),
         },
     )
-    time_end = time.perf_counter()
-    logger.info(f"END build_plate_setup_df, elapsed {time_end-time_start:.3f} s")
     return plate_setup_df
 
 
