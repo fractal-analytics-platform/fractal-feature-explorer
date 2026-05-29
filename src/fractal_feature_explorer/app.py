@@ -52,7 +52,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             .frame_ancestors("'none'")
             .img_src("'self'", "data:")
             .object_src("'none'")
-            .script_src("'self'")
+            .script_src("'self'", "'unsafe-eval'")
             .script_src_attr("'none'")
             .style_src("'self'", "https:", "'unsafe-inline'")
             .upgrade_insecure_requests()
