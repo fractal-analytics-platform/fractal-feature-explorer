@@ -43,7 +43,8 @@ git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer
 # Install the project via pixi
 pixi install
 # Run the app
-pixi run uvicorn fractal_feature_explorer.app:app
+export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/development-config.toml
+pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
 At the first run, it will ask you for permission to create a configuration file in your home directory (`~/.fractal_feature_explorer/config.toml`), which will be used for future runs.
 
