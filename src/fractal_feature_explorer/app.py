@@ -70,7 +70,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response: Response = await call_next(request)
         await self.secure_headers.set_headers_async(response)
-        del response._headers["server"]
         return response
 
 
