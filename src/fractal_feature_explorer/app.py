@@ -10,6 +10,18 @@ from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from secure import Secure
+from secure.headers import (
+    CrossOriginEmbedderPolicy,
+    CrossOriginOpenerPolicy,
+    CrossOriginResourcePolicy,
+    StrictTransportSecurity,
+    PermissionsPolicy,
+    ReferrerPolicy,
+    Server,
+    XContentTypeOptions,
+    XFrameOptions,
+    ContentSecurityPolicy,
+)
 
 
 async def endpoint_alive(request: Request) -> JSONResponse:
@@ -27,13 +39,41 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.secure_headers = Secure.with_default_headers()
+        
+        # self.secure_headers = Secure.with_default_headers()
+
+        csp = (
+            ContentSecurityPolicy()
+            .default_src("'self'")
+            .base_uri("'self'")
+            .font_src("'self'", "https:", "data:")
+            .form_action("'self'")
+            .frame_ancestors("'self'")
+            .img_src("'self'", "data:")
+            .object_src("'none'")
+            .script_src("'self'")
+            .script_src_attr("'none'")
+            .style_src("'self'", "https:", "'unsafe-inline'")
+            .upgrade_insecure_requests()
+        )
+
+        self.secure_headers = Secure(
+            coop=CrossOriginOpenerPolicy().same_origin(),
+            corp=CrossOriginResourcePolicy().same_origin(),
+            csp=csp,
+            hsts=StrictTransportSecurity().max_age(31536000).include_subdomains(),
+            permissions=PermissionsPolicy().geolocation().microphone().camera(),
+            referrer=ReferrerPolicy().strict_origin_when_cross_origin(),
+            server=Server().set(""),
+            xcto=XContentTypeOptions().nosniff(),
+            xfo=XFrameOptions().sameorigin(),
+        )
 
     async def dispatch(self, request: Request, call_next):
         response: Response = await call_next(request)
         await self.secure_headers.set_headers_async(response)
         del response._headers["server"]
-        response._headers["x-frame-options"] = "DENY" # FIXME: do it via secure
+        response._headers["x-frame-options"] = "DENY"  # FIXME: do it via secure
         # FIXME: remove
         # for k, v in response.headers.items():
         #     print(k, v)
