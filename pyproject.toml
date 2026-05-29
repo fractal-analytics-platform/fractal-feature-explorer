@@ -8,7 +8,7 @@ dependencies = [
     "orjson",
     "rich",
     "urllib3",
-    "secure",
+    "secure >=2.0.1, <2.1.0",
 ]
 name = "fractal-feature-explorer"
 requires-python = ">=3.12,<3.14"
