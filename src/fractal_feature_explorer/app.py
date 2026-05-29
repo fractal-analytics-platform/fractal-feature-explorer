@@ -8,6 +8,8 @@ from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from secure import Secure
+
 
 async def endpoint_alive(request: Request) -> JSONResponse:
     return JSONResponse(
@@ -19,15 +21,21 @@ async def endpoint_alive(request: Request) -> JSONResponse:
     )
 
 
-class MockMiddleware(BaseHTTPMiddleware):
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    secure_headers: Secure
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.secure_headers = Secure.with_default_headers()
+
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        response.headers["mock-header-name"] = "mock-header-value"
+        await self.secure_headers.set_headers_async(response)
         return response
 
 
 app = App(
     Path(__file__).parent / "main.py",
     routes=[Route("/alive", endpoint_alive)],
-    middleware=[Middleware(MockMiddleware)],
+    middleware=[Middleware(SecurityHeadersMiddleware)],
 )
