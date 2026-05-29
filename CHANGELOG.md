@@ -1,7 +1,10 @@
-## Unreleased
+## v0.1.18
 
 - Bump streamlit to 1.58.
-- Use `starlette.App`, and describe how to run via `uvicorn`.
+- Add `secure` dependency.
+- Use `starlette.App`.
+- Provide example commands based on `uvicorn` in README.
+- Provide example configuration files for local/remote/development.
 - Introduce `/alive` endpoint.
 - Introduce middleware to set security headers (via `secure` dependency).
 - Remove interactivity from local configuration.
