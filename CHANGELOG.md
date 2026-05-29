@@ -1,3 +1,12 @@
+## Unreleased
+
+- Bump streamlit to 1.58.
+- Use `starlette.App`, and describe how to run via `uvicorn`.
+- Introduce `/alive` endpoint.
+- Introduce middleware to set security headers (via `secure` dependency).
+- Remove interactivity from local configuration.
+- Remove obsolete references to `psrecord`.
+
 ## v0.1.17
 
 - Bump streamlit to 1.57.
