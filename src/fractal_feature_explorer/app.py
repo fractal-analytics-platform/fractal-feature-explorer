@@ -3,6 +3,7 @@ from streamlit.starlette import App
 from fractal_feature_explorer import __version__
 from ngio import __version__ as ngio_version
 from starlette.routing import Route
+from starlette.responses import Response
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
@@ -28,9 +29,14 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         super().__init__(*args, **kwargs)
         self.secure_headers = Secure.with_default_headers()
 
-    async def dispatch(self, request, call_next):
-        response = await call_next(request)
+    async def dispatch(self, request: Request, call_next):
+        response: Response = await call_next(request)
         await self.secure_headers.set_headers_async(response)
+        del response._headers["server"]
+        response._headers["x-frame-options"] = "DENY" # FIXME: do it via secure
+        # FIXME: remove
+        # for k, v in response.headers.items():
+        #     print(k, v)
         return response
 
 
