@@ -67,7 +67,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             referrer=ReferrerPolicy().strict_origin_when_cross_origin(),
             server=Server().set(""),
             xcto=XContentTypeOptions().nosniff(),
-            xfo=XFrameOptions().sameorigin(),
+            xfo=XFrameOptions().deny(),
         )
 
     async def dispatch(self, request: Request, call_next):
