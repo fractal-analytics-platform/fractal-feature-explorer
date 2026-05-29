@@ -11,28 +11,31 @@ This is the repository that contains the **Fractal feature explorer** dashboard.
 
 ## Run the dashboard locally
 
+
+
 ## Run the dashboard on a remote server
 
-INSTALL
+The most common option is to create a virtual environment and install via `pip`
 
 This can be installed with te
 ```bash
-# Option 1: from within a virtual environment
+python3 -m venv venv
+source venv/bin/activate
 pip install fractal-feature-explorer
-
-# Option 2: as a globally-available tool
-pipx install fractal-feature-explorer
 ```
-
-RUN
-
+and then running from the environment, e.g. as in:
 ```bash
+source venv/bin/activate
+export FRACTAL_FEATURE_EXPLORER_CONFIG="config.toml"
 uvicorn \
     fractal_feature_explorer.app:app\
     --host 0.0.0.0 \
     --port 8501
 ```
 
+Configuration-file examples:
+- [config.toml](./example-config-files/remote-config.toml)
+- [.streamlit/config.toml](./example-config-files/remote-streamlit-config.toml)
 
 
 ## Develoment
@@ -46,24 +49,12 @@ pixi install
 export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/development-config.toml
 pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
-At the first run, it will ask you for permission to create a configuration file in your home directory (`~/.fractal_feature_explorer/config.toml`), which will be used for future runs.
-
-Alternatively, you can expose a configuration file using the `FRACTAL_FEATURE_EXPLORER_CONFIG` environment variable:
+Alternatively, you can expose a configuration file using the `` environment variable:
 
 ```bash
 export FRACTAL_FEATURE_EXPLORER_CONFIG=/path/to/config.toml
 pixi run uvicorn fractal_feature_explorer.app:app
 ```
-
-
-## Run the dashboard remotely
-
-
-
-Configuration files:
-1. FIXME / dashboard config
-2. FIXME / streamlit config, see example
-3. Uvicorn??
 
 ## Change log
 
