@@ -6,8 +6,34 @@
 [![CI](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml)
 
 
+This is the repository that contains the **Fractal feature explorer** dashboard. Find more information about Fractal in general and the other repositories at the [Fractal home page](https://fractal-analytics-platform.github.io).
 
-FIXME: A short description paragraph.
+
+## Run the dashboard locally
+
+## Run the dashboard on a remote server
+
+INSTALL
+
+This can be installed with te
+```bash
+# Option 1: from within a virtual environment
+pip install fractal-feature-explorer
+
+# Option 2: as a globally-available tool
+pipx install fractal-feature-explorer
+```
+
+RUN
+
+```bash
+uvicorn \
+    fractal_feature_explorer.app:app\
+    --host 0.0.0.0 \
+    --port 8501
+```
+
+
 
 ## Develoment
 
@@ -31,27 +57,7 @@ pixi run uvicorn fractal_feature_explorer.app:app
 
 ## Run the dashboard remotely
 
-INSTALL
 
-This can be installed with te
-```bash
-# Option 1: from within a virtual environment
-pip install fractal-feature-explorer
-
-# Option 2: as a globally-available tool
-pipx install fractal-feature-explorer
-```
-
-RUN
-
-```bash
-uvicorn \
-    fractal_feature_explorer.app:app\
-    --host 0.0.0.0 \
-    --port 8501 \
-    --no-access-log \
-    --workers 2 \
-```
 
 Configuration files:
 1. FIXME / dashboard config
@@ -97,3 +103,10 @@ Releasing a new version on PyPI:
     ```bash
     git push --tags
     ```
+
+
+## License and contributors
+
+The Fractal project is developed by the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) at the University of Zurich, who contracts [eXact lab s.r.l.](https://www.exact-lab.it/en/) for software engineering and development support.
+
+Unless otherwise specified, Fractal components are released under the BSD 3-Clause License, and copyright is with the BioVisionCenter at the University of Zurich.
