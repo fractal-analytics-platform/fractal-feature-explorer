@@ -1965,7 +1965,6 @@ packages:
   - rich
   - streamlit>=1.58.0,<1.59.0
   - urllib3
-  - uvicorn
   - devtools ; extra == 'dev'
   - notebook ; extra == 'dev'
   - pre-commit ; extra == 'dev'
