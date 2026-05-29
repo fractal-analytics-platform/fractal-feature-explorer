@@ -11,7 +11,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from secure import Secure
 from secure.headers import (
-    CrossOriginEmbedderPolicy,
     CrossOriginOpenerPolicy,
     CrossOriginResourcePolicy,
     StrictTransportSecurity,
