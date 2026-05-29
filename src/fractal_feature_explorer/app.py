@@ -39,16 +39,17 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        
+
         # self.secure_headers = Secure.with_default_headers()
 
         csp = (
             ContentSecurityPolicy()
-            .default_src("'self'")
-            .base_uri("'self'")
+            .default_src("'none'")
+            .connect_src("'self'")
+            .base_uri("'none'")
             .font_src("'self'", "https:", "data:")
             .form_action("'self'")
-            .frame_ancestors("'self'")
+            .frame_ancestors("'none'")
             .img_src("'self'", "data:")
             .object_src("'none'")
             .script_src("'self'")
@@ -73,7 +74,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response: Response = await call_next(request)
         await self.secure_headers.set_headers_async(response)
         del response._headers["server"]
-        response._headers["x-frame-options"] = "DENY"  # FIXME: do it via secure
+        # response._headers["x-frame-options"] = "DENY"  # FIXME: do it via secure
         # FIXME: remove
         # for k, v in response.headers.items():
         #     print(k, v)
