@@ -11,22 +11,20 @@ This is the repository that contains the **Fractal feature explorer** dashboard.
 
 ## Run the dashboard locally
 
-
+**FIXME**
 
 ## Run the dashboard on a remote server
 
-The most common option is to create a virtual environment and install via `pip`
-
-This can be installed with te
+The most common option is to create a virtual environment and install via `pip`, and then run via `uvicorn`
 ```bash
 python3 -m venv venv
+
 source venv/bin/activate
+
 pip install fractal-feature-explorer
-```
-and then running from the environment, e.g. as in:
-```bash
-source venv/bin/activate
+
 export FRACTAL_FEATURE_EXPLORER_CONFIG="config.toml"
+
 uvicorn \
     fractal_feature_explorer.app:app\
     --host 0.0.0.0 \
@@ -49,12 +47,16 @@ pixi install
 export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/development-config.toml
 pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
-Alternatively, you can expose a configuration file using the `` environment variable:
 
+Note that this [development-config.toml](./example-config-files/development-config.toml) simulates a production deployment and thus it requires Fractal services running locally on a given set of ports (`fractal-server` on port 8000, `fractal-web` on port 5173, `fractal-data` on port 3000).
+
+If you do not need all of this, run via
 ```bash
-export FRACTAL_FEATURE_EXPLORER_CONFIG=/path/to/config.toml
-pixi run uvicorn fractal_feature_explorer.app:app
+export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/local-config.toml
+pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
+
+
 
 ## Change log
 
