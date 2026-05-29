@@ -27,8 +27,9 @@ export FRACTAL_FEATURE_EXPLORER_CONFIG="config.toml"
 
 uvicorn \
     fractal_feature_explorer.app:app\
+    --no-server-header \
     --host 0.0.0.0 \
-    --port 8501
+    --port 8501 \
 ```
 
 Configuration-file examples:
