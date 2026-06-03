@@ -41,8 +41,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         csp = (
             ContentSecurityPolicy()
-            # Fallback policy for not defined rules: by default forbid
-            # everything that is not defined
+            # Fallback policy: forbid what is not defined
             .default_src("'none'")
             # Control fetch requests and WebSocket connections
             .connect_src("'self'")
@@ -50,7 +49,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             .base_uri("'none'")
             # Fonts
             .font_src("'self'", "https:", "data:")
-            # Restrict form submissions to self
+            # Restrict form submissions
             .form_action("'self'")
             # Forbid frames
             .frame_ancestors("'none'")
@@ -58,11 +57,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             .img_src("'self'", "data:")
             # Forbid <object> and <embed> tag
             .object_src("'none'")
-            # NOTE: unsafe-eval needed to display plots
+            # NOTE: unsafe-eval needed to display plots - see also
+            # https://github.com/plotly/dash/issues/1794
             .script_src("'self'", "'unsafe-eval'")
             # Sources for JavaScript inline event handlers
             .script_src_attr("'none'")
-            # Styles (CSS)
+            # Styles (CSS) - see also
+            # https://github.com/plotly/dash/issues/1794
             .style_src("'self'", "https:", "'unsafe-inline'")
         )
 
