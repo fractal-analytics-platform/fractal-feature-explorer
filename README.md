@@ -11,7 +11,33 @@ This is the repository that contains the **Fractal feature explorer** dashboard.
 
 ## Run the dashboard locally
 
-**FIXME**
+Examples:
+
+1. Via [`uvx`](https://docs.astral.sh/uv/guides/tools/#running-tools):
+```bash
+pipx run --spec fractal-feature-explorer explorer
+```
+2. Via [`pipx`](https://pipx.pypa.io/stable/):
+```bash
+uvx --from fractal-feature-explorer explorer
+```
+3. Via [`pixi`](pixi.prefix.dev):
+Via `pixi`:
+```bash
+git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
+cd fractal-feature-explorer
+pixi run explorer
+```
+4. Via `venv`+`pip`:
+```bash
+git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
+cd fractal-feature-explorer
+python3 -m venv venv
+source ./venv/bin/activate
+python3 -m pip install -e .
+explorer
+```
+
 
 ## Run the dashboard on a remote server
 
