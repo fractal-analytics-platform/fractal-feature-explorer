@@ -101,10 +101,10 @@ def selectbox_component(
     This function handles the session state for the selectbox component.
     A unique key is required for each selectbox component.
     """
-
     if len(options) == 0:
         raise ValueError(
-            "Selectbox options are empty. Selectbox cannot be created with an empty list."
+            "Selectbox options are empty. "
+            "Selectbox cannot be created with an empty list."
         )
 
     if f"{key}_state_model" not in st.session_state:

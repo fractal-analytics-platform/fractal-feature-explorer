@@ -1,25 +1,25 @@
 import asyncio
+from typing import Literal
 
 import polars as pl
 import streamlit as st
 from ngio.images._table_ops import (
-    concatenate_image_tables_async,
     concatenate_image_tables_as_async,
+    concatenate_image_tables_async,
     list_image_tables_async,
 )
 from ngio.tables import FeatureTable
-from typing import Literal
+from streamlit.logger import get_logger
+
+from fractal_feature_explorer.config import st_cache_data_wrapper
+from fractal_feature_explorer.pages.setup_page._utils import (
+    extras_from_url,
+    plate_name_from_url,
+)
 from fractal_feature_explorer.utils import (
     get_ome_zarr_container,
     get_ome_zarr_plate,
 )
-from fractal_feature_explorer.pages.setup_page._utils import (
-    plate_name_from_url,
-    extras_from_url,
-)
-from fractal_feature_explorer.config import st_cache_data_wrapper
-
-from streamlit.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -117,7 +117,8 @@ def _load_single_plate_condition_table(
     for column in required_columns:
         if column not in table_df.columns:
             st.error(
-                f"Condition table {table_name} does not contain required column {column}."
+                f"Condition table {table_name} does not contain required "
+                f"column {column}."
             )
             return None
     return table_df

@@ -1,9 +1,10 @@
-import urllib3.util
-from fractal_feature_explorer.config import get_config, ProductionConfig
-import urllib3
 import streamlit as st
-from fractal_feature_explorer.utils import Scope
+import urllib3
+import urllib3.util
 from streamlit.logger import get_logger
+
+from fractal_feature_explorer.config import ProductionConfig, get_config
+from fractal_feature_explorer.utils import Scope
 
 
 class FractalUserNonVerifiedException(ValueError):
@@ -31,13 +32,13 @@ def _verify_authentication(config: ProductionConfig):
                 if _cookie.strip().startswith(config.fractal_cookie_name)
             )
             token = cookie.split("=")[1]
-        except StopIteration:
+        except StopIteration as exc1:
             msg = "Could not find the expected cookie."
             logger.info(msg)
-            raise ValueError(msg)
-        except IndexError:
+            raise ValueError(msg) from exc1
+        except IndexError as exc2:
             msg = "Invalid cookie."
-            raise ValueError(msg)
+            raise ValueError(msg) from exc2
         # Get user information from Fractal backend
         logger.info("Now obtain user information.")
         current_user_url = f"{config.fractal_backend_url}/auth/current-user/"
@@ -71,12 +72,12 @@ def verify_authentication():
     try:
         _verify_authentication(config)
     except FractalUserNonVerifiedException as e:
-        logger.info(f"Authentication failed. Original error: {str(e)}.")
+        logger.info(f"Authentication failed. Original error: {e!s}.")
         MSG = "Access is restricted to verified Fractal users."
         st.error(MSG)
         st.stop()
     except Exception as e:
-        logger.info(f"Authentication failed. Original error: {str(e)}.")
+        logger.info(f"Authentication failed. Original error: {e!s}.")
         login_url = f"{config.fractal_frontend_url}/auth/login"
         MSG = (
             "You are not authenticated as a Fractal user. "

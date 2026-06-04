@@ -1,4 +1,4 @@
-"""Fractal Explorer Dashboard"""
+"""Fractal Explorer Dashboard."""
 
 from importlib.metadata import PackageNotFoundError, version
 

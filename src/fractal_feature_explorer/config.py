@@ -1,17 +1,15 @@
 import functools
-from pathlib import Path
-from pydantic import BaseModel, ConfigDict, AfterValidator, Field
-import toml
-import streamlit as st
-from typing import Literal
-from typing import Annotated
-from datetime import timedelta
-from streamlit.logger import get_logger
 import os
+from datetime import timedelta
+from pathlib import Path
+from typing import Annotated, Literal
+
+import streamlit as st
+import toml
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+from streamlit.logger import get_logger
 
 logger = get_logger(__name__)
-
-
 
 
 def remove_trailing_slash(value: str) -> str:
@@ -28,7 +26,9 @@ class BaseConfig(BaseModel):
 
 class LocalConfig(BaseConfig):
     deployment_type: Literal["local"]  # type: ignore override type
-    fractal_data_urls: list[Annotated[str, AfterValidator(remove_trailing_slash)]] = Field(default_factory=list)
+    fractal_data_urls: list[Annotated[str, AfterValidator(remove_trailing_slash)]] = (
+        Field(default_factory=list)
+    )
     allow_local_paths: bool = True
 
 
@@ -44,9 +44,7 @@ class ProductionConfig(BaseConfig):
 
 @st.cache_data
 def get_config() -> LocalConfig | ProductionConfig:
-    """
-    Get the configuration for the Fractal Explorer.
-    """
+    """Get the configuration for the Fractal Explorer."""
     config_path = Path(
         os.getenv(
             "FRACTAL_FEATURE_EXPLORER_CONFIG",
@@ -84,8 +82,7 @@ def get_config() -> LocalConfig | ProductionConfig:
 
 
 def st_cache_data_wrapper(func):
-    """
-    Wrapper around st.cache_data to set a default ttl.
+    """Wrapper around st.cache_data to set a default ttl.
 
     Supports per-user cache busting via the 'setup:cache_buster' session state key.
     Incrementing that value in a user's session invalidates their cached entries
@@ -107,9 +104,7 @@ def st_cache_data_wrapper(func):
 
 
 def st_cache_resource_wrapper(func):
-    """
-    Wrapper around st.cache_resource to set a default ttl.
-    """
+    """Wrapper around st.cache_resource to set a default ttl."""
     config = get_config()
     return st.cache_resource(
         ttl=config.cache_ttl, max_entries=config.cache_max_entries

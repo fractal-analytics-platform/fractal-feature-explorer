@@ -1,6 +1,8 @@
 import polars as pl
 import streamlit as st
+from streamlit.logger import get_logger
 
+from fractal_feature_explorer.authentication import verify_authentication
 from fractal_feature_explorer.pages.filters_page._column_filter import (
     ColumnsFilter,
     columns_filter_component,
@@ -15,8 +17,6 @@ from fractal_feature_explorer.pages.filters_page._scatter_filter import (
     scatter_filter_component,
 )
 from fractal_feature_explorer.utils import Scope, invalidate_session_state
-from streamlit.logger import get_logger
-from fractal_feature_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 
@@ -57,9 +57,7 @@ def build_feature_frame(feature_table: pl.LazyFrame) -> FeatureFrame:
 
 
 def _find_unique_name(keys: list[str], prefix: str) -> str:
-    """
-    Find a unique name for the filter
-    """
+    """Find a unique name for the filter."""
     i = 1
     while True:
         name = f"{prefix} {i}"
@@ -69,9 +67,7 @@ def _find_unique_name(keys: list[str], prefix: str) -> str:
 
 
 def add_filters() -> None:
-    """
-    Dynamically add filters to the feature table
-    """
+    """Dynamically add filters to the feature table."""
     if f"{Scope.FILTERS}:filters_dict" not in st.session_state:
         st.session_state[f"{Scope.FILTERS}:filters_dict"] = {
             "Columns Filter": (
@@ -119,9 +115,7 @@ def add_filters() -> None:
 
 
 def display_filters(feature_frame: FeatureFrame) -> FeatureFrame:
-    """
-    Display the filters in the feature table
-    """
+    """Display the filters in the feature table."""
     filter_list = st.session_state[f"{Scope.FILTERS}:filters_dict"]
 
     for name, (filter_key, filter_component) in filter_list.items():
@@ -170,9 +164,7 @@ def display_filters(feature_frame: FeatureFrame) -> FeatureFrame:
 
 
 def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
-    """
-    Apply the filters to the feature table
-    """
+    """Apply the filters to the feature table."""
     if f"{Scope.FILTERS}:filters_dict" not in st.session_state:
         return feature_frame
     filters_dict = st.session_state[f"{Scope.FILTERS}:filters_dict"]
@@ -222,14 +214,12 @@ def apply_filters(feature_frame: FeatureFrame) -> FeatureFrame:
 def feature_filters_manger(
     feature_table: pl.LazyFrame, table_name: str
 ) -> FeatureFrame:
-    """
-    Setup the feature table for the dashboard.
-    """
+    """Setup the feature table for the dashboard."""
     st.markdown(
         f"""
         ## Feature Table Setup
         Select the features to include in the feature table.
-        
+
         Table Name: **{table_name}**
         """
     )
@@ -260,7 +250,8 @@ def main():
     feature_table_name = st.session_state.get(f"{Scope.DATA}:feature_table_name", "")
     if feature_table is None:
         st.warning(
-            "No feature table found in session state. Please make sure to run the setup page first."
+            "No feature table found in session state. "
+            "Please make sure to run the setup page first."
         )
         st.stop()
 

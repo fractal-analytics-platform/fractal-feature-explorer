@@ -1,17 +1,15 @@
-"""
-Fractal Feature Explorer - Setup Page
-"""
+"""Fractal Feature Explorer - Setup Page."""
 
+import polars as pl
 import streamlit as st
 from streamlit.logger import get_logger
 
+from fractal_feature_explorer.authentication import verify_authentication
+from fractal_feature_explorer.config import get_config
 from fractal_feature_explorer.pages.setup_page._plate_mode_setup import (
     plate_mode_setup_component,
 )
 from fractal_feature_explorer.utils import Scope, invalidate_session_state
-import polars as pl
-from fractal_feature_explorer.config import get_config
-from fractal_feature_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 
@@ -39,9 +37,7 @@ def parse_query_params():
 
 
 def setup_global_state():
-    """
-    Setup the global state for the Streamlit app.
-    """
+    """Setup the global state for the Streamlit app."""
     init_global_state()
     parse_query_params()  # This may be useful e.g. when linking from fractal-web
 
@@ -67,7 +63,8 @@ def filter_cache_invalidations(
         if old_table_name != table_name:
             # invalidate the old table
             warn_msg = (
-                f"The feature table name has changed. {old_table_name} -> {table_name}. \n"
+                "The feature table name has changed. "
+                f"{old_table_name} -> {table_name}.\n"
                 "All filters have been reset."
             )
             logger.warning(warn_msg)
@@ -86,9 +83,7 @@ def filter_cache_invalidations(
 
 
 def _token_input_widget():
-    """
-    Input field for the Fractal authentication token.
-    """
+    """Input field for the Fractal authentication token."""
     config = get_config()
     if config.deployment_type == "production":
         return None
@@ -120,7 +115,10 @@ def main():
                 "Reset Setup",
                 key=f"{Scope.SETUP}:reset_setup",
                 icon="🔄",
-                help="Reset the setup state. This will clear all filters and the feature table.",
+                help=(
+                    "Reset the setup state. "
+                    "This will clear all filters and the feature table."
+                    ),
             ):
                 invalidate_session_state(f"{Scope.SETUP}")
                 st.rerun()
@@ -128,7 +126,10 @@ def main():
                 "Clear Data Cache",
                 key=f"{Scope.SETUP}:clear_cache",
                 icon="🗑️",
-                help="Clear the data cache for your session. Use this if the data has changed on disk.",
+                help=(
+                    "Clear the data cache for your session. "
+                    "Use this if the data has changed on disk."
+                ),
             ):
                 cb = st.session_state.get(f"{Scope.SETUP}:cache_buster", 0)
                 st.session_state[f"{Scope.SETUP}:cache_buster"] = cb + 1
@@ -142,7 +143,10 @@ def main():
             logger.error("Image mode is not yet implemented.")
             st.stop()
         case _:
-            error_msg = f"Invalid setup mode selected. Should be 'Plates' or 'Images' but got {setup_mode}."
+            error_msg = (
+                "Invalid setup mode selected. "
+                f"Should be 'Plates' or 'Images' but got {setup_mode}."
+            )
             st.error(error_msg)
             logger.error(error_msg)
             st.stop()
@@ -153,7 +157,8 @@ def main():
     st.session_state[f"{Scope.DATA}:feature_table_name"] = table_name
     st.session_state[f"{Scope.DATA}:feature_table_schema"] = schema
     logger.info(
-        f"Feature table {table_name} with schema {schema} has been set in session state."
+        f"Feature table {table_name} with schema {schema} "
+        "has been set in session state."
     )
     logger.info("Setup page loading complete.")
 

@@ -17,9 +17,7 @@ class ColumnsFilter(BaseModel):
     )
 
     def apply(self, feature_frame: FeatureFrame) -> FeatureFrame:
-        """
-        Filter the feature frame using the columns filter
-        """
+        """Filter the feature frame using the columns filter."""
         all_columns = set(
             self.features + self.cathegorical + self.others + feature_frame.protected
         )
@@ -38,9 +36,7 @@ def columns_filter_component(
     key: str,
     feature_frame: FeatureFrame,
 ) -> FeatureFrame:
-    """
-    Filter the feature table to only include the specified columns.
-    """
+    """Filter the feature table to only include the specified columns."""
     features = feature_frame.features
     selected_features = multiselect_component(
         key=f"{key}:features_filter",

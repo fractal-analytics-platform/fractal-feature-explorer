@@ -3,6 +3,7 @@ import copy
 import plotly.express as px
 import streamlit as st
 from streamlit.logger import get_logger
+
 from fractal_feature_explorer.pages.filters_page._common import FeatureFrame
 from fractal_feature_explorer.pages.filters_page._scatter_filter import view_point
 from fractal_feature_explorer.utils.st_components import (
@@ -17,9 +18,8 @@ def scatter_plot_component(
     key: str,
     feature_frame: FeatureFrame,
 ) -> None:
-    """
-    Create a scatter plot for the feature frame
-    And return the filtered feature frame
+    """Create a scatter plot for the feature frame
+    And return the filtered feature frame.
     """
     if len(feature_frame.features) < 2:
         error_msg = (
@@ -65,12 +65,12 @@ def scatter_plot_component(
             perc_samples = 1.0
 
         # color
-        possible_color_columns = (
-            ["--No Color--"]
-            + feature_frame.cathegorical
-            + feature_frame.protected
-            + feature_frame.features
-        )
+        possible_color_columns = [
+            "--No Color--",
+            *feature_frame.cathegorical,
+            *feature_frame.protected,
+            *feature_frame.features,
+        ]
         possible_color_columns = copy.deepcopy(possible_color_columns)
         for col in columns_needed:
             if col in possible_color_columns:
@@ -88,7 +88,7 @@ def scatter_plot_component(
             color_column = None
 
         # size
-        possible_size_columns = ["--No Size--"] + feature_frame.features
+        possible_size_columns = ["--No Size--", *feature_frame.features]
         possible_size_columns = copy.deepcopy(possible_size_columns)
         for col in columns_needed:
             if col in possible_size_columns:

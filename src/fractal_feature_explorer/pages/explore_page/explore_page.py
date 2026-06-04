@@ -2,6 +2,7 @@ import polars as pl
 import streamlit as st
 from streamlit.logger import get_logger
 
+from fractal_feature_explorer.authentication import verify_authentication
 from fractal_feature_explorer.pages.explore_page._heat_map_plot import (
     heat_map_component,
 )
@@ -14,15 +15,12 @@ from fractal_feature_explorer.pages.filters_page import (
 )
 from fractal_feature_explorer.pages.filters_page._common import FeatureFrame
 from fractal_feature_explorer.utils import Scope, invalidate_session_state
-from fractal_feature_explorer.authentication import verify_authentication
 
 logger = get_logger(__name__)
 
 
 def _find_unique_name(keys: list[str], prefix: str) -> str:
-    """
-    Find a unique name for the filter
-    """
+    """Find a unique name for the filter."""
     i = 1
     while True:
         name = f"{prefix} {i}"
@@ -32,9 +30,7 @@ def _find_unique_name(keys: list[str], prefix: str) -> str:
 
 
 def add_plot() -> None:
-    """
-    Dynamically add a plot to the explorer page
-    """
+    """Dynamically add a plot to the explorer page."""
     if f"{Scope.EXPLORE}:plots_dict" not in st.session_state:
         st.session_state[f"{Scope.EXPLORE}:plots_dict"] = {}
 
@@ -77,9 +73,7 @@ def add_plot() -> None:
 
 
 def display_plots(feature_frame: FeatureFrame) -> FeatureFrame:
-    """
-    Display the plots in the feature table
-    """
+    """Display the plots in the feature table."""
     plot_list = st.session_state[f"{Scope.EXPLORE}:plots_dict"]
 
     for name, (plot_key, plot_component) in plot_list.items():
@@ -118,13 +112,11 @@ def display_plots(feature_frame: FeatureFrame) -> FeatureFrame:
 def feature_explore_manager(
     feature_table: pl.LazyFrame, table_name: str, skip_filters: bool = True
 ) -> FeatureFrame:
-    """
-    Setup the feature table for the dashboard.
-    """
+    """Setup the feature table for the dashboard."""
     st.markdown(
         f"""
         ## Explore the feature table
-        
+
         Table Name: **{table_name}**
         """
     )
@@ -164,7 +156,8 @@ def main():
 
     if feature_table is None:
         st.warning(
-            "No feature table found in session state. Please make sure to run the setup page first."
+            "No feature table found in session state. "
+            "Please make sure to run the setup page first."
         )
         st.stop()
 

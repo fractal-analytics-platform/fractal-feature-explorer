@@ -1,6 +1,13 @@
 import polars as pl
 import streamlit as st
+from streamlit.logger import get_logger
 
+from fractal_feature_explorer.pages.setup_page._tables_io import (
+    collect_condition_table_from_images,
+    collect_condition_table_from_plates,
+    list_images_tables,
+    list_plate_tables,
+)
 from fractal_feature_explorer.utils.common import Scope
 from fractal_feature_explorer.utils.st_components import (
     double_slider_component,
@@ -8,15 +15,6 @@ from fractal_feature_explorer.utils.st_components import (
     pills_component,
     selectbox_component,
 )
-
-from fractal_feature_explorer.pages.setup_page._tables_io import (
-    list_images_tables,
-    list_plate_tables,
-    collect_condition_table_from_images,
-    collect_condition_table_from_plates,
-)
-
-from streamlit.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -203,9 +201,11 @@ def _join_condition_table_widget(
     image_condition_tables = [
         f"{t_name}{image_condition_tables_suffix}" for t_name in image_condition_tables
     ]
-    condition_tables = (
-        ["-- No Condition Table --"] + table_condition_tables + image_condition_tables
-    )
+    condition_tables = [
+        "-- No Condition Table --",
+        *table_condition_tables,
+        *image_condition_tables,
+    ]
     selected_table = selectbox_component(
         key=f"{Scope.SETUP}:plate_setup:condition_table_selection",
         label="Select Condition Table",
@@ -313,16 +313,14 @@ def _string_filter_widget(plate_setup_df: pl.DataFrame, column: str) -> pl.DataF
 
 
 def filter_based_on_condition(plate_setup_df: pl.DataFrame) -> pl.DataFrame:
-    condition_columns = set(plate_setup_df.columns) - set(
-        [
-            "plate_url",
-            "plate_name",
-            "row",
-            "column",
-            "path_in_well",
-            "image_url",
-        ]
-    )
+    condition_columns = set(plate_setup_df.columns) - {
+        "plate_url",
+        "plate_name",
+        "row",
+        "column",
+        "path_in_well",
+        "image_url",
+    }
 
     for column in condition_columns:
         column_series: pl.Series = plate_setup_df[column]

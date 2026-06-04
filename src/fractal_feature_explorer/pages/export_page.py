@@ -3,18 +3,16 @@ import io
 import polars as pl
 import streamlit as st
 
+from fractal_feature_explorer.authentication import verify_authentication
 from fractal_feature_explorer.pages.filters_page import (
     apply_filters,
     build_feature_frame,
 )
 from fractal_feature_explorer.utils import Scope
-from fractal_feature_explorer.authentication import verify_authentication
 
 
 def table_to_csv_buffer(table: pl.LazyFrame) -> io.BytesIO:
-    """
-    Convert a Polars DataFrame to a CSV buffer.
-    """
+    """Convert a Polars DataFrame to a CSV buffer."""
     _table = table.collect()
     buffer = io.BytesIO()
     _table.write_csv(buffer)
@@ -23,9 +21,7 @@ def table_to_csv_buffer(table: pl.LazyFrame) -> io.BytesIO:
 
 
 def table_to_parquet_buffer(table: pl.LazyFrame) -> io.BytesIO:
-    """
-    Convert a Polars DataFrame to a Parquet buffer.
-    """
+    """Convert a Polars DataFrame to a Parquet buffer."""
     _table = table.collect()
     buffer = io.BytesIO()
     _table.write_parquet(buffer)
@@ -39,7 +35,8 @@ def main():
     feature_table_name = st.session_state.get(f"{Scope.DATA}:feature_table_name", "")
     if feature_table is None:
         st.warning(
-            "No feature table found in session state. Please make sure to run the setup page first."
+            "No feature table found in session state. "
+            "Please make sure to run the setup page first."
         )
         st.stop()
 
