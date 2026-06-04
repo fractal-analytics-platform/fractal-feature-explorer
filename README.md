@@ -22,7 +22,6 @@ pipx run --spec fractal-feature-explorer explorer
 uvx --from fractal-feature-explorer explorer
 ```
 3. Via [`pixi`](pixi.prefix.dev):
-Via `pixi`:
 ```bash
 git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
 cd fractal-feature-explorer
