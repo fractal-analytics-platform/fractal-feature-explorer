@@ -29,7 +29,7 @@ def _verify_authentication(config: ProductionConfig):
             token = st.context.cookies[config.fractal_cookie_name]
         except Exception as e:
             msg = f"Could not find the expected {config.fractal_cookie_name} cookie."
-            logger.error(msg)
+            logger.info(msg)
             raise ValueError(msg) from e
         # Get user information from Fractal backend
         logger.info("Now obtain user information.")
