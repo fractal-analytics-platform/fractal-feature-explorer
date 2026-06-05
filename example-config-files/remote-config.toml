@@ -1,0 +1,8 @@
+deployment_type = "production"
+allow_local_paths = false
+
+fractal_frontend_url = "https://fractal.example.org"
+fractal_backend_url = "https://fractal.example.org/backend"
+fractal_data_url = "https://fractal.example.org/data"
+cache_ttl = "60m"
+cache_max_entries = 100

@@ -5,63 +5,84 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/fractal-feature-explorer.svg?color=green)](https://python.org)
 [![CI](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/fractal-analytics-platform/fractal-feature-explorer/actions/workflows/ci.yml)
 
-## Installation
 
-The easiest way to install the `fractal-feature-explorer` is to use `uv` or `pipx`:
+This is the repository that contains the **Fractal feature explorer** dashboard. Find more information about Fractal in general and the other repositories at the [Fractal home page](https://fractal-analytics-platform.github.io).
 
+
+## Run the dashboard locally
+
+Examples:
+
+1. Via [`uvx`](https://docs.astral.sh/uv/guides/tools/#running-tools):
 ```bash
-pipx install fractal-feature-explorer
+pipx run --spec fractal-feature-explorer explorer
+```
+2. Via [`pipx`](https://pipx.pypa.io/stable/):
+```bash
+uvx --from fractal-feature-explorer explorer
+```
+3. Via [`pixi`](pixi.prefix.dev):
+```bash
+git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
+cd fractal-feature-explorer
+pixi run explorer
+```
+4. Via `venv`+`pip`:
+```bash
+git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
+cd fractal-feature-explorer
+python3 -m venv venv
+source ./venv/bin/activate
+python3 -m pip install -e .
+explorer
 ```
 
-or
 
+## Run the dashboard on a remote server
+
+The most common option is to create a virtual environment and install via `pip`, and then run via `uvicorn`
 ```bash
-uv tool install fractal-feature-explorer
-```
+python3 -m venv venv
 
-Alternatively, you can install it in a standart Conda/Venv using `pip`:
+source venv/bin/activate
 
-```bash
 pip install fractal-feature-explorer
+
+export FRACTAL_FEATURE_EXPLORER_CONFIG="config.toml"
+
+uvicorn \
+    fractal_feature_explorer.app:app\
+    --no-server-header \
+    --host 0.0.0.0 \
+    --port 8501 \
 ```
 
-## Usage
+Configuration-file examples:
+- [config.toml](./example-config-files/remote-config.toml)
+- [.streamlit/config.toml](./example-config-files/remote-streamlit-config.toml)
 
-You can run the dashboard using the `explorer` command:
+
+## Develoment
 
 ```bash
-explorer
+# Clone this repository
+git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
+# Install the project via pixi
+pixi install
+# Run the app
+export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/development-config.toml
+pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
 
-at the first run, it will ask you for permission to create a configuration file in your home directory (`~/.fractal_feature_explorer/config.toml`), which will be used for future runs.
+Note that this [development-config.toml](./example-config-files/development-config.toml) simulates a production deployment and thus it requires Fractal services running locally on a given set of ports (`fractal-server` on port 8000, `fractal-web` on port 5173, `fractal-data` on port 3000).
 
-Alternatively, you can expose a configuration file using the `FRACTAL_FEATURE_EXPLORER_CONFIG` environment variable:
-
+If you do not need all of this, run via
 ```bash
-export FRACTAL_FEATURE_EXPLORER_CONFIG=/path/to/config.toml
-explorer
+export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/local-config.toml
+pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
 
-More details on the configuration file will be availble soon.
 
-## Local development setup
-
-- pixi (lockfile create with pixi 0.47)
-- local clone of this repo
-
-## running the dashboard
-
-- using pixi task
-
-    ```bash
-    pixi run -e dev explorer-dev
-    ```
-
-- from streamlit directly
-
-    ```bash
-    pixi run streamlit run src/fractal_feature_explorer/main.py
-    ```
 
 ## Change log
 
@@ -87,18 +108,6 @@ example URL: `http://localhost:8501/?zarr_url=/Users/locerr/data/20200812-23well
 - Image preview is not available for 3D images.
 - Single images not supported, only plates.
 
-## Troubleshooting
-
-- pixi lock file not supported by your local pixi version:
-
-    ```bash
-    $ pixi run explorer
-    × Failed to load lock file from `/xxx/fractal-feature-explorer/pixi.lock`
-    ╰─▶ found newer lockfile format version 6, but only up to including version 5 is supported
-    ```
-
-    If you get an error like this you need to either update your local pixi version (`pixi self-update`) or create a new lock file with your local version of pixi. To do this, delete the `pixi.lock`, a new lock will be created when your run the dashboard again.
-
 ## Contributing
 
 Releasing a new version on PyPI:
@@ -114,3 +123,10 @@ Releasing a new version on PyPI:
     ```bash
     git push --tags
     ```
+
+
+## License and contributors
+
+The Fractal project is developed by the [BioVisionCenter](https://www.biovisioncenter.uzh.ch/en.html) at the University of Zurich, who contracts [eXact lab s.r.l.](https://www.exact-lab.it/en/) for software engineering and development support.
+
+Unless otherwise specified, Fractal components are released under the BSD 3-Clause License, and copyright is with the BioVisionCenter at the University of Zurich.

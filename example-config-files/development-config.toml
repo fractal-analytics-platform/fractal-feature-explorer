@@ -1,0 +1,7 @@
+deployment_type = "production"
+allow_http = true
+fractal_frontend_url = "http://localhost:5173"
+fractal_backend_url = "http://localhost:8000"
+fractal_data_url = "http://localhost:3000"
+cache_ttl = "60m"
+cache_max_entries = 100

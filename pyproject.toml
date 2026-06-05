@@ -1,13 +1,14 @@
 [project]
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
 dependencies = [
-    "streamlit>=1.57.0, <1.58.0",
+    "streamlit>=1.58.0, <1.59.0",
     "ngio>=0.5.0, <0.6.0",
     "plotly",
     "matplotlib",
     "orjson",
     "rich",
     "urllib3",
+    "secure >=2.0.1, <2.1.0",
 ]
 name = "fractal-feature-explorer"
 requires-python = ">=3.12,<3.14"
@@ -37,7 +38,6 @@ dev = [
     "pre-commit",
     "ruff",
     "watchdog",
-    "psrecord[plot]",
 ]
 
 test = ["pytest", "pytest-cov", "devtools"]
@@ -68,7 +68,3 @@ fractal_feature_explorer = { path = ".", editable = true }
 default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "dev" }
 test = { features = ["test"], solve-group = "test" }
-
-
-[tool.pixi.tasks]
-explorer-dev = { cmd = "streamlit run src/fractal_feature_explorer/main.py" }

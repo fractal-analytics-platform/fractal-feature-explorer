@@ -17,10 +17,9 @@ enableXsrfProtection = true
 fileWatcherType = "none"
 
 [browser]
-serverAddress = "localhost:8501"
+serverAddress = "fractal.example.org/dashboard/"
 gatherUsageStats = false
 
 [client]
 toolbarMode = "minimal"
 allowedOrigins = []
-
