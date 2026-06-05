@@ -94,4 +94,3 @@ ignore = [
 # https://docs.astral.sh/ruff/formatter/
 [tool.ruff.format]
 docstring-code-format = true
-

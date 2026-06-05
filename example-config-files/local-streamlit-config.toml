@@ -23,4 +23,3 @@ gatherUsageStats = false
 [client]
 toolbarMode = "minimal"
 allowedOrigins = []
-

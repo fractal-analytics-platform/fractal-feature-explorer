@@ -118,7 +118,7 @@ def main():
                 help=(
                     "Reset the setup state. "
                     "This will clear all filters and the feature table."
-                    ),
+                ),
             ):
                 invalidate_session_state(f"{Scope.SETUP}")
                 st.rerun()
