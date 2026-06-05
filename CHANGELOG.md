@@ -9,6 +9,7 @@
 - Introduce middleware to set security headers (via `secure` dependency).
 - Remove interactivity from local configuration.
 - Remove obsolete references to `psrecord`.
+- Add `ruff` formatting to precommit.
 
 ## v0.1.17
 
