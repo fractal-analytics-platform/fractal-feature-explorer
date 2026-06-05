@@ -32,6 +32,7 @@ def _verify_authentication(config: ProductionConfig):
                 if _cookie.strip().startswith(config.fractal_cookie_name)
             )
             token = cookie.split("=")[1]
+            print(st.context.cookies[config.fractal_cookie_name])
         except StopIteration as exc1:
             msg = "Could not find the expected cookie."
             logger.info(msg)
