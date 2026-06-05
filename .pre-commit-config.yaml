@@ -17,8 +17,8 @@ repos:
     hooks:
       - id: validate-pyproject
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.15.6
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.16
     hooks:
       - id: ruff
         args: [--fix]  # may also add '--unsafe-fixes'
