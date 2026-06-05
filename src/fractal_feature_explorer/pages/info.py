@@ -1,10 +1,9 @@
 import streamlit as st
 from streamlit.logger import get_logger
-from fractal_feature_explorer.utils import Scope
 
 from fractal_feature_explorer.authentication import verify_authentication
-
 from fractal_feature_explorer.config import get_config
+from fractal_feature_explorer.utils import Scope
 
 logger = get_logger(__name__)
 

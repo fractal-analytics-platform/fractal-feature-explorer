@@ -24,7 +24,7 @@ def heat_map_component(
 
     if "column" in cathegorical_columns:
         cathegorical_columns.remove("column")
-        cathegorical_columns = ["column"] + cathegorical_columns
+        cathegorical_columns = ["column", *cathegorical_columns]
 
     x_axis = selectbox_component(
         key=f"{key}:scatter_plot_x_axis",
@@ -37,7 +37,7 @@ def heat_map_component(
 
     if "row" in cathegorical_columns:
         cathegorical_columns.remove("row")
-        cathegorical_columns = ["row"] + cathegorical_columns
+        cathegorical_columns = ["row", *cathegorical_columns]
 
     y_axis = selectbox_component(
         key=f"{key}:scatter_plot_y_axis",
@@ -57,7 +57,7 @@ def heat_map_component(
         help="Select the type of aggregation to apply.",
     )
     axes_names = [x_axis, y_axis]
-    columns_needed = [selected_feature] + axes_names
+    columns_needed = [selected_feature, *axes_names]
     feature_df = feature_frame.table.select(columns_needed).collect()
     feature_df = feature_df.to_pandas()
 

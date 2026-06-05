@@ -6,6 +6,7 @@ import polars as pl
 import streamlit as st
 from matplotlib.path import Path
 from pydantic import BaseModel, Field
+from streamlit.logger import get_logger
 
 from fractal_feature_explorer.pages.filters_page._common import FeatureFrame
 from fractal_feature_explorer.utils.ngio_io_caches import (
@@ -16,7 +17,6 @@ from fractal_feature_explorer.utils.st_components import (
     selectbox_component,
     single_slider_component,
 )
-from streamlit.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -34,9 +34,7 @@ def _show_point_info(
 
 @st.dialog("Cell Preview")
 def view_point(point: int, feature_df: pl.DataFrame) -> None:
-    """
-    View the point in the data frame
-    """
+    """View the point in the data frame."""
     point_dict = feature_df.select("image_url", "label", "reference_label").to_dicts()[
         point
     ]
@@ -108,28 +106,28 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             index=0,
             help="Select the level to display",
         )
-        
+
         image_scaling = st.selectbox(
             label="Image Scaling",
             options=["Metadata", "Min-Max", "Custom"],
             index=0,
             help="Select the image scaling",
         )
-        
+
         vis_meta = image.channels_meta.channels[channel].channel_visualisation
         if image_scaling == "Custom":
             vis_meta = image.channels_meta.channels[channel].channel_visualisation
-            max_value = float(max(vis_meta.end * 1.5, 255.))
+            max_value = float(max(vis_meta.end * 1.5, 255.0))
             min_intensity, max_intensity = st.slider(
                 label="Intensity Range",
-                min_value=0.,
+                min_value=0.0,
                 max_value=max_value,
                 value=(float(vis_meta.start), float(vis_meta.end)),
             )
         else:
             min_intensity = vis_meta.start
             max_intensity = vis_meta.end
-        
+
     try:
         image = get_single_label_image(
             image_url=point_dict["image_url"],
@@ -145,7 +143,7 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
             min_intensity=min_intensity,
             max_intensity=max_intensity,
         )
-        
+
         st.image(image, width=500)
     except Exception as e:
         logger.error(f"Error opening image: {e}")
@@ -168,9 +166,7 @@ class ScatterFilter(BaseModel):
     # )
 
     def apply(self, feature_frame: FeatureFrame) -> FeatureFrame:
-        """
-        Filter the feature frame using the histogram filter
-        """
+        """Filter the feature frame using the histogram filter."""
         table = feature_frame.table.select(self.column_x, self.column_y).collect()
         mask = self.compute_selection_mask(table)
         filtered_table = feature_frame.table.filter(mask)
@@ -183,7 +179,7 @@ class ScatterFilter(BaseModel):
 
     def compute_selection_mask(self, feature_df: pl.DataFrame) -> np.ndarray:
         """
-        Compute the selection mask for the feature frame using the histogram filter
+        Compute the selection mask for the feature frame using the histogram filter.
         """
         assert len(self.sel_x) == len(self.sel_y), (
             "X and Y coordinates must be the same length"
@@ -201,9 +197,7 @@ class ScatterFilter(BaseModel):
         return mask
 
     def apply_to_df(self, feature_df: pl.DataFrame) -> pl.DataFrame:
-        """
-        Filter the feature frame using the histogram filter
-        """
+        """Filter the feature frame using the histogram filter."""
         mask = self.compute_selection_mask(feature_df)
         filtered_table = feature_df.filter(mask)
         return filtered_table
@@ -213,9 +207,8 @@ def scatter_filter_component(
     key: str,
     feature_frame: FeatureFrame,
 ) -> FeatureFrame:
-    """
-    Create a scatter filter for the feature frame
-    And return the filtered feature frame
+    """Create a scatter filter for the feature frame
+    And return the filtered feature frame.
     """
     if len(feature_frame.features) < 2:
         error_msg = (
@@ -251,7 +244,10 @@ def scatter_filter_component(
             key=f"{key}:scatter_filter_sampling",
             label="Do sampling",
             value=True,
-            help="If the number of points is too high, we will sample the points to display",
+            help=(
+                "If the number of points is too high, "
+                "we will sample the points to display."
+            ),
         )
         if do_sampling:
             if feature_df.height > 50000:
@@ -328,11 +324,11 @@ def scatter_filter_component(
             x=feature_df[x_column],
             y=feature_df[y_column],
             mode="markers",
-            marker=dict(
-                size=point_size,
-                color="#1f77b4",
-                opacity=opacity * opacity_factor,
-            ),
+            marker={
+                "size": point_size,
+                "color": "#1f77b4",
+                "opacity": opacity * opacity_factor,
+            },
             name="All Points",
         )
     )
@@ -345,24 +341,24 @@ def scatter_filter_component(
                 x=filtered_df[x_column],
                 y=filtered_df[y_column],
                 mode="markers",
-                marker=dict(
-                    size=point_size,
-                    opacity=opacity,
-                    color="#1f77b4",
-                ),
+                marker={
+                    "size": point_size,
+                    "opacity": opacity,
+                    "color": "#1f77b4",
+                },
                 name="Selected Points",
             )
         )
 
-        sel_x = state.sel_x + [state.sel_x[0]]
-        sel_y = state.sel_y + [state.sel_y[0]]
+        sel_x = [*state.sel_x, state.sel_x[0]]
+        sel_y = [*state.sel_y, state.sel_y[0]]
         fig.add_trace(
             go.Scattergl(
                 x=sel_x,
                 y=sel_y,
                 mode="lines+markers",  # Shows both lines and markers
-                line=dict(color="#ff7f0e", width=2),
-                marker=dict(size=8, opacity=1),
+                line={"color": "#ff7f0e", "width": 2},
+                marker={"size": 8, "opacity": 1},
                 name="Current Selection",
             )
         )
@@ -416,7 +412,8 @@ def scatter_filter_component(
         )
         feature_frame = scatter_state.apply(feature_frame=feature_frame)
         logger.info(
-            f"Scatter filter applied: {scatter_state.column_x} [{scatter_state.sel_x}, {scatter_state.sel_y}]"
+            f"Scatter filter applied: {scatter_state.column_x} "
+            f"[{scatter_state.sel_x}, {scatter_state.sel_y}]"
         )
         return feature_frame
     scatter_state = ScatterFilter(

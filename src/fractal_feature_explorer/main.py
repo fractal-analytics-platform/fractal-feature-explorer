@@ -1,8 +1,10 @@
-import streamlit as st
-import fractal_feature_explorer
-import ngio
-from fractal_feature_explorer.config import get_config
 from pathlib import Path
+
+import ngio
+import streamlit as st
+
+import fractal_feature_explorer
+from fractal_feature_explorer.config import get_config
 
 
 def main():

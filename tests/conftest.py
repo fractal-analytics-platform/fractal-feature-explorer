@@ -1,5 +1,5 @@
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 config_path = Path("tests/configs/local.toml")
 if not config_path.exists():

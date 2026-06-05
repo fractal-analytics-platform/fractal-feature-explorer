@@ -1,26 +1,26 @@
 from pathlib import Path
-from streamlit.starlette import App
-from fractal_feature_explorer import __version__
-from ngio import __version__ as ngio_version
-from starlette.routing import Route
-from starlette.responses import Response
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-from starlette.middleware import Middleware
-from starlette.middleware.base import BaseHTTPMiddleware
 
+from ngio import __version__ as ngio_version
 from secure import Secure
 from secure.headers import (
+    ContentSecurityPolicy,
     CrossOriginOpenerPolicy,
     CrossOriginResourcePolicy,
-    StrictTransportSecurity,
     PermissionsPolicy,
     ReferrerPolicy,
     Server,
+    StrictTransportSecurity,
     XContentTypeOptions,
     XFrameOptions,
-    ContentSecurityPolicy,
 )
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
+from starlette.routing import Route
+from streamlit.starlette import App
+
+from fractal_feature_explorer import __version__
 
 
 async def endpoint_alive(request: Request) -> JSONResponse:

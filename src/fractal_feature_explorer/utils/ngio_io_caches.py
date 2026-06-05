@@ -1,10 +1,13 @@
-import urllib3
 import asyncio
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Literal
 
+import fsspec
 import numpy as np
 import streamlit as st
+import urllib3
+import urllib3.util
 from ngio import (
     OmeZarrContainer,
     OmeZarrPlate,
@@ -12,18 +15,11 @@ from ngio import (
     open_ome_zarr_plate,
 )
 from ngio.common import Dimensions, Roi
-from ngio.images._table_ops import list_image_tables_async
 from ngio.common._zoom import numpy_zoom
+from ngio.images._table_ops import list_image_tables_async
 from ngio.ome_zarr_meta.ngio_specs import PixelSize
 from ngio.tables import MaskingRoiTable
-from ngio.utils import fractal_fsspec_store
-
-from pathlib import Path
-
-import fsspec
-from ngio.utils import NgioValueError
-import urllib3.util
-from fractal_feature_explorer.utils import get_fractal_token
+from ngio.utils import NgioValueError, fractal_fsspec_store
 from streamlit.logger import get_logger
 
 from fractal_feature_explorer.config import (
@@ -31,13 +27,13 @@ from fractal_feature_explorer.config import (
     st_cache_data_wrapper,
     st_cache_resource_wrapper,
 )
+from fractal_feature_explorer.utils import get_fractal_token
 
 logger = get_logger(__name__)
 
 
 def _url_belongs_to_base(url: str, base_url: str) -> bool:
-    """
-    Check if the url has the same protocol and host as the base_url,
+    """Check if the url has the same protocol and host as the base_url,
     and if the path of the url is a subpath of the base_url.
     """
     parsed_url = urllib3.util.parse_url(url)
@@ -60,9 +56,7 @@ def _url_belongs_to_base(url: str, base_url: str) -> bool:
 
 
 def _include_token_for_url(url: str) -> bool:
-    """
-    Check if the URL is a valid HTTP Fractal URL.
-    """
+    """Check if the URL is a valid HTTP Fractal URL."""
     config = get_config()
     if config.deployment_type == "production":
         return _url_belongs_to_base(url, config.fractal_data_url)
@@ -101,15 +95,11 @@ def get_http_store(
     url: str, fractal_token: str | None = None
 ) -> fsspec.mapping.FSMap | None:
     """Ping the URL to check if it is reachable."""
-
     config = get_config()
     if config.deployment_type == "production":
         msg = None
         scheme = urllib3.util.parse_url(url).scheme
-        if (
-            scheme != "https"
-            and not (scheme == "http" and config.allow_http)
-        ):
+        if scheme != "https" and not (scheme == "http" and config.allow_http):
             msg = f"Non-https URLs are not supported (provided: {url})."
         if msg is None and not _url_belongs_to_base(url, config.fractal_data_url):
             msg = f"URLs must be part of {config.fractal_data_url} (provided: {url})."
@@ -378,15 +368,13 @@ def scale_image_intensity(
     min_intensity: int | float = 0,
     max_intensity: int | float = 255,
 ) -> np.ndarray:
-    """
-    Scale the image intensity based on the selected scaling mode.
-    """
+    """Scale the image intensity based on the selected scaling mode."""
     if scaling_mode not in ["Metadata", "Min-Max", "Custom"]:
         raise ValueError(f"Invalid scaling mode: {scaling_mode}")
-    
+
     if scaling_mode != "Min-Max":
         image_array = np.clip(image_array, min_intensity, max_intensity)
-        
+
     min_intensity = image_array.min()
     max_intensity = image_array.max()
     image_array = (image_array - min_intensity) / (max_intensity - min_intensity)
@@ -407,9 +395,7 @@ def get_single_label_image(
     min_intensity: int | float = 0,
     max_intensity: int | float = 255,
 ) -> np.ndarray:
-    """
-    Get the region of interest from the image url
-    """
+    """Get the region of interest from the image url."""
     fractal_token = get_fractal_token()
     image_array = _get_image_array(
         image_url=image_url,

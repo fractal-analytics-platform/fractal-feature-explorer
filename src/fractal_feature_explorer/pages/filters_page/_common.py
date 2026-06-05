@@ -15,7 +15,5 @@ class FeatureFrame:
         return ["image_url", "reference_label", "label"]
 
     def all_columns(self) -> list[str]:
-        """
-        Get all columns in the feature table.
-        """
+        """Get all columns in the feature table."""
         return self.features + self.cathegorical + self.others

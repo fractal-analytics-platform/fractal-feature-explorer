@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import polars as pl
 import streamlit as st
 from pydantic import BaseModel, ConfigDict
+from streamlit.logger import get_logger
 
 from fractal_feature_explorer.pages.filters_page._common import FeatureFrame
 from fractal_feature_explorer.utils.st_components import (
@@ -10,7 +11,6 @@ from fractal_feature_explorer.utils.st_components import (
     number_input_component,
     selectbox_component,
 )
-from streamlit.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -25,9 +25,7 @@ class HistogramFilter(BaseModel):
     )
 
     def apply(self, feature_frame: FeatureFrame) -> FeatureFrame:
-        """
-        Filter the feature frame using the histogram filter
-        """
+        """Filter the feature frame using the histogram filter."""
         filtered_table = feature_frame.table.filter(
             (pl.col(self.column) >= self.min) & (pl.col(self.column) <= self.max)
         )
@@ -44,9 +42,8 @@ def histogram_filter_component(
     key: str,
     feature_frame: FeatureFrame,
 ) -> FeatureFrame:
-    """
-    Create a histogram filter for the feature frame
-    And return the filtered feature frame
+    """Create a histogram filter for the feature frame
+    And return the filtered feature frame.
     """
     if len(feature_frame.features) == 0:
         error_msg = "No features found in the feature table."
@@ -83,11 +80,11 @@ def histogram_filter_component(
     filtered_values = values[np.logical_and(values >= min_filter, values <= max_filter)]
     # original
 
-    common_bins = dict(
-        start=origin_min,
-        end=origin_max,
-        size=(origin_max - origin_min) / num_bins,
-    )
+    common_bins = {
+        "start": origin_min,
+        "end": origin_max,
+        "size": (origin_max - origin_min) / num_bins,
+    }
 
     original_histo = go.Histogram(
         x=values,
@@ -101,7 +98,10 @@ def histogram_filter_component(
         name="Filtered",
         opacity=1,
         xbins=common_bins,
-        marker=dict(color="rgba(255, 127, 14, 0.5)", line=dict(color="black", width=1)),
+        marker={
+            "color": "rgba(255, 127, 14, 0.5)",
+            "line": {"color": "black", "width": 1},
+        },
     )
     fig = go.Figure()
     fig.add_trace(original_histo)
