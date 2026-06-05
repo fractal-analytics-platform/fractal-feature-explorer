@@ -10,6 +10,7 @@
 - Remove interactivity from local configuration.
 - Remove obsolete references to `psrecord`.
 - Add `ruff` formatting to precommit.
+- Use `st.context.cookies` rather than `headers`.
 
 ## v0.1.17
 

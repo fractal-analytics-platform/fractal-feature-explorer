@@ -26,19 +26,11 @@ def _verify_authentication(config: ProductionConfig):
         logger.info("Proceed with user authentication.")
         # Extract cookie and token from browser
         try:
-            cookie = next(
-                _cookie.strip()
-                for _cookie in st.context.headers["cookie"].split(";")
-                if _cookie.strip().startswith(config.fractal_cookie_name)
-            )
-            token = cookie.split("=")[1]
-        except StopIteration as exc1:
-            msg = "Could not find the expected cookie."
+            token = st.context.cookies[config.fractal_cookie_name]
+        except Exception as e:
+            msg = f"Could not find the expected {config.fractal_cookie_name} cookie."
             logger.info(msg)
-            raise ValueError(msg) from exc1
-        except IndexError as exc2:
-            msg = "Invalid cookie."
-            raise ValueError(msg) from exc2
+            raise ValueError(msg) from e
         # Get user information from Fractal backend
         logger.info("Now obtain user information.")
         current_user_url = f"{config.fractal_backend_url}/auth/current-user/"
