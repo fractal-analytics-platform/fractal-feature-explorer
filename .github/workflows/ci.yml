@@ -45,7 +45,7 @@ jobs:
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
-      - run: uv sync --extra dev --frozen
+      - run: uv sync --frozen --all-extras
       - run: uv run pytest -v
 
   deploy-pypi:
