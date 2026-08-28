@@ -4,8 +4,10 @@ TODO This is just a placeholder for the app testing. TBD what to test.
 
 """
 
-from streamlit.testing.v1 import AppTest
 from pathlib import Path
+
+from streamlit.testing.v1 import AppTest
+
 import fractal_feature_explorer
 
 
