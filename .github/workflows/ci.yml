@@ -29,34 +29,27 @@ jobs:
       - run: pipx run check-manifest
 
   test:
-    name: ${{ matrix.platform }}
+    name: ${{ matrix.platform }} / ${{ matrix.python-version }}
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
-
-      - uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
-            cache: true
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --frozen --all-extras
+      - run: uv run pytest -v
 
-      - name: Run Tests
-        run: pixi run -e test pytest
-
-      - name: Coverage
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: /home/runner/work/fractal-feature-explorer/fractal-feature-explorer/coverage.xml
-
-  deploy:
-    name: Deploy
+  deploy-pypi:
+    name: Publish to PyPI
     needs: test
     if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name != 'schedule'
     runs-on: ubuntu-latest
@@ -70,21 +63,102 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
-          python-version: "3.x"
+          version: "0.12.5"
+          enable-cache: false
+          python-version: "3.12"
+      - run: uv sync --frozen
+      - run: uv build
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
-      - name: Build
-        run: |
-          python -m pip install build
-          python -m build
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
+  github-release-create-draft:
+    needs: test
+    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - run: gh release create "${GH_REF_NAME}" --draft --title "${GH_REF_NAME}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REF_NAME: ${{ github.ref_name }}
 
-      - run: gh release create "${GH_REF_NAME}" --title "${GH_REF_NAME}" ./dist/*
+  github-release-build-wheel-file:
+    needs: github-release-create-draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.5"
+          enable-cache: false
+          python-version: "3.12"
+      - run: uv sync --frozen
+      - run: uv build --verbose
+      - run: gh release upload "${GH_REF_NAME}" dist/*.whl
+        env:
+          GH_REF_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+
+  github-release-build-pylock-files:
+    needs: github-release-create-draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        python-version: [skip]
+        python-version-underscore: [skip]
+
+        include:
+          - python-version: "3.12"
+            python-version-underscore: "3_12"
+          - python-version: "3.13"
+            python-version-underscore: "3_13"
+          - python-version: "3.14"
+            python-version-underscore: "3_14"
+        exclude:
+          - python-version: "skip"
+            python-version-underscore: "skip"
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.5"
+          enable-cache: false
+          python-version: ${{ matrix.python-version }}
+      # Build and upload a pylock file for each Python version
+      - run: uv export --frozen --format pylock.toml --no-extra dev --no-emit-project --output-file "$PYLOCK_FILENAME"
+        env:
+          PYLOCK_FILENAME: "pylock.prod-${{ matrix.python-version-underscore }}.toml"
+      - run: gh release upload "${GH_REF_NAME}" "$PYLOCK_FILENAME"
+        env:
+          GH_REF_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+          PYLOCK_FILENAME: "pylock.prod-${{ matrix.python-version-underscore }}.toml"
+
+  github-release-deploy:
+    needs: [github-release-build-wheel-file, github-release-build-pylock-files]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - run: gh release edit "${GH_REF_NAME}" --draft=false
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REF_NAME: ${{ github.ref_name }}

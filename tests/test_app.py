@@ -4,14 +4,20 @@ TODO This is just a placeholder for the app testing. TBD what to test.
 
 """
 
+from pathlib import Path
+
 from streamlit.testing.v1 import AppTest
+
+import fractal_feature_explorer
 
 
 def test_app():
     """
     Basic Workflow Test for the Fractal Feature Explorer App.
     """
-    app = AppTest.from_file("src/fractal_feature_explorer/main.py")
+    app = AppTest.from_file(
+        Path(fractal_feature_explorer.__file__).parent / "main.py"
+    )
     app.run(timeout=15)
 
     assert not app.exception, app.exception._list[0].stack_trace[0]

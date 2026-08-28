@@ -9,7 +9,7 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: check-added-large-files
-        exclude: "pixi\\.lock"
+        exclude: "uv\\.lock"
       - id: check-case-conflict
 
   - repo: https://github.com/abravalheri/validate-pyproject
@@ -23,3 +23,8 @@ repos:
       - id: ruff
         args: [--fix]  # may also add '--unsafe-fixes'
       - id: ruff-format
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.5
+    hooks:
+      - id: uv-lock
+
