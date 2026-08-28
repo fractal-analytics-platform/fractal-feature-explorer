@@ -29,7 +29,7 @@ jobs:
       - run: pipx run check-manifest
 
   test:
-    name: ${{ matrix.platform }}
+    name: ${{ matrix.platform }} / ${{ matrix.python-version }}
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
