@@ -48,7 +48,7 @@ jobs:
           enable-cache: false
           python-version: ${{ matrix.python-version }}
 
-      - run: uv sync --extra devs
+      - run: uv sync --extra dev
 
       - run: uv run pytest
 
