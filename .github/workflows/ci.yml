@@ -70,7 +70,7 @@ jobs:
           python-version: "3.12"
       - run: uv sync --frozen
       - run: uv build
-      - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
 
   github-release-create-draft:
@@ -149,6 +149,7 @@ jobs:
           GH_REF_NAME: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
           PYLOCK_FILENAME: "pylock.prod-${{ matrix.python-version-underscore }}.toml"
+
   github-release-deploy:
     needs: [github-release-build-wheel-file, github-release-build-pylock-files]
     runs-on: ubuntu-latest
