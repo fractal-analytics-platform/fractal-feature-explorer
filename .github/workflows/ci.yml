@@ -94,6 +94,29 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REF_NAME: ${{ github.ref_name }}
 
+  github-release-build-wheel-file:
+    needs: github-release-create-draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.5"
+          enable-cache: false
+          python-version: "3.13"
+      # Build and upload the wheel file only for a single Python version
+      - run: uv build --verbose
+      - run: gh release upload "${GH_REF_NAME}" "dist/$WHEEL_FILENAME"
+        env:
+          GH_REF_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+          WHEEL_FILENAME: "fractal_server-${{ github.ref_name }}-py3-none-any.whl"
+
   github-release-build-pylock-files:
     needs: github-release-create-draft
     runs-on: ubuntu-latest
@@ -143,7 +166,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PYLOCK_FILENAME: "pylock.prod-${{ matrix.python-version-underscore }}.toml"
   github-release-deploy:
-    needs: [github-release-build-pylock-files]
+    needs: [github-release-build-wheel-file, github-release-build-pylock-files]
     runs-on: ubuntu-latest
     permissions:
       contents: write
