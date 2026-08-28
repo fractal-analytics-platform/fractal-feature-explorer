@@ -23,3 +23,8 @@ repos:
       - id: ruff
         args: [--fix]  # may also add '--unsafe-fixes'
       - id: ruff-format
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.5
+    hooks:
+      - id: uv-lock
+
