@@ -2,6 +2,7 @@
 
 - Support python3.14.
 - Move from `pixi` to `uv` for development.
+- Publish pylock files for dependencies in GitHub releases.
 
 ## v0.1.18
 
