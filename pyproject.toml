@@ -37,9 +37,9 @@ dev = [
     "pre-commit",
     "ruff",
     "watchdog",
+    "pytest",
+    "pytest-cov",
 ]
-
-test = ["pytest", "pytest-cov", "devtools"]
 
 
 [project.scripts]
