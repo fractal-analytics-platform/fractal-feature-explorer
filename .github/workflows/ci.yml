@@ -134,7 +134,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           WHEEL_FILENAME: "fractal_server-${{ github.ref_name }}-py3-none-any.whl"
       # Build and upload a pylock file for each Python version
-      - run: uv export --frozen --format pylock.toml --no-group dev --no-group docs --no-emit-project --output-file "$PYLOCK_FILENAME"
+      - run: uv export --frozen --format pylock.toml --no-extra dev --no-emit-project --output-file "$PYLOCK_FILENAME"
         env:
           PYLOCK_FILENAME: "pylock.prod-${{ matrix.python-version-underscore }}.toml"
       - run: gh release upload "${GH_REF_NAME}" "$PYLOCK_FILENAME"
