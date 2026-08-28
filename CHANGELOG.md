@@ -1,3 +1,8 @@
+## v0.1.19
+
+- Support python3.14.
+- Move from `pixi` to `uv` for development.
+
 ## v0.1.18
 
 - Bump streamlit to 1.58.
