@@ -41,14 +41,11 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
-
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
-
       - run: uv sync --extra dev
-
       - run: uv run pytest -v
 
   deploy-pypi:
@@ -66,16 +63,11 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: "3.12"
-
-      - name: Build
-        run: |
-          python -m pip install build
-          python -m build
-
+      - run: uv sync
+      - run: uv build
       - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
 
 
@@ -108,8 +100,8 @@ jobs:
         with:
           version: "0.12.5"
           enable-cache: false
-          python-version: "3.13"
-      # Build and upload the wheel file only for a single Python version
+          python-version: "3.12"
+      - run: uv sync
       - run: uv build --verbose
       - run: gh release upload "${GH_REF_NAME}" "dist/$WHEEL_FILENAME"
         env:
