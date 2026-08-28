@@ -3,6 +3,7 @@
 - Support python3.14.
 - Move from `pixi` to `uv` for development.
 - Publish pylock files for dependencies in GitHub releases.
+- Bump streamlit to 1.62.
 
 ## v0.1.18
 
