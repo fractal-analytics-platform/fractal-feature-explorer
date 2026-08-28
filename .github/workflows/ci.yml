@@ -45,7 +45,7 @@ jobs:
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
-      - run: uv sync --extra dev
+      - run: uv sync --extra dev --frozen
       - run: uv run pytest -v
 
   deploy-pypi:
@@ -68,7 +68,7 @@ jobs:
           version: "0.12.5"
           enable-cache: false
           python-version: "3.12"
-      - run: uv sync
+      - run: uv sync --frozen
       - run: uv build
       - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
 
@@ -102,7 +102,7 @@ jobs:
           version: "0.12.5"
           enable-cache: false
           python-version: "3.12"
-      - run: uv sync
+      - run: uv sync --frozen
       - run: uv build --verbose
       - run: gh release upload "${GH_REF_NAME}" "dist/$WHEEL_FILENAME"
         env:
