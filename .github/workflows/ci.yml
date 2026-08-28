@@ -104,11 +104,10 @@ jobs:
           python-version: "3.12"
       - run: uv sync --frozen
       - run: uv build --verbose
-      - run: gh release upload "${GH_REF_NAME}" "dist/$WHEEL_FILENAME"
+      - run: gh release upload "${GH_REF_NAME}" dist/*.whl
         env:
           GH_REF_NAME: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
-          WHEEL_FILENAME: "fractal_feature_explorer-${{ github.ref_name }}-py3-none-any.whl"
 
   github-release-build-pylock-files:
     needs: github-release-create-draft
