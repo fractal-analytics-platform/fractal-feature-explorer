@@ -41,12 +41,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
-            cache: true
+          version: "0.11.14"
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
 
       - name: Run Tests
-        run: pixi run -e test pytest
+        run: uv run pytest
 
       - name: Coverage
         if: ${{ matrix.platform == 'ubuntu-latest' }}

@@ -1,7 +1,5 @@
-
-# pixi environments
-.pixi
 *.egg-info
+.venv
 
 # Python
 __pycache__/

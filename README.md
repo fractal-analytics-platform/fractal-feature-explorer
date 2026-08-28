@@ -15,17 +15,17 @@ Examples:
 
 1. Via [`uvx`](https://docs.astral.sh/uv/guides/tools/#running-tools):
 ```bash
-pipx run --spec fractal-feature-explorer explorer
+uvx --from fractal-feature-explorer explorer
 ```
 2. Via [`pipx`](https://pipx.pypa.io/stable/):
 ```bash
-uvx --from fractal-feature-explorer explorer
+pipx run --spec fractal-feature-explorer explorer
 ```
-3. Via [`pixi`](pixi.prefix.dev):
+3. Via [`uv`](https://docs.astral.sh/uv):
 ```bash
 git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
 cd fractal-feature-explorer
-pixi run explorer
+uv run explorer
 ```
 4. Via `venv`+`pip`:
 ```bash
@@ -67,11 +67,12 @@ Configuration-file examples:
 ```bash
 # Clone this repository
 git clone https://github.com/fractal-analytics-platform/fractal-feature-explorer.git
-# Install the project via pixi
-pixi install
+cd fractal-feature-explorer
+# Install the project via uv
+uv sync
 # Run the app
 export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/development-config.toml
-pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
+uv run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
 
 Note that this [development-config.toml](./example-config-files/development-config.toml) simulates a production deployment and thus it requires Fractal services running locally on a given set of ports (`fractal-server` on port 8000, `fractal-web` on port 5173, `fractal-data` on port 3000).
@@ -79,10 +80,8 @@ Note that this [development-config.toml](./example-config-files/development-conf
 If you do not need all of this, run via
 ```bash
 export FRACTAL_FEATURE_EXPLORER_CONFIG=./example-config-files/local-config.toml
-pixi run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
+uv run uvicorn fractal_feature_explorer.app:app --host 0.0.0.0 --port 8501
 ```
-
-
 
 ## Change log
 

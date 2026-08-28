@@ -54,21 +54,6 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "vcs"
 
-
-[tool.pixi.workspace]
-channels = ["conda-forge"]
-platforms = ["osx-arm64", "linux-64", "win-64"]
-
-[tool.pixi.pypi-dependencies]
-fractal_feature_explorer = { path = ".", editable = true }
-# ngio = { path = "../ngio", editable = true }
-
-
-[tool.pixi.environments]
-default = { solve-group = "default" }
-dev = { features = ["dev"], solve-group = "dev" }
-test = { features = ["test"], solve-group = "test" }
-
 [tool.ruff.lint]
 select = [
     "E",    # style errors
