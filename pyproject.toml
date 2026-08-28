@@ -39,7 +39,6 @@ dev = [
     "ruff",
     "watchdog",
     "pytest",
-    "pytest-cov",
 ]
 
 
