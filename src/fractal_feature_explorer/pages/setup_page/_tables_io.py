@@ -2,7 +2,11 @@ from typing import Literal
 
 import polars as pl
 import streamlit as st
-from ngio.images._table_ops import concatenate_image_tables, list_image_tables
+from ngio.images._table_ops import (
+    concatenate_image_tables,
+    concatenate_image_tables_as,
+    list_image_tables,
+)
 from ngio.tables import FeatureTable
 from streamlit.logger import get_logger
 
@@ -275,12 +279,12 @@ def _collect_feature_table_from_images_cached(
     extras = [extras_from_url(url) for url in list_urls]
     # For more efficient loading, we should reimplement this
     # using the streamlit caches
-    feature_table = concatenate_image_tables(
+    feature_table = concatenate_image_tables_as(
         images=images,
         extras=extras,
         name=table_name,
-        table_cls=FeatureTable,
         mode="lazy",
+        table_cls=FeatureTable,
         max_workers="auto",
     )
     feature_df = feature_table.lazy_frame.collect()
