@@ -1,13 +1,8 @@
-import asyncio
 from typing import Literal
 
 import polars as pl
 import streamlit as st
-from ngio.images._table_ops import (
-    concatenate_image_tables_as_async,
-    concatenate_image_tables_async,
-    list_image_tables_async,
-)
+from ngio.images._table_ops import concatenate_image_tables, list_image_tables
 from ngio.tables import FeatureTable
 from streamlit.logger import get_logger
 
@@ -77,8 +72,11 @@ def list_images_tables(
     """Collect existing image tables from the plate URLs."""
     images_urls = plate_setup_df["image_url"].unique().to_list()
     images = [get_ome_zarr_container(url, mode="plate") for url in images_urls]
-    images_condition_tables = asyncio.run(
-        list_image_tables_async(images=images, filter_types=filter_types, mode=mode)
+    images_condition_tables = list_image_tables(
+        images=images,
+        filter_types=filter_types,
+        mode=mode,
+        max_workers="auto",
     )
     if mode == "all":
         logger.info(f"List of image level tables: {images_condition_tables}")
@@ -153,12 +151,11 @@ def _collect_condition_table_from_images_cached(
     extras = [extras_from_url(url) for url in list_urls]
     # For more efficient loading, we should reimplement this
     # using the streamlit caches
-    condition_table = asyncio.run(
-        concatenate_image_tables_async(
-            images=images,
-            extras=extras,
-            name=table_name,
-        )
+    condition_table = concatenate_image_tables(
+        images=images,
+        extras=extras,
+        name=table_name,
+        max_workers="auto",
     )
     condition_table = condition_table.lazy_frame.collect()
     if mode == "plate":
@@ -278,14 +275,13 @@ def _collect_feature_table_from_images_cached(
     extras = [extras_from_url(url) for url in list_urls]
     # For more efficient loading, we should reimplement this
     # using the streamlit caches
-    feature_table = asyncio.run(
-        concatenate_image_tables_as_async(
-            images=images,
-            extras=extras,
-            name=table_name,
-            table_cls=FeatureTable,
-            mode="lazy",
-        )
+    feature_table = concatenate_image_tables(
+        images=images,
+        extras=extras,
+        name=table_name,
+        table_cls=FeatureTable,
+        mode="lazy",
+        max_workers="auto",
     )
     feature_df = feature_table.lazy_frame.collect()
     if mode == "plate":
