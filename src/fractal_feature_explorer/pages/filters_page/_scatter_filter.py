@@ -52,7 +52,7 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
         _show_point_info(point_dict)
         return
 
-    channels = container.channel_labels
+    channels = container.channel_labels  # FIXME for ngio v1?
     if len(channels) > 1:
         channel_sel = st.selectbox(
             label="Select channel",
@@ -102,7 +102,7 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
 
         level_path = st.selectbox(
             label="Select Level",
-            options=container.levels_paths,
+            options=container.level_paths,
             index=0,
             help="Select the level to display",
         )
