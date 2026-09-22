@@ -52,7 +52,7 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
         _show_point_info(point_dict)
         return
 
-    channels = container.channel_labels  # FIXME for ngio v1?
+    channels = container.channel_labels
     if len(channels) > 1:
         channel_sel = st.selectbox(
             label="Select channel",
