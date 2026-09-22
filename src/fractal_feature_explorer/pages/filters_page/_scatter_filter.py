@@ -102,7 +102,7 @@ def view_point(point: int, feature_df: pl.DataFrame) -> None:
 
         level_path = st.selectbox(
             label="Select Level",
-            options=container.levels_paths,
+            options=container.level_paths,
             index=0,
             help="Select the level to display",
         )

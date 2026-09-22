@@ -1,4 +1,3 @@
-import asyncio
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Literal
@@ -16,7 +15,7 @@ from ngio import (
 )
 from ngio.common import Dimensions, Roi
 from ngio.common._zoom import numpy_zoom
-from ngio.images._table_ops import list_image_tables_async
+from ngio.images._table_ops import list_image_tables
 from ngio.ome_zarr_meta.ngio_specs import PixelSize
 from ngio.tables import MaskingRoiTable
 from ngio.utils import NgioValueError, fractal_fsspec_store
@@ -182,7 +181,7 @@ def _get_ome_zarr_container_in_plate(
     *_plate_url, row, col, path_in_well = url.split("/")
     plate_url = "/".join(_plate_url)
     plate = _get_ome_zarr_plate(plate_url, fractal_token=fractal_token)
-    images = asyncio.run(plate.get_images_async())
+    images = plate.get_images(max_workers="auto")
     path = f"{row}/{col}/{path_in_well}"
     return images[path]
 
@@ -210,31 +209,18 @@ def get_ome_zarr_container(
 
 
 @st_cache_data_wrapper
-def _list_image_tables(
-    urls: list[str],
-    fractal_token: str | None = None,
-    mode: Literal["image", "plate"] = "image",
-) -> list[str]:
-    images = [
-        _get_ome_zarr_container(url, fractal_token=fractal_token, mode=mode)
-        for url in urls
-    ]
-    image_list = asyncio.run(list_image_tables_async(images))
-    return image_list
-
-
-@st_cache_data_wrapper
-def list_image_tables(
+def list_image_tables_cached(
     urls: list[str],
     fractal_token: str | None = None,
     mode: Literal["image", "plate"] = "image",
 ) -> list[str]:
     fractal_token = get_fractal_token()
-    return _list_image_tables(
-        urls=urls,
-        fractal_token=fractal_token,
-        mode=mode,
-    )
+    images = [
+        _get_ome_zarr_container(url, fractal_token=fractal_token, mode=mode)
+        for url in urls
+    ]
+    image_list = list_image_tables(images, max_workers="auto")
+    return image_list
 
 
 def roi_to_slice_kwargs(

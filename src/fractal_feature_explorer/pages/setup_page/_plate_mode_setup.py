@@ -1,5 +1,3 @@
-import asyncio
-
 import polars as pl
 import streamlit as st
 from streamlit.logger import get_logger
@@ -71,7 +69,7 @@ def build_plate_setup_df(plate_urls: list[str]) -> pl.DataFrame:
         if plate_url is None:
             continue
         plate = get_ome_zarr_plate(plate_url)
-        images_paths = asyncio.run(plate.images_paths_async())
+        images_paths = plate.images_paths()
         for path_in_plate in images_paths:
             image_url = f"{plate_url}/{path_in_plate}"
             image_url = sanify_and_validate_url(image_url)
