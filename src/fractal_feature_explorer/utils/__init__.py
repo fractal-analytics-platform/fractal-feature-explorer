@@ -10,7 +10,7 @@ from fractal_feature_explorer.utils.ngio_io_caches import (
     get_ome_zarr_plate,
     get_single_label_image,
     is_http_url,
-    list_image_tables,
+    list_image_tables_cached,
 )
 from fractal_feature_explorer.utils.st_components import (
     double_slider_component,
@@ -32,7 +32,7 @@ __all__ = [
     "get_single_label_image",
     "invalidate_session_state",
     "is_http_url",
-    "list_image_tables",
+    "list_image_tables_cached",
     "multiselect_component",
     "number_input_component",
     "pills_component",
