@@ -1,6 +1,7 @@
 ## v0.1.20
 
 - Bump ngio to 1.1.
+- Bump streamlit to 1.65.
 
 ## v0.1.19
 
