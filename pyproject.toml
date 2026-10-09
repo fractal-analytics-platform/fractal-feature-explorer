@@ -1,7 +1,7 @@
 [project]
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
 dependencies = [
-    "streamlit>=1.62.0, <1.63.0",
+    "streamlit>=1.65.0, <1.66.0",
     "ngio>=1.1.0, <1.2.0",
     "plotly",
     "matplotlib",
