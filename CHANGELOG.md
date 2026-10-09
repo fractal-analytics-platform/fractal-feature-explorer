@@ -1,3 +1,7 @@
+## v0.1.20
+
+- Bump ngio to 1.1.
+
 ## v0.1.19
 
 - Support python3.14.
