@@ -35,7 +35,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.12", "3.13", "3.14"]
+        python-version: ["3.12", "3.13", "3.14", "3.15"]
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -43,6 +43,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: "latest-known"
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync --frozen --all-extras
@@ -65,9 +66,9 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          version: "0.12.5"
+          version: "latest-known"
           enable-cache: false
-          python-version: "3.12"
+          python-version: "3.14"
       - run: uv sync --frozen
       - run: uv build
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
@@ -99,9 +100,9 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          version: "0.12.5"
+          version: "latest-known"
           enable-cache: false
-          python-version: "3.12"
+          python-version: "3.14"
       - run: uv sync --frozen
       - run: uv build --verbose
       - run: gh release upload "${GH_REF_NAME}" dist/*.whl
@@ -126,6 +127,8 @@ jobs:
             python-version-underscore: "3_13"
           - python-version: "3.14"
             python-version-underscore: "3_14"
+          - python-version: "3.15"
+            python-version-underscore: "3_15"
         exclude:
           - python-version: "skip"
             python-version-underscore: "skip"
@@ -136,7 +139,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          version: "0.12.5"
+          version: "latest-known"
           enable-cache: false
           python-version: ${{ matrix.python-version }}
       # Build and upload a pylock file for each Python version
