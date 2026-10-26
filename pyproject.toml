@@ -1,7 +1,7 @@
 [project]
 authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
 dependencies = [
-    "streamlit>=1.65.0, <1.66.0",
+    "streamlit>=1.66.0, <1.67.0",
     "ngio>=1.1.0, <1.2.0",
     "plotly",
     "matplotlib",
@@ -9,6 +9,7 @@ dependencies = [
     "rich",
     "urllib3",
     "secure >=2.0.1, <2.1.0",
+    "tomli_w >=1.2.0, <1.3.0",
 ]
 name = "fractal-feature-explorer"
 requires-python = ">=3.12,<3.15"
