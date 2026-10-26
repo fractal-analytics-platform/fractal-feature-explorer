@@ -75,7 +75,7 @@ def get_config() -> LocalConfig | ProductionConfig:
         config = LocalConfig(deployment_type="local", allow_local_paths=True)
         config_path.parent.mkdir(parents=True, exist_ok=True)
         with config_path.open("wb") as f:
-            tomli_w.dump(config.model_dump(), f)
+            tomli_w.dump(config.model_dump(exclude_none=True), f)
         logger.info(f"Default configuration saved to {config_path.as_posix()}.")
 
     logger.debug(f"{config=}")
