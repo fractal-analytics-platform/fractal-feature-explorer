@@ -54,7 +54,7 @@ def get_config() -> LocalConfig | ProductionConfig:
     )
 
     if config_path.exists():
-        with open(config_path) as f:
+        with open(config_path, "rb") as f:
             config_data = tomllib.load(f)
         deployment_type = config_data.get("deployment_type", None)
         if deployment_type == "local":
@@ -74,7 +74,7 @@ def get_config() -> LocalConfig | ProductionConfig:
         logger.warning("Creating configuration file with default local configuration.")
         config = LocalConfig(deployment_type="local", allow_local_paths=True)
         config_path.parent.mkdir(parents=True, exist_ok=True)
-        with config_path.open("w") as f:
+        with config_path.open("wb") as f:
             tomli_w.dump(config.model_dump(), f)
         logger.info(f"Default configuration saved to {config_path.as_posix()}.")
 
