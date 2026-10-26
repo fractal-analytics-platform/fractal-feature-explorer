@@ -1,3 +1,7 @@
+## v0.1.21
+
+- Bump lockfile (ref https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2).
+
 ## v0.1.20
 
 - Bump ngio to 1.1.
