@@ -1,3 +1,10 @@
+## v0.1.22 (unreleased)
+
+- Bump streamlit to 1.66.
+- Add `tomli-w` dependency.
+- Bump lockfile.
+
+
 ## v0.1.21
 
 - Bump lockfile (ref https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2).
